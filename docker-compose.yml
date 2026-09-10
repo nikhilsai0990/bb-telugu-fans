@@ -1,0 +1,75 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: bb-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: bb_admin
+      POSTGRES_PASSWORD: SuperSecurePassword2026!
+      POSTGRES_DB: bbtelugufans
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/src/database/schema.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bb_admin -d bbtelugufans"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: bb-redis
+    restart: always
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: bb-api
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      DATABASE_URL: postgresql://bb_admin:SuperSecurePassword2026!@postgres:5432/bbtelugufans?schema=public
+      REDIS_URL: redis://redis:6379/0
+      MAX_VOTES_PER_IP: 50
+    ports:
+      - "4000:4000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  web:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: bb-web
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: 9000
+      NEXT_PUBLIC_API_URL: http://api:4000/api/v1
+    ports:
+      - "9000:9000"
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:
+  redis_data:

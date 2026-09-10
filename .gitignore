@@ -1,0 +1,38 @@
+# Environment Variables & Secrets
+.env
+.env.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
+.env.production
+.env.production.local
+.env.*.local
+*.env
+*.env.json
+.vercel
+
+# Dependencies
+node_modules/
+/.pnp
+.pnp.js
+
+# Build Outputs
+dist/
+.next/
+out/
+build/
+*.tsbuildinfo
+
+# Playwright & Tests
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# Logs & System
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+Thumbs.db
