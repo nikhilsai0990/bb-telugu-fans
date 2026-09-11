@@ -21,6 +21,9 @@ export interface Contestant {
   zone?: ContestantZone;
   isHighRiskZone?: boolean;
   isHighZone?: boolean;
+  isHousemate?: boolean;
+  isTaskWinner?: boolean;
+  taskTitle?: string;
   taskStatus?: TaskStatus;
   isEliminated?: boolean;
   eliminatedAt?: string;

@@ -10,11 +10,15 @@ import {
   ArrowLeft,
   Share2,
   Lock,
+  LogIn,
+  UserPlus,
 } from "lucide-react";
 import { Poll } from "../../../types";
 import { api } from "../../../lib/api";
+import { useAuth } from "../../../context/AuthContext";
 
 export function PollDetailClient({ initialPoll }: { initialPoll: Poll }) {
+  const { user, token } = useAuth();
   const [poll, setPoll] = useState<Poll>(initialPoll);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [voting, setVoting] = useState(false);
@@ -39,7 +43,7 @@ export function PollDetailClient({ initialPoll }: { initialPoll: Poll }) {
     // 2. Query backend voter status
     async function checkStatus() {
       try {
-        const status = await api.getVoteStatus(poll.id);
+        const status = await api.getVoteStatus(poll.id, token || undefined);
         if (status.hasVoted) {
           setHasVoted(true);
           if (status.optionId) setSelectedOption(status.optionId);
@@ -49,17 +53,16 @@ export function PollDetailClient({ initialPoll }: { initialPoll: Poll }) {
             const opt = poll.options.find((o) => o.id === status.optionId);
             if (opt) {
               setVotedContestantName(
-                opt.text.replace(/Save\s*/i, "").replace(/\s*\(RED TEAM\)/i, "").replace(/\s*\(BLUE TEAM\)/i, "").trim()
+                opt.text.replace(/Save\s*/i, "").replace(/\s*\([^)]*\)/i, "").trim()
               );
             }
           }
-        } else {
+        } else if (user) {
           setHasVoted(false);
           setSelectedOption(null);
           setVotedContestantName(null);
           if (typeof window !== "undefined") {
             localStorage.removeItem(`bb_voted_${poll.id}`);
-            localStorage.removeItem("bb_voted_poll-eviction-01");
           }
         }
       } catch (e) {
@@ -67,30 +70,36 @@ export function PollDetailClient({ initialPoll }: { initialPoll: Poll }) {
       }
     }
     checkStatus();
-  }, [poll.id]);
+  }, [poll.id, token, user]);
 
   const handleVote = async () => {
     if (!selectedOption || !poll || hasVoted) return;
+    if (!user) {
+      setMessage({ type: "error", text: "Authentication required to cast a vote. Please sign in or register." });
+      return;
+    }
     setVoting(true);
     setMessage(null);
 
     try {
-      const res = await api.vote(poll.id, selectedOption);
+      const res = await api.vote(poll.id, selectedOption, token || undefined);
       setHasVoted(true);
       const chosenName =
         res.contestantName ||
         (selectedItem
-          ? selectedItem.text.replace(/Save\s*/i, "").replace(/\s*\(RED TEAM\)/i, "").replace(/\s*\(BLUE TEAM\)/i, "").trim()
+          ? selectedItem.text.replace(/Save\s*/i, "").replace(/\s*\([^)]*\)/i, "").trim()
           : "your selected housemate");
       setVotedContestantName(chosenName);
       setMessage({ type: "success", text: res.message || "Your vote has been verified and recorded!" });
-      if (res.options) {
+      if (res.poll) {
+        setPoll(res.poll);
+      } else if (res.options) {
         setPoll((prev) => ({ ...prev, totalVotes: res.totalVotes, options: res.options }));
       }
     } catch (err: any) {
       if (err.message?.includes("ALREADY_VOTED") || err.error === "ALREADY_VOTED") {
         setHasVoted(true);
-        const status = await api.getVoteStatus(poll.id);
+        const status = await api.getVoteStatus(poll.id, token || undefined);
         if (status.contestantName) {
           setVotedContestantName(status.contestantName);
         }
@@ -111,6 +120,7 @@ export function PollDetailClient({ initialPoll }: { initialPoll: Poll }) {
   };
 
   const selectedItem = poll.options.find((o) => o.id === selectedOption);
+  const currentPath = typeof window !== "undefined" ? window.location.pathname : `/polls/${poll.id}`;
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 space-y-8">
@@ -130,14 +140,14 @@ export function PollDetailClient({ initialPoll }: { initialPoll: Poll }) {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/[0.08] pb-5">
           <div className="space-y-1">
             <div className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-zinc-400">
-              <span className="w-2 h-2 rounded-full bg-team-red" />
+              <span className="w-2 h-2 rounded-full bg-bb-gold animate-pulse" />
               <span>OFFICIAL FAN BALLOT &bull; WEEK 1</span>
             </div>
             <h1 className="font-display text-4xl sm:text-5xl uppercase tracking-tight text-white leading-none">
               {poll.title}
             </h1>
             <p className="text-xs sm:text-sm text-zinc-300 max-w-xl leading-relaxed pt-1">
-              {poll.description}
+              14 active housemates are nominated for eviction (Charan and Chaitra Rai eliminated). Cast your verified fan vote to save your favorite housemate (1 vote per user per day).
             </p>
           </div>
 
@@ -155,6 +165,37 @@ export function PollDetailClient({ initialPoll }: { initialPoll: Poll }) {
           </div>
         </div>
 
+        {/* Authentication Prompt for Non-Logged-In Users */}
+        {!user && (
+          <div data-testid="auth-prompt" className="p-4 sm:p-5 rounded-lg bg-zinc-900/90 border border-bb-gold/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-lg">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2 text-bb-gold font-bold text-sm uppercase tracking-wider">
+                <Lock className="w-4 h-4 text-bb-gold flex-shrink-0" />
+                <span>SIGN IN OR SIGN UP TO VOTE</span>
+              </div>
+              <p className="text-xs text-zinc-300">
+                Voting requires a verified fan account. Sign in or create a free account to cast your 1 vote per day.
+              </p>
+            </div>
+            <div className="flex items-center gap-3 flex-shrink-0">
+              <Link
+                href={`/login?redirect=${encodeURIComponent(currentPath)}`}
+                className="px-4 py-2 rounded font-bold text-xs uppercase tracking-wider bg-bb-gold text-black hover:bg-bb-gold-light transition-all flex items-center gap-1.5 shadow"
+              >
+                <LogIn className="w-4 h-4" />
+                <span>Sign In</span>
+              </Link>
+              <Link
+                href={`/register?redirect=${encodeURIComponent(currentPath)}`}
+                className="px-4 py-2 rounded font-bold text-xs uppercase tracking-wider bg-white/[0.08] hover:bg-white/[0.15] text-white border border-white/20 transition-all flex items-center gap-1.5"
+              >
+                <UserPlus className="w-4 h-4" />
+                <span>Sign Up</span>
+              </Link>
+            </div>
+          </div>
+        )}
+
         {/* Alerts & Duplicate Vote Banner */}
         {hasVoted && (
           <div className="p-4 sm:p-5 rounded-lg bg-emerald-950/40 border-2 border-emerald-500/50 flex items-start gap-3.5 text-emerald-300 shadow-md">
@@ -164,7 +205,7 @@ export function PollDetailClient({ initialPoll }: { initialPoll: Poll }) {
                 ✓ YOUR VOTE IS ALREADY CAST
               </div>
               <p className="text-sm text-zinc-200 font-medium">
-                You voted for <span className="text-white font-bold">{votedContestantName || (selectedItem ? selectedItem.text.replace(/Save\s*/i, "").replace(/\s*\(RED TEAM\)/i, "").replace(/\s*\(BLUE TEAM\)/i, "").trim() : "your selected housemate")}</span>.
+                You voted for <span className="text-white font-bold">{votedContestantName || (selectedItem ? selectedItem.text.replace(/Save\s*/i, "").replace(/\s*\([^)]*\)/i, "").trim() : "your selected housemate")}</span>.
               </p>
             </div>
           </div>
@@ -187,24 +228,26 @@ export function PollDetailClient({ initialPoll }: { initialPoll: Poll }) {
           </div>
         )}
 
-        {/* Candidate Options (15 Active Nominated Housemates) */}
+        {/* Candidate Options (14 Active Nominated Housemates) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
           {poll.options.map((option) => {
             const isSelected = selectedOption === option.id;
-            const isRed = option.text.toUpperCase().includes("RED") || option.team === "RED";
             const isHighRisk =
-              (option.zone === "HIGH_RISK" ||
-                option.isHighRiskZone ||
-                option.text.toUpperCase().includes("CHAITRA") ||
-                option.text.toUpperCase().includes("RAM PRASAD") ||
-                option.contestantId === "c-10" ||
-                option.contestantId === "c-02") &&
-              !option.text.toUpperCase().includes("AMAN") &&
-              !option.text.toUpperCase().includes("MUKESH") &&
-              !option.text.toUpperCase().includes("CHARAN") &&
-              option.contestantId !== "c-12" &&
-              option.contestantId !== "c-05" &&
-              option.contestantId !== "c-13";
+              option.zone === "HIGH_RISK" ||
+              option.isHighRiskZone ||
+              option.contestantId === "c-12" ||
+              option.contestantId === "c-09" ||
+              option.contestantId === "c-06" ||
+              option.text.toLowerCase().includes("aman") ||
+              option.text.toLowerCase().includes("sudheer") ||
+              option.text.toLowerCase().includes("varshini");
+
+            const cleanName = option.text
+              .replace(/Save\s*/i, "")
+              .replace(/\s*\(RED TEAM\)/i, "")
+              .replace(/\s*\(BLUE TEAM\)/i, "")
+              .replace(/\s*\([^)]*\)/i, "")
+              .trim();
 
             return (
               <div
@@ -214,9 +257,7 @@ export function PollDetailClient({ initialPoll }: { initialPoll: Poll }) {
                   hasVoted
                     ? "cursor-default bg-white/[0.02] border-white/[0.06]"
                     : isSelected
-                    ? isRed
-                      ? "bg-[#1C0E11] border-team-red ring-1 ring-team-red cursor-pointer"
-                      : "bg-[#0E1522] border-team-blue ring-1 ring-team-blue cursor-pointer"
+                    ? "bg-bb-gold/10 border-bb-gold ring-1 ring-bb-gold cursor-pointer"
                     : "bg-[#13141B] border-white/[0.07] hover:border-white/20 hover:bg-[#181923] cursor-pointer"
                 }`}
               >
@@ -225,7 +266,7 @@ export function PollDetailClient({ initialPoll }: { initialPoll: Poll }) {
                     {option.imageUrl ? (
                       <img
                         src={option.imageUrl}
-                        alt={option.text}
+                        alt={cleanName}
                         className="w-full h-full object-cover object-top"
                       />
                     ) : (
@@ -236,21 +277,12 @@ export function PollDetailClient({ initialPoll }: { initialPoll: Poll }) {
                   </div>
 
                   <div className="min-w-0 flex-1">
-                    <span
-                      className={`text-[9px] font-black uppercase px-1.5 py-0.2 rounded border ${
-                        isRed
-                          ? "bg-team-red/15 text-team-red border-team-red/30"
-                          : "bg-team-blue/15 text-team-blue border-team-blue/30"
-                      }`}
-                    >
-                      {isRed ? "Red Team" : "Blue Team"}
-                    </span>
-                    <h3 className="font-display text-lg uppercase tracking-wide text-white group-hover:text-bb-gold transition-colors leading-tight mt-1 truncate">
-                      {option.text.replace(/Save\s*/i, "").replace(/\s*\(RED TEAM\)/i, "").replace(/\s*\(BLUE TEAM\)/i, "")}
+                    <h3 className="font-display text-lg uppercase tracking-wide text-white group-hover:text-bb-gold transition-colors leading-tight truncate">
+                      {cleanName}
                     </h3>
                     {isHighRisk && (
-                      <span className="text-[9px] font-bold text-amber-300 uppercase block">
-                        HIGH RISK ZONE • ACTIVE
+                      <span className="text-[9px] font-bold text-amber-300 uppercase block mt-0.5">
+                        HIGH RISK ZONE
                       </span>
                     )}
                   </div>
@@ -264,13 +296,11 @@ export function PollDetailClient({ initialPoll }: { initialPoll: Poll }) {
                     <div
                       className={`w-4 h-4 rounded-full border flex items-center justify-center transition-colors ${
                         isSelected
-                          ? isRed
-                            ? "border-team-red bg-team-red"
-                            : "border-team-blue bg-team-blue"
+                          ? "border-bb-gold bg-bb-gold text-black"
                           : "border-white/20 group-hover:border-white/40"
                       }`}
                     >
-                      {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                      {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-black" />}
                     </div>
                   )}
                 </div>
@@ -283,28 +313,38 @@ export function PollDetailClient({ initialPoll }: { initialPoll: Poll }) {
         <div className="pt-4 border-t border-white/[0.08] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
           <div className="flex items-center gap-2 text-xs text-zinc-400">
             <ShieldCheck className="w-4 h-4 text-bb-gold flex-shrink-0" />
-            <span>Cryptographic voter device integrity active. 1 vote per user per day enforced.</span>
+            <span>Verified Fan Voting active. 1 authenticated vote per user per day enforced.</span>
           </div>
 
           {!hasVoted ? (
-            <button
-              onClick={handleVote}
-              disabled={!selectedOption || voting}
-              className={`px-8 py-3.5 rounded font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 ${
-                !selectedOption || voting
-                  ? "bg-white/[0.06] text-zinc-500 cursor-not-allowed border border-white/[0.08]"
-                  : "bg-team-red hover:bg-team-red-dark text-white shadow-lg active:scale-[0.99]"
-              }`}
-            >
-              <Vote className="w-4 h-4" />
-              <span>
-                {voting
-                  ? "Submitting Vote..."
-                  : selectedItem
-                  ? `Cast Vote to Save ${selectedItem.text.replace(/Save\s*/i, "").replace(/\s*\([^)]*\)/i, "")}`
-                  : "Select a Housemate to Cast Vote"}
-              </span>
-            </button>
+            user ? (
+              <button
+                onClick={handleVote}
+                disabled={!selectedOption || voting}
+                className={`px-8 py-3.5 rounded font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 ${
+                  !selectedOption || voting
+                    ? "bg-white/[0.06] text-zinc-500 cursor-not-allowed border border-white/[0.08]"
+                    : "bg-bb-gold hover:bg-bb-gold-light text-black shadow-lg active:scale-[0.99]"
+                }`}
+              >
+                <Vote className="w-4 h-4" />
+                <span>
+                  {voting
+                    ? "Submitting Vote..."
+                    : selectedItem
+                    ? `Cast Vote to Save ${selectedItem.text.replace(/Save\s*/i, "").replace(/\s*\([^)]*\)/i, "").trim()}`
+                    : "Select a Housemate to Cast Vote"}
+                </span>
+              </button>
+            ) : (
+              <Link
+                href={`/login?redirect=${encodeURIComponent(currentPath)}`}
+                className="px-8 py-3.5 rounded font-bold text-xs uppercase tracking-wider bg-bb-gold hover:bg-bb-gold-light text-black shadow-lg flex items-center justify-center gap-2"
+              >
+                <LogIn className="w-4 h-4" />
+                <span>Sign In to Cast Vote</span>
+              </Link>
+            )
           ) : (
             <button
               disabled
@@ -333,17 +373,17 @@ export function PollDetailClient({ initialPoll }: { initialPoll: Poll }) {
             </div>
           </div>
 
-          {/* All 15 Contestants with Name and Votes */}
+          {/* All 14 Active Contestants with Name and Votes */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
             {poll.options.map((option) => {
               const contestantName = option.text
                 .replace(/Save\s*/i, "")
                 .replace(/\s*\(RED TEAM\)/i, "")
                 .replace(/\s*\(BLUE TEAM\)/i, "")
+                .replace(/\s*\([^)]*\)/i, "")
                 .trim();
               const votes = option.votesCount || 0;
               const percentage = poll.totalVotes > 0 ? ((votes / poll.totalVotes) * 100).toFixed(1) : "0.0";
-              const isRed = option.text.toUpperCase().includes("RED") || option.team === "RED";
               const isVotedChoice = Boolean(
                 hasVoted &&
                   ((votedContestantName && contestantName.toLowerCase() === votedContestantName.toLowerCase()) ||
@@ -361,14 +401,8 @@ export function PollDetailClient({ initialPoll }: { initialPoll: Poll }) {
                 >
                   <div>
                     <div className="flex items-center justify-between gap-2">
-                      <span
-                        className={`text-[9px] font-black uppercase px-1.5 py-0.2 rounded border ${
-                          isRed
-                            ? "bg-team-red/15 text-team-red border-team-red/30"
-                            : "bg-team-blue/15 text-team-blue border-team-blue/30"
-                        }`}
-                      >
-                        {isRed ? "Red Team" : "Blue Team"}
+                      <span className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">
+                        Contestant
                       </span>
                       {isVotedChoice && (
                         <span className="text-[9px] font-bold uppercase px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
@@ -394,11 +428,7 @@ export function PollDetailClient({ initialPoll }: { initialPoll: Poll }) {
                     <div className="w-full h-1 bg-white/[0.06] rounded-full overflow-hidden">
                       <div
                         className={`h-full rounded-full transition-all duration-500 ${
-                          isVotedChoice
-                            ? "bg-emerald-400"
-                            : isRed
-                            ? "bg-team-red"
-                            : "bg-team-blue"
+                          isVotedChoice ? "bg-emerald-400" : "bg-bb-gold"
                         }`}
                         style={{ width: `${votes > 0 && poll.totalVotes > 0 ? Math.max(parseFloat(percentage), 4) : 0}%` }}
                       />

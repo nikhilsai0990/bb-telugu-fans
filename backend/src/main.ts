@@ -68,9 +68,30 @@ async function bootstrap() {
   // Cookie parser for secure HttpOnly cookie management (Section 25)
   app.use(cookieParser());
 
-  // CORS Configuration - Port 9000 allowed for frontend
+  // CORS Configuration - Strictly restricted to authorized origins (Port 9000 & production domains)
+  const allowedOrigins = [
+    "http://localhost:9000",
+    "http://127.0.0.1:9000",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+  ];
+  if (process.env.FRONTEND_URL) {
+    allowedOrigins.push(process.env.FRONTEND_URL);
+  }
+
+  const trustedDomainRegex = /^(https:\/\/[a-zA-Z0-9-]+\.vercel\.app|https:\/\/(www\.)?bbtelugufans\.com)$/;
+
   app.enableCors({
-    origin: ["http://localhost:9000", "http://127.0.0.1:9000"],
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, curl, server-to-server)
+      if (!origin) {
+        return callback(null, true);
+      }
+      if (allowedOrigins.includes(origin) || trustedDomainRegex.test(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error("CORS origin not allowed"), false);
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Voter-Token", "CF-Connecting-IP"],

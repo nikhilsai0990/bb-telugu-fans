@@ -43,7 +43,7 @@ export default async function NewsDetailPage({
           <div className="p-3.5 rounded bg-amber-500/10 border border-amber-500/25 flex items-center gap-2 text-xs text-amber-200">
             <AlertCircle className="w-4 h-4 text-amber-400 flex-shrink-0" />
             <span>
-              <strong>Crucial High Risk Zone Notice:</strong> Auto Ram Prasad (Blue Team) and Chaitra Rai (Red Team) are the only 2 contestants in the HIGH RISK ZONE. <em>&quot;High Risk Zone&quot; does NOT mean elimination.</em> Both are ACTIVE housemates, neither is eliminated, and both are nominated! Charan, Aman, and Mukesh Gowda are NOT in the High Risk Zone.
+              <strong>Crucial High Risk Zone Notice:</strong> Aman, Sudheer Kumar Reddy, and Varshini Sounderajan are the 3 contestants in the HIGH RISK ZONE. <em>&quot;High Risk Zone&quot; does NOT mean elimination.</em> All three are ACTIVE housemates, none is eliminated, and all are nominated! Auto Ram Prasad, Mukesh Gowda, Charan, and Chaitra Rai are NOT in the High Risk Zone.
             </span>
           </div>
         )}
@@ -52,7 +52,7 @@ export default async function NewsDetailPage({
       {/* Featured Media */}
       <div className="rounded-xl overflow-hidden border border-white/[0.1] aspect-[16/10] sm:aspect-[3/2] w-full bg-black">
         <img
-          src={article.imageUrl || (isHighZone ? "/images/contestants/chaitra-rai.webp" : "/images/contestants/debjani-modak.webp")}
+          src={article.imageUrl || (isHighZone ? "/images/contestants/aman.webp" : "/images/contestants/debjani-modak.webp")}
           alt={article.title}
           className="w-full h-full object-cover object-[center_20%]"
         />
@@ -74,12 +74,12 @@ export default async function NewsDetailPage({
           <h2 className="font-display text-2xl uppercase tracking-wide text-white">
             Have your say in the official ballot
           </h2>
-          <p className="text-xs text-zinc-400">15 active housemates are nominated (Charan eliminated). Cast your verified vote now (1 vote per user per day).</p>
+          <p className="text-xs text-zinc-400">14 active housemates are nominated (Charan and Chaitra Rai eliminated). Cast your verified vote now (1 vote per authenticated user per day).</p>
         </div>
         <div className="flex items-center gap-3">
           <Link
             href="/polls"
-            className="px-6 py-3 rounded bg-team-red hover:bg-team-red-dark text-white font-bold text-xs uppercase tracking-wider transition-colors flex items-center gap-2"
+            className="px-6 py-3 rounded bg-bb-gold hover:bg-bb-gold-light text-black font-bold text-xs uppercase tracking-wider transition-colors flex items-center gap-2"
           >
             <Vote className="w-4 h-4" />
             <span>Cast Ballot</span>

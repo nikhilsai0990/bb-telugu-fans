@@ -1,4 +1,12 @@
-import { Injectable, UnauthorizedException, ConflictException, ForbiddenException, NotFoundException } from "@nestjs/common";
+import {
+  Injectable,
+  UnauthorizedException,
+  ConflictException,
+  ForbiddenException,
+  NotFoundException,
+  HttpException,
+  HttpStatus,
+} from "@nestjs/common";
 import { DatabaseService, User } from "../database/database.service";
 import { v4 as uuidv4 } from "uuid";
 import * as crypto from "crypto";
@@ -13,6 +21,8 @@ export interface TokenPayload {
 @Injectable()
 export class AuthService {
   private readonly jwtSecret = process.env.JWT_SECRET || "bb_super_secret_jwt_key_2026";
+  // Rate limiting / brute-force protection: identifier -> { count, lockedUntil }
+  private failedLoginAttempts: Map<string, { count: number; lockedUntil: number }> = new Map();
 
   constructor(private readonly db: DatabaseService) {}
 
@@ -54,7 +64,9 @@ export class AuthService {
       }
       const [header, body, signature] = parts;
       const expectedSignature = crypto.createHmac("sha256", this.jwtSecret).update(`${header}.${body}`).digest("base64url");
-      if (signature !== expectedSignature) {
+      const sigBuf = Buffer.from(signature);
+      const expBuf = Buffer.from(expectedSignature);
+      if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) {
         throw new UnauthorizedException("Invalid token signature");
       }
       const payload = JSON.parse(Buffer.from(body, "base64url").toString("utf-8"));
@@ -109,6 +121,21 @@ export class AuthService {
 
   public async login(dto: { email: string; password: string }) {
     const identifier = dto.email.trim().toLowerCase();
+
+    // Check brute-force lockout
+    const attempt = this.failedLoginAttempts.get(identifier);
+    if (attempt && attempt.lockedUntil > Date.now()) {
+      const remainingMin = Math.ceil((attempt.lockedUntil - Date.now()) / 60000);
+      throw new HttpException(
+        {
+          statusCode: HttpStatus.TOO_MANY_REQUESTS,
+          error: "Too Many Requests",
+          message: `Too many failed login attempts. Account temporarily locked. Please try again in ${remainingMin} minute(s).`,
+        },
+        HttpStatus.TOO_MANY_REQUESTS,
+      );
+    }
+
     let foundUser: User | undefined;
     for (const u of this.db.users.values()) {
       if (
@@ -120,17 +147,32 @@ export class AuthService {
       }
     }
 
+    const recordFailure = () => {
+      const now = Date.now();
+      const current = this.failedLoginAttempts.get(identifier) || { count: 0, lockedUntil: 0 };
+      current.count += 1;
+      if (current.count >= 5) {
+        current.lockedUntil = now + 15 * 60 * 1000; // 15-minute lockout
+      }
+      this.failedLoginAttempts.set(identifier, current);
+    };
+
     if (!foundUser) {
+      recordFailure();
       throw new UnauthorizedException("Invalid email or password");
     }
 
     if (!this.verifyPassword(dto.password, foundUser.passwordHash)) {
+      recordFailure();
       throw new UnauthorizedException("Invalid email or password");
     }
 
     if (foundUser.isBanned) {
       throw new ForbiddenException("Your account has been suspended for violation of community guidelines");
     }
+
+    // Success — clear any failed attempts
+    this.failedLoginAttempts.delete(identifier);
 
     const token = this.generateToken(foundUser);
     return {
@@ -147,49 +189,11 @@ export class AuthService {
     };
   }
 
-  public async googleLogin(dto: { googleId: string; email: string; name: string; avatarUrl?: string }) {
-    let user: User | undefined;
-    for (const u of this.db.users.values()) {
-      if (u.email.toLowerCase() === dto.email.toLowerCase()) {
-        user = u;
-        break;
-      }
-    }
-
-    if (!user) {
-      const username = (dto.name.replace(/\s+/g, "_") + "_" + Math.floor(100 + Math.random() * 900)).toLowerCase();
-      user = {
-        id: uuidv4(),
-        username,
-        email: dto.email.toLowerCase(),
-        passwordHash: this.hashPassword(uuidv4()), // random password for OAuth user
-        role: "USER",
-        avatarUrl: dto.avatarUrl || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(username)}`,
-        bio: "Joined via Google authentication",
-        isBanned: false,
-        isSuspended: false,
-        createdAt: new Date(),
-      };
-      this.db.users.set(user.id, user);
-    }
-
-    if (user.isBanned) {
-      throw new ForbiddenException("Your account has been suspended");
-    }
-
-    const token = this.generateToken(user);
-    return {
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        role: user.role,
-        avatarUrl: user.avatarUrl,
-        bio: user.bio,
-        createdAt: user.createdAt,
-      },
-      token,
-    };
+  public async googleLogin(dto: { googleId: string; email: string; name: string; avatarUrl?: string }): Promise<{ user: Partial<User>; token: string }> {
+    // SECURITY FIX (Test 4): Reject unverified client-asserted Google logins.
+    // Client-side OAuth tokens must be cryptographically verified against Google's OAuth2 certs.
+    // Since Google OAuth is not actively enabled on the client, block unverified account creation/takeover.
+    throw new UnauthorizedException("Direct unverified Google OAuth login is disabled. Please authenticate using email and password.");
   }
 
   public async getProfile(userId: string) {

@@ -2,13 +2,21 @@
 
 import React from "react";
 import Link from "next/link";
-import { TrendingUp, TrendingDown, Minus, Crown, ArrowRight } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus, ArrowRight, Trophy, AlertCircle } from "lucide-react";
 import { Contestant } from "../types";
 
 export const ContestantRankings: React.FC<{ contestants: Contestant[] }> = ({ contestants }) => {
   const topList = contestants
-    .filter((c) => !c.isEliminated && c.status !== "ELIMINATED" && c.status !== "EVICTED" && c.slug !== "charan" && c.id !== "c-13")
-    .sort((a, b) => (b.popularityScore ?? 0) - (a.popularityScore ?? 0))
+    .filter(
+      (c) =>
+        !c.isEliminated &&
+        c.status !== "ELIMINATED" &&
+        c.status !== "EVICTED" &&
+        c.slug !== "charan" &&
+        c.slug !== "chaitra-rai" &&
+        c.id !== "c-13" &&
+        c.id !== "c-10"
+    )
     .slice(0, 5);
 
   return (
@@ -22,17 +30,17 @@ export const ContestantRankings: React.FC<{ contestants: Contestant[] }> = ({ co
             <span>Power Benchmark &bull; Week 1</span>
           </div>
           <h3 className="font-display text-3xl sm:text-4xl uppercase tracking-wide text-white leading-none mt-1">
-            Top 5 Standings
+            Active Standings
           </h3>
           <p className="text-xs text-zinc-400 mt-1">
-            Audience Rating: 0% &bull; No ranking data yet.
+            Individual Competition &bull; 14 Active Housemates
           </p>
         </div>
         <Link
           href="/contestants"
           className="text-xs font-bold uppercase tracking-wider text-bb-gold hover:text-white transition-colors flex items-center gap-1 mt-1"
         >
-          <span>All 16 Contestants</span>
+          <span>All 16 Housemates</span>
           <ArrowRight className="w-3.5 h-3.5" />
         </Link>
       </div>
@@ -42,19 +50,21 @@ export const ContestantRankings: React.FC<{ contestants: Contestant[] }> = ({ co
         {topList.map((contestant, index) => {
           const rank = index + 1;
           const isLeaderRank = rank === 1;
-          const isRed = contestant.team === "RED";
-          const isLeader =
-            (contestant.role === "LEADER" || contestant.slug === "debjani-modak" || contestant.slug === "rohit-naidu") &&
-            contestant.slug !== "auto-ram-prasad" &&
-            contestant.id !== "c-05";
           const isHighRisk =
-            (contestant.slug === "chaitra-rai" || contestant.slug === "auto-ram-prasad" || contestant.id === "c-10" || contestant.id === "c-02" || contestant.zone === "HIGH_RISK") &&
-            contestant.slug !== "aman" &&
-            contestant.slug !== "mukesh-gowda" &&
-            contestant.slug !== "charan" &&
-            contestant.id !== "c-12" &&
-            contestant.id !== "c-05" &&
-            contestant.id !== "c-13";
+            contestant.slug === "aman" ||
+            contestant.slug === "sudheer-kumar-reddy" ||
+            contestant.slug === "varshini-sounderajan" ||
+            contestant.id === "c-12" ||
+            contestant.id === "c-09" ||
+            contestant.id === "c-06" ||
+            contestant.zone === "HIGH_RISK" ||
+            contestant.isHighRiskZone;
+
+          const isTaskWinner =
+            contestant.isTaskWinner ||
+            contestant.stats?.tasksWon > 0 ||
+            contestant.slug === "auto-ram-prasad" ||
+            contestant.id === "c-02";
 
           return (
             <Link
@@ -93,23 +103,14 @@ export const ContestantRankings: React.FC<{ contestants: Contestant[] }> = ({ co
                     <h4 className="text-xs font-bold text-white group-hover:text-bb-gold transition-colors truncate">
                       {contestant.name}
                     </h4>
-                    <span
-                      className={`text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded border ${
-                        isRed
-                          ? "bg-team-red/15 text-team-red border-team-red/30"
-                          : "bg-team-blue/15 text-team-blue border-team-blue/30"
-                      }`}
-                    >
-                      {contestant.team}
-                    </span>
-                    {isLeader && (
-                      <span className="text-[9px] font-black uppercase px-1.5 py-0.2 rounded bg-bb-gold text-black">
-                        Team Leader
-                      </span>
-                    )}
                     {isHighRisk && (
                       <span className="text-[9px] font-black uppercase px-1.5 py-0.2 rounded bg-amber-400 text-black">
-                        HIGH RISK ZONE &bull; ACTIVE
+                        HIGH RISK ZONE
+                      </span>
+                    )}
+                    {isTaskWinner && (
+                      <span className="text-[9px] font-black uppercase px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1">
+                        <Trophy className="w-2.5 h-2.5 text-emerald-400" /> TASK WINNER
                       </span>
                     )}
                   </div>
@@ -119,24 +120,18 @@ export const ContestantRankings: React.FC<{ contestants: Contestant[] }> = ({ co
                 </div>
               </div>
 
-              {/* Score & Trend */}
+              {/* Status */}
               <div className="flex items-center gap-2.5 flex-shrink-0 pl-2">
                 <div className="text-right">
-                  <span className="font-display text-lg text-white block leading-none">
-                    {contestant.popularityScore ?? 0}%
+                  <span className="font-display text-xs text-zinc-300 uppercase block leading-none">
+                    {isHighRisk ? "High Risk" : "Active"}
                   </span>
                   <span className="text-[9px] font-semibold text-zinc-500 uppercase">
-                    Audience Rating
+                    Nominated
                   </span>
                 </div>
                 <div>
-                  {contestant.trend === "UP" ? (
-                    <TrendingUp className="w-4 h-4 text-emerald-400" />
-                  ) : contestant.trend === "DOWN" ? (
-                    <TrendingDown className="w-4 h-4 text-team-red" />
-                  ) : (
-                    <Minus className="w-4 h-4 text-zinc-500" />
-                  )}
+                  <Minus className="w-4 h-4 text-zinc-500" />
                 </div>
               </div>
             </Link>
@@ -146,8 +141,8 @@ export const ContestantRankings: React.FC<{ contestants: Contestant[] }> = ({ co
 
       {/* Footnote */}
       <div className="pt-2 border-t border-white/[0.08] flex items-center justify-between text-[11px] text-zinc-400">
-        <span>Week 1 Mass Nominations &bull; Red Team Won Task 1</span>
-        <span className="text-bb-gold font-semibold">15 Active Nominated &bull; Charan Eliminated</span>
+        <span>Individual Battle &bull; Task Winner: Auto Ram Prasad</span>
+        <span className="text-bb-gold font-semibold">14 Active &bull; 2 Eliminated</span>
       </div>
 
     </div>

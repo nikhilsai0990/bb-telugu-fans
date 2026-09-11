@@ -1,8 +1,10 @@
-import { Controller, Get, Post, Param, Body, Query, Req, UseGuards, Ip, BadRequestException } from "@nestjs/common";
+import { Controller, Get, Post, Param, Body, Query, Req, UseGuards, Ip, BadRequestException, UnauthorizedException } from "@nestjs/common";
 import { Request } from "express";
 import { PollsService } from "./polls.service";
 import { CastVoteDto, CreatePollDto } from "./dto/vote.dto";
 import { AuthService } from "../auth/auth.service";
+import { AuthGuard } from "../auth/auth.guard";
+import { RolesGuard, Roles } from "../auth/roles.guard";
 
 @Controller("polls")
 export class PollsController {
@@ -21,6 +23,8 @@ export class PollsController {
     return this.pollsService.getPollById(id);
   }
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles("ADMIN")
   @Post(":id/reset")
   resetPoll(@Param("id") id: string) {
     return this.pollsService.resetPoll(id);
@@ -30,12 +34,13 @@ export class PollsController {
   async getVoteStatus(
     @Param("id") pollId: string,
     @Query("voterToken") voterTokenQuery: string,
+    @Query("userId") userIdQuery: string,
     @Req() req: Request,
   ) {
-    let userId: string | undefined;
+    let userId: string | undefined = userIdQuery;
     const authHeader = req.headers["authorization"];
     const cookieToken = req.cookies ? req.cookies["access_token"] : undefined;
-    const token = (authHeader && authHeader.startsWith("Bearer ")) ? authHeader.substring(7) : cookieToken;
+    const token = (authHeader && authHeader.startsWith("Bearer ")) ? authHeader.substring(7).trim() : cookieToken;
 
     if (token) {
       try {
@@ -44,12 +49,13 @@ export class PollsController {
       } catch (err) {}
     }
 
-    const voterToken = (req.headers["x-voter-token"] as string) || voterTokenQuery;
+    if (!userId) {
+      return { hasVoted: false };
+    }
 
     return this.pollsService.getVoterStatus({
       pollId,
       userId,
-      voterToken,
     });
   }
 
@@ -65,30 +71,33 @@ export class PollsController {
 
     // Extract real client IP (Cloudflare CF-Connecting-IP, X-Forwarded-For, or req.ip)
     const clientIp = (req.headers["cf-connecting-ip"] as string) ||
-      (req.headers["x-forwarded-for"] as string)?.split(",")[0] ||
+      (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ||
       req.socket.remoteAddress ||
       "127.0.0.1";
 
-    // Optional user token
-    let userId: string | undefined;
+    // Extract user token strictly from Authorization header or secure cookie
+    let userId: string | undefined = undefined;
     const authHeader = req.headers["authorization"];
     const cookieToken = req.cookies ? req.cookies["access_token"] : undefined;
-    const token = (authHeader && authHeader.startsWith("Bearer ")) ? authHeader.substring(7) : cookieToken;
+    const token = (authHeader && authHeader.startsWith("Bearer ")) ? authHeader.substring(7).trim() : cookieToken;
 
     if (token) {
       try {
         const decoded = this.authService.verifyToken(token);
         userId = decoded.sub;
       } catch (err) {
-        // Token invalid, fall back to anonymous voter token if present
+        throw new UnauthorizedException("Authentication session expired or invalid. Please sign in again.");
       }
+    }
+
+    if (!userId) {
+      throw new UnauthorizedException("Authentication required to vote. Please sign in or sign up.");
     }
 
     return this.pollsService.castVote({
       pollId,
       optionId: body.optionId,
       userId,
-      voterToken: body.voterToken,
       clientIp,
     });
   }

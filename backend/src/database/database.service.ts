@@ -38,6 +38,9 @@ export interface Contestant {
   zone?: ContestantZone;
   isHighRiskZone?: boolean;
   isHighZone?: boolean;
+  isHousemate?: boolean;
+  isTaskWinner?: boolean;
+  taskTitle?: string;
   taskStatus?: TaskStatus;
   isEliminated?: boolean;
   eliminatedAt?: Date;
@@ -362,25 +365,24 @@ export class DatabaseService implements OnModuleInit {
     this.users.set(fanUser.id, fanUser);
 
     // 2. Canonical Season 10 Master Roster (16 Contestants)
-    // 15 ACTIVE CONTESTANTS, 1 ELIMINATED CONTESTANT (Charan).
-    // Exactly TWO teams of 8:
-    // RED TEAM (8): Rohit Naidu (LEADER, Task 1 Winner), Aman, Shalini, Singer Jhansi, Temper Vamsi (Task 1 Winner), Chaitra Rai (HIGH RISK ZONE), Srushti Vyakaranam, Charan (ELIMINATED)
-    // BLUE TEAM (8): Debjani Modak (LEADER), Auto Ram Prasad (HIGH RISK ZONE), Thrigun (Task 1 Participant), Mukesh Gowda (Task 1 Participant), Sudheer Kumar Reddy, Jabardasth Naresh, Varshini Sounderajan, Krishnudu
-    // Red Team Won Task 1: Rohit Naidu & Temper Vamsi represented Red Team (WIN). Thrigun & Mukesh Gowda represented Blue Team (LOSS).
-    // Exactly TWO in HIGH RISK ZONE: Auto Ram Prasad (Blue Team) and Chaitra Rai (Red Team) — both ACTIVE housemates, neither eliminated.
-    // Red Team Leader: Rohit Naidu. Blue Team Leader: Debjani Modak. (Auto Ram Prasad is NOT captain/leader).
-    // Charan is ELIMINATED based on housemates' votes; not in High Risk Zone; cannot receive votes.
+    // EXACTLY 14 ACTIVE CONTESTANTS, 2 ELIMINATED CONTESTANTS (Charan & Chaitra Rai).
+    // The competition is now purely INDIVIDUAL with NO teams and NO team leaders.
+    // EXACTLY THREE in HIGH RISK ZONE: Aman, Sudheer Kumar Reddy, and Varshini Sounderajan.
+    // TASK WINNER: Auto Ram Prasad (tasksWon = 1).
+    // CURRENT HOUSEMATES: Rohit Naidu, Auto Ram Prasad, Temper Vamsi.
+    // CONTESTANTS: All other active contenders.
+    // ELIMINATED: Charan and Chaitra Rai. Not in active poll, not in High Risk Zone.
     const contestantsList: Contestant[] = [
-      // --- RED TEAM (8 Total: 7 Active, 1 Eliminated) ---
       {
         id: "c-11",
         name: "Rohit Naidu",
         slug: "rohit-naidu",
         season: 10,
         team: "RED",
-        role: "LEADER",
+        role: "PLAYER",
+        isHousemate: true,
         avatarUrl: "/images/contestants/rohit-naidu.webp",
-        bio: "Red Team Leader who represented Red Team and won Task 1 alongside Temper Vamsi, guiding the squad with strategic composure.",
+        bio: "Model and television star navigating the house with strategic composure as an individual contender.",
         occupation: "Model & Television Star",
         status: "NOMINATED",
         isActive: true,
@@ -390,7 +392,7 @@ export class DatabaseService implements OnModuleInit {
         trend: "STABLE",
         weekNumber: 1,
         stats: {
-          tasksWon: 1,
+          tasksWon: 0,
           nominationsFaced: 1,
           timesCaptain: 0,
           fanSentimentPositive: 0,
@@ -406,8 +408,11 @@ export class DatabaseService implements OnModuleInit {
         season: 10,
         team: "RED",
         role: "PLAYER",
+        zone: "HIGH_RISK",
+        isHighRiskZone: true,
+        isHighZone: true,
         avatarUrl: "/images/contestants/aman.webp",
-        bio: "Athletic model and fitness standout bringing explosive power and discipline to the Red Team camp.",
+        bio: "Athletic model and fitness athlete currently in the High Risk Zone as an active nominated individual housemate.",
         occupation: "Fitness Athlete",
         status: "NOMINATED",
         isActive: true,
@@ -434,7 +439,7 @@ export class DatabaseService implements OnModuleInit {
         team: "RED",
         role: "PLAYER",
         avatarUrl: "/images/contestants/shalini.webp",
-        bio: "Bold digital model and Agnipariksha contender voicing fierce, unfiltered perspectives for the Red Team.",
+        bio: "Bold digital model voicing unfiltered perspectives in the individual arena.",
         occupation: "Fashion Model",
         status: "NOMINATED",
         isActive: true,
@@ -461,7 +466,7 @@ export class DatabaseService implements OnModuleInit {
         team: "RED",
         role: "PLAYER",
         avatarUrl: "/images/contestants/singer-jhansi.webp",
-        bio: "Soulful Telugu folk and playback singer infusing the Red Team with cultural resonance, melody, and grounded warmth.",
+        bio: "Soulful Telugu folk and playback singer infusing the house with cultural resonance and melody.",
         occupation: "Folk & Playback Singer",
         status: "NOMINATED",
         isActive: true,
@@ -487,8 +492,9 @@ export class DatabaseService implements OnModuleInit {
         season: 10,
         team: "RED",
         role: "PLAYER",
+        isHousemate: true,
         avatarUrl: "/images/contestants/temper-vamsi.webp",
-        bio: "High-octane character actor who represented Red Team and won Task 1 alongside Rohit Naidu, bringing fierce fighting spirit.",
+        bio: "High-octane character actor bringing fierce fighting spirit to the individual competition.",
         occupation: "Character Actor",
         status: "NOMINATED",
         isActive: true,
@@ -498,7 +504,7 @@ export class DatabaseService implements OnModuleInit {
         trend: "STABLE",
         weekNumber: 1,
         stats: {
-          tasksWon: 1,
+          tasksWon: 0,
           nominationsFaced: 1,
           timesCaptain: 0,
           fanSentimentPositive: 0,
@@ -514,16 +520,18 @@ export class DatabaseService implements OnModuleInit {
         season: 10,
         team: "RED",
         role: "PLAYER",
-        zone: "HIGH_RISK",
-        isHighRiskZone: true,
+        zone: "NORMAL",
+        isHighRiskZone: false,
         isHighZone: false,
         avatarUrl: "/images/contestants/chaitra-rai.webp",
-        bio: "Experienced serial lead currently in the High Risk Zone alongside Auto Ram Prasad, remaining an active, nominated Red Team housemate.",
+        bio: "Experienced television actress. Officially eliminated from Bigg Boss Telugu Season 10 based on housemates' votes.",
         occupation: "Television Actress",
-        status: "NOMINATED",
-        isActive: true,
-        isNominated: true,
-        isEliminated: false,
+        status: "ELIMINATED",
+        isActive: false,
+        isNominated: false,
+        isEliminated: true,
+        eliminatedAt: new Date(),
+        eliminationReason: "Eliminated based on housemates' votes",
         popularityScore: 0,
         trend: "STABLE",
         weekNumber: 1,
@@ -545,7 +553,7 @@ export class DatabaseService implements OnModuleInit {
         team: "RED",
         role: "PLAYER",
         avatarUrl: "/images/contestants/srushti-vyakaranam.webp",
-        bio: "Miss India Asia Pacific 2016 showcasing strategic poise, keen game reading, and mental resilience in Red Team.",
+        bio: "Miss India Asia Pacific 2016 showcasing strategic poise, game reading, and mental resilience.",
         occupation: "International Model",
         status: "NOMINATED",
         isActive: true,
@@ -575,7 +583,7 @@ export class DatabaseService implements OnModuleInit {
         isHighRiskZone: false,
         isHighZone: false,
         avatarUrl: "/images/contestants/charan.webp",
-        bio: "Spirited RJ and youth presenter. Eliminated from Season 10 based on housemates' votes.",
+        bio: "Spirited RJ and youth presenter. Officially eliminated from Bigg Boss Telugu Season 10 based on housemates' votes.",
         occupation: "Radio Jockey",
         status: "ELIMINATED",
         isActive: false,
@@ -597,7 +605,7 @@ export class DatabaseService implements OnModuleInit {
         createdAt: new Date(),
       },
 
-      // --- BLUE TEAM (8 Total) ---
+      // --- INDIVIDUAL CONTESTANTS (FORMER BLUE MEMBERS) ---
       {
         id: "c-02",
         name: "Auto Ram Prasad",
@@ -605,11 +613,14 @@ export class DatabaseService implements OnModuleInit {
         season: 10,
         team: "BLUE",
         role: "PLAYER",
-        zone: "HIGH_RISK",
-        isHighRiskZone: true,
+        zone: "NORMAL",
+        isHighRiskZone: false,
         isHighZone: false,
+        isHousemate: true,
+        isTaskWinner: true,
+        taskTitle: "TASK WINNER",
         avatarUrl: "/images/contestants/auto-ram-prasad.webp",
-        bio: "Celebrated Jabardasth punchline king currently in the High Risk Zone alongside Chaitra Rai, remaining an active, nominated Blue Team housemate.",
+        bio: "Celebrated Jabardasth punchline king and Task Winner, competing as an active nominated individual housemate.",
         occupation: "Stand-up Comedian & Writer",
         status: "NOMINATED",
         isActive: true,
@@ -619,7 +630,7 @@ export class DatabaseService implements OnModuleInit {
         trend: "STABLE",
         weekNumber: 1,
         stats: {
-          tasksWon: 0,
+          tasksWon: 1,
           nominationsFaced: 1,
           timesCaptain: 0,
           fanSentimentPositive: 0,
@@ -636,7 +647,7 @@ export class DatabaseService implements OnModuleInit {
         team: "BLUE",
         role: "PLAYER",
         avatarUrl: "/images/contestants/thrigun.webp",
-        bio: "Dynamic Tollywood actor who represented Blue Team in Task 1, bringing physical stamina and dedication to the camp.",
+        bio: "Dynamic Tollywood actor bringing physical stamina and dedication to the arena.",
         occupation: "Film Actor",
         status: "NOMINATED",
         isActive: true,
@@ -666,7 +677,7 @@ export class DatabaseService implements OnModuleInit {
         isHighRiskZone: false,
         isHighZone: false,
         avatarUrl: "/images/contestants/mukesh-gowda.webp",
-        bio: "Beloved 'Rishi Sir' of Telugu television who represented Blue Team in Task 1, bringing dignified strength and poise to the camp.",
+        bio: "Beloved television actor bringing dignified strength and poise to the individual game.",
         occupation: "Television Actor",
         status: "NOMINATED",
         isActive: true,
@@ -692,8 +703,11 @@ export class DatabaseService implements OnModuleInit {
         season: 10,
         team: "BLUE",
         role: "PLAYER",
+        zone: "HIGH_RISK",
+        isHighRiskZone: true,
+        isHighZone: true,
         avatarUrl: "/images/contestants/sudheer-kumar-reddy.webp",
-        bio: "Digital creator and voice of 'Sudheer Talks' delivering sharp analytical strategy and teamwork to Blue Team.",
+        bio: "Digital creator and voice of 'Sudheer Talks' currently in the High Risk Zone as an active nominated individual housemate.",
         occupation: "Podcaster & Creator",
         status: "NOMINATED",
         isActive: true,
@@ -720,7 +734,7 @@ export class DatabaseService implements OnModuleInit {
         team: "BLUE",
         role: "PLAYER",
         avatarUrl: "/images/contestants/jabardasth-naresh.webp",
-        bio: "Beloved comedy dynamo and audience favorite providing morale, spontaneous humor, and quick coordination to Blue Team.",
+        bio: "Beloved comedy dynamo and audience favorite providing spontaneous humor and charisma.",
         occupation: "Comedian & Entertainer",
         status: "NOMINATED",
         isActive: true,
@@ -746,8 +760,11 @@ export class DatabaseService implements OnModuleInit {
         season: 10,
         team: "BLUE",
         role: "PLAYER",
+        zone: "HIGH_RISK",
+        isHighRiskZone: true,
+        isHighZone: true,
         avatarUrl: "/images/contestants/varshini-sounderajan.webp",
-        bio: "Spirited television host with sharp verbal clarity, fearless debate presence, and magnetic charisma in Blue Team.",
+        bio: "Spirited television host with sharp verbal clarity, fearless debate presence, and magnetic charisma currently in the High Risk Zone as an active nominated individual contender.",
         occupation: "TV Anchor & Actress",
         status: "NOMINATED",
         isActive: true,
@@ -772,9 +789,9 @@ export class DatabaseService implements OnModuleInit {
         slug: "debjani-modak",
         season: 10,
         team: "BLUE",
-        role: "LEADER",
+        role: "PLAYER",
         avatarUrl: "/images/contestants/debjani-modak.webp",
-        bio: "Graceful serial actress serving as the Blue Team Leader, bringing poise, emotive depth, and strategic direction to her camp.",
+        bio: "Graceful television serial actress competing as an active nominated individual housemate.",
         occupation: "Television Actress",
         status: "NOMINATED",
         isActive: true,
@@ -801,7 +818,7 @@ export class DatabaseService implements OnModuleInit {
         team: "BLUE",
         role: "PLAYER",
         avatarUrl: "/images/contestants/krishnudu.webp",
-        bio: "Veteran Tollywood actor spreading calm presence, warmth, and mature guidance among his Blue Team mates.",
+        bio: "Veteran Tollywood actor spreading calm presence, warmth, and mature guidance.",
         occupation: "Film Actor",
         status: "NOMINATED",
         isActive: true,
@@ -830,12 +847,7 @@ export class DatabaseService implements OnModuleInit {
     }
 
     // 3. Official Season 10 Poll — ONLY "WHO SHOULD BE SAVED?"
-    // Contains EXACTLY the 15 active nominated contestants (Charan is ELIMINATED and excluded).
-    // Canonical order:
-    // 1. Debjani Modak, 2. Auto Ram Prasad, 3. Jabardasth Naresh, 4. Thrigun,
-    // 5. Mukesh Gowda, 6. Varshini Sounderajan, 7. Temper Vamsi, 8. Krishnudu,
-    // 9. Sudheer Kumar Reddy, 10. Chaitra Rai, 11. Rohit Naidu, 12. Aman,
-    // 13. Shalini, 14. Srushti Vyakaranam, 15. Singer Jhansi
+    // Contains EXACTLY the 14 active nominated contestants (Charan and Chaitra Rai are ELIMINATED and excluded).
     // Clean neutral voting state — 0 fake votes!
     const pollSaveId = "poll-eviction-01";
     const canonicalPollContestantsOrder = [
@@ -847,10 +859,10 @@ export class DatabaseService implements OnModuleInit {
       "c-06", // Varshini Sounderajan
       "c-07", // Temper Vamsi
       "c-08", // Krishnudu
-      "c-09", // Sudheer Kumar Reddy
-      "c-10", // Chaitra Rai
+      "c-09", // Sudheer Kumar Reddy (HIGH RISK ZONE)
+      // c-10 Chaitra Rai is ELIMINATED - Excluded from poll!
       "c-11", // Rohit Naidu
-      "c-12", // Aman
+      "c-12", // Aman (HIGH RISK ZONE)
       // c-13 Charan is ELIMINATED - Excluded from poll!
       "c-14", // Shalini
       "c-15", // Srushti Vyakaranam
@@ -863,7 +875,7 @@ export class DatabaseService implements OnModuleInit {
         id: `opt-save-${c.id}`,
         pollId: pollSaveId,
         contestantId: c.id,
-        text: `Save ${c.name} (${c.team} TEAM)`,
+        text: `Save ${c.name}`,
         imageUrl: c.avatarUrl,
         team: c.team,
         zone: c.zone,
@@ -880,7 +892,7 @@ export class DatabaseService implements OnModuleInit {
     const pollSave: Poll = {
       id: pollSaveId,
       title: "Who Should Be Saved?",
-      description: "15 active housemates are currently nominated! Cast your verified fan vote to save your favorite housemate (1 vote per day).",
+      description: "14 active housemates are currently nominated! Cast your verified fan vote to save your favorite housemate (1 vote per day).",
       category: "Nominations",
       status: "ACTIVE",
       totalVotes: 0,
@@ -895,14 +907,14 @@ export class DatabaseService implements OnModuleInit {
     const newsItems: NewsItem[] = [
       {
         id: "news-01",
-        title: "CHARAN ELIMINATED FROM BIGG BOSS BASED ON HOUSEMATES' VOTES",
-        slug: "charan-eliminated-from-bigg-boss-based-on-housemates-votes",
-        summary: "Charan has been officially eliminated from Bigg Boss Telugu Season 10 following housemates' votes, leaving 15 active housemates in the competition.",
-        content: `In the first eviction of Bigg Boss Telugu Season 10, Charan has been eliminated from the house based on housemates' votes.
+        title: "CHAITRA RAI AND CHARAN ELIMINATED FROM BIGG BOSS BASED ON HOUSEMATES' VOTES",
+        slug: "chaitra-rai-and-charan-eliminated-from-bigg-boss-based-on-housemates-votes",
+        summary: "Charan and Chaitra Rai have both been officially eliminated from Bigg Boss Telugu Season 10, leaving 14 active housemates in the individual competition.",
+        content: `In a dramatic turn of events in Bigg Boss Telugu Season 10, both Charan and Chaitra Rai have been officially eliminated from the house based on housemates' votes.
 
-With Charan's exit, 15 active contestants remain in the competition. The official voting poll has been updated to reflect the 15 active nominated housemates, and voting is open with 1 vote per user per day.`,
+With Charan and Chaitra Rai evicted, 14 active contestants remain in the competition. The official voting poll has been updated to reflect the 14 active nominated housemates, and voting is open with 1 vote per authenticated account.`,
         category: "Evictions",
-        imageUrl: "/images/contestants/charan.webp",
+        imageUrl: "/images/contestants/chaitra-rai.webp",
         viewsCount: 0,
         isTrending: true,
         isPublished: true,
@@ -911,14 +923,14 @@ With Charan's exit, 15 active contestants remain in the competition. The officia
       },
       {
         id: "news-02",
-        title: "RED TEAM WINS TASK 1: ROHIT NAIDU AND TEMPER VAMSI SECURE VICTORY",
-        slug: "red-team-wins-task-1-rohit-naidu-and-temper-vamsi-secure-victory",
-        summary: "Red Team takes the victory in Task 1 as Rohit Naidu and Temper Vamsi outperform Blue Team's Thrigun and Mukesh Gowda in an intense arena battle.",
-        content: `Red Team has clinched victory in the first official task of Bigg Boss Telugu Season 10.
+        title: "AUTO RAM PRASAD NAMED TASK WINNER IN DOMINANT INDIVIDUAL ARENA DISPLAY",
+        slug: "auto-ram-prasad-named-task-winner-in-dominant-individual-arena-display",
+        summary: "Auto Ram Prasad clinches victory as Task Winner, securing an individual achievement award in Season 10.",
+        content: `Auto Ram Prasad has emerged triumphant in the arena challenge of Bigg Boss Telugu Season 10.
 
-Representing Red Team, Leader Rohit Naidu and Temper Vamsi delivered a dominant performance to secure the win. Blue Team participants Thrigun and Mukesh Gowda fought hard but took the loss. Red Team celebrates a crucial victory as Week 1 continues.`,
+Delivering an extraordinary performance, Auto Ram Prasad secured Task Winner honors as an individual achievement. His victory establishes momentum as the 14 active housemates face public voting.`,
         category: "Tasks",
-        imageUrl: "/images/contestants/rohit-naidu.webp",
+        imageUrl: "/images/contestants/auto-ram-prasad.webp",
         viewsCount: 0,
         isTrending: true,
         isPublished: true,
@@ -927,14 +939,14 @@ Representing Red Team, Leader Rohit Naidu and Temper Vamsi delivered a dominant 
       },
       {
         id: "news-03",
-        title: "AUTO RAM PRASAD AND CHAITRA RAI ENTER HIGH RISK ZONE",
-        slug: "auto-ram-prasad-and-chaitra-rai-enter-high-risk-zone",
-        summary: "Auto Ram Prasad (Blue Team) and Chaitra Rai (Red Team) are the only two contestants currently in the High Risk Zone. Both remain active, nominated housemates.",
-        content: `The Bigg Boss Telugu Season 10 danger zone is set: Auto Ram Prasad from Blue Team and Chaitra Rai from Red Team have entered the High Risk Zone.
+        title: "AMAN, SUDHEER KUMAR REDDY, AND VARSHINI SOUNDERAJAN ENTER HIGH RISK ZONE",
+        slug: "aman-sudheer-kumar-reddy-and-varshini-sounderajan-enter-high-risk-zone",
+        summary: "Aman, Sudheer Kumar Reddy, and Varshini Sounderajan are the three contestants currently in the High Risk Zone. All remain active, nominated housemates.",
+        content: `The Bigg Boss Telugu Season 10 High Risk Zone is set: Aman, Sudheer Kumar Reddy, and Varshini Sounderajan occupy the three positions.
 
-Exactly two contestants currently occupy the High Risk Zone. Bigg Boss Telugu Fans clarifies that High Risk Zone does NOT mean elimination; both Auto Ram Prasad and Chaitra Rai are active, nominated housemates eligible for public votes in the save poll. Charan, Aman, and Mukesh Gowda are NOT in the High Risk Zone.`,
+Exactly three contestants currently occupy the High Risk Zone: Aman, Sudheer Kumar Reddy, and Varshini Sounderajan. High Risk Zone indicates danger of eviction but does NOT mean elimination; all three are active, nominated housemates eligible for public votes in the save poll. Auto Ram Prasad, Mukesh Gowda, Charan, and Chaitra Rai are NOT in the High Risk Zone.`,
         category: "Nominations",
-        imageUrl: "/images/contestants/auto-ram-prasad.webp",
+        imageUrl: "/images/contestants/aman.webp",
         viewsCount: 0,
         isTrending: true,
         isPublished: true,
@@ -943,13 +955,13 @@ Exactly two contestants currently occupy the High Risk Zone. Bigg Boss Telugu Fa
       },
       {
         id: "news-04",
-        title: "DEBJANI MODAK AND ROHIT NAIDU LEAD BLUE AND RED TEAMS",
-        slug: "debjani-modak-and-rohit-naidu-lead-blue-and-red-teams",
-        summary: "Debjani Modak commands Blue Team while Rohit Naidu leads Red Team as 15 active contestants face Week 1 public voting.",
-        content: `With Week 1 dynamics heating up, Debjani Modak stands firm as Blue Team Leader and Rohit Naidu as Red Team Leader.
+        title: "COMPETITION TRANSITIONS TO INDIVIDUAL BATTLE AS 14 HOUSEMATES REMAIN",
+        slug: "competition-transitions-to-individual-battle-as-14-housemates-remain",
+        summary: "Teams are dissolved as Bigg Boss Telugu Season 10 becomes an all-out individual contest among the 14 active housemates.",
+        content: `Bigg Boss Telugu Season 10 has eliminated team divisions. The competition is now purely individual, with each of the 14 active housemates battling on their own merit.
 
 Fans can support their favorites through the verified fan voting system, with exactly 1 vote per user per day allowed.`,
-        category: "Leadership",
+        category: "House Dynamics",
         imageUrl: "/images/contestants/debjani-modak.webp",
         viewsCount: 0,
         isTrending: true,
@@ -970,8 +982,8 @@ Fans can support their favorites through the verified fan voting system, with ex
       username: fanUser.username,
       userAvatar: fanUser.avatarUrl,
       category: "Fan Theories",
-      title: "Red Team Task 1 Victory: How will Blue Team bounce back?",
-      description: "With Rohit Naidu and Temper Vamsi securing victory in Task 1 over Thrigun and Mukesh Gowda, how will Debjani Modak rally the Blue Team? Also, what are your thoughts on Charan's elimination and Auto Ram Prasad & Chaitra Rai in the High Risk Zone?",
+      title: "Auto Ram Prasad Task Winner: Can he survive the individual competition?",
+      description: "Auto Ram Prasad is the Task Winner, while Aman, Sudheer Kumar Reddy, and Varshini Sounderajan are in the High Risk Zone. With Charan and Chaitra Rai eliminated, who is your top pick?",
       likesCount: 0,
       commentsCount: 0,
       isPinned: true,
@@ -986,8 +998,8 @@ Fans can support their favorites through the verified fan voting system, with ex
       username: adminUser.username,
       userAvatar: adminUser.avatarUrl,
       category: "Nominations",
-      title: "15 Active Contestants Nominated: Cast your 1 vote per day to save your favorite!",
-      description: "With Charan eliminated, 15 housemates are on the voting block. Who are you supporting today? Remember: 1 vote per user per day!",
+      title: "14 Active Contestants Nominated: Cast your 1 vote per day to save your favorite!",
+      description: "With Charan and Chaitra Rai eliminated, 14 housemates are on the voting block. Who are you supporting today? Remember: 1 vote per authenticated user per day!",
       likesCount: 0,
       commentsCount: 0,
       isPinned: true,

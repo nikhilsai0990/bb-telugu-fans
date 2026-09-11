@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Search, Crown, AlertCircle, ArrowUpRight, Trophy } from "lucide-react";
+import { Search, AlertCircle, ArrowUpRight, Trophy } from "lucide-react";
 import { Contestant } from "../../types";
 import { api, fallbackContestants } from "../../lib/api";
 
@@ -23,36 +23,48 @@ export default function ContestantsPage() {
   }, [search]);
 
   let displayedContestants = contestants;
-  if (filter === "RED") {
-    displayedContestants = contestants.filter((c) => c.team === "RED");
-  } else if (filter === "BLUE") {
-    displayedContestants = contestants.filter((c) => c.team === "BLUE");
-  } else if (filter === "NOMINATED") {
-    displayedContestants = contestants.filter((c) => c.isNominated || c.status === "NOMINATED");
+  if (filter === "NOMINATED") {
+    displayedContestants = contestants.filter(
+      (c) =>
+        !c.isEliminated &&
+        c.status !== "ELIMINATED" &&
+        c.slug !== "charan" &&
+        c.slug !== "chaitra-rai" &&
+        (c.isNominated || c.status === "NOMINATED")
+    );
   } else if (filter === "HIGH_RISK" || filter === "HIGH_ZONE") {
     displayedContestants = contestants.filter(
       (c) =>
-        (c.slug === "chaitra-rai" || c.slug === "auto-ram-prasad" || c.id === "c-10" || c.id === "c-02" || c.zone === "HIGH_RISK") &&
+        !c.isEliminated &&
+        c.status !== "ELIMINATED" &&
         c.slug !== "charan" &&
-        c.slug !== "aman" &&
+        c.slug !== "chaitra-rai" &&
+        c.slug !== "auto-ram-prasad" &&
         c.slug !== "mukesh-gowda" &&
-        c.id !== "c-13" &&
-        c.id !== "c-12" &&
-        c.id !== "c-05"
+        (c.isHighRiskZone ||
+          c.zone === "HIGH_RISK" ||
+          c.slug === "aman" ||
+          c.slug === "sudheer-kumar-reddy" ||
+          c.slug === "varshini-sounderajan" ||
+          c.id === "c-06")
     );
   } else if (filter === "ELIMINATED") {
     displayedContestants = contestants.filter(
-      (c) => c.isEliminated || c.status === "ELIMINATED" || c.slug === "charan" || c.id === "c-13"
+      (c) =>
+        c.isEliminated ||
+        c.status === "ELIMINATED" ||
+        c.slug === "charan" ||
+        c.slug === "chaitra-rai" ||
+        c.id === "c-13" ||
+        c.id === "c-10"
     );
   }
 
   const filterTabs = [
     { id: "ALL", label: "All Housemates (16)" },
-    { id: "RED", label: "Red Team (8)" },
-    { id: "BLUE", label: "Blue Team (8)" },
-    { id: "NOMINATED", label: "Active Nominated (15)" },
-    { id: "HIGH_RISK", label: "HIGH RISK ZONE (2)" },
-    { id: "ELIMINATED", label: "Eliminated (1)" },
+    { id: "NOMINATED", label: "Active Nominated (14)" },
+    { id: "HIGH_RISK", label: "HIGH RISK ZONE (3)" },
+    { id: "ELIMINATED", label: "Eliminated (2)" },
   ];
 
   return (
@@ -62,13 +74,13 @@ export default function ContestantsPage() {
       <div className="space-y-3 border-b border-white/[0.08] pb-6">
         <div className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-zinc-400">
           <span className="w-2 h-2 rounded-full bg-bb-gold" />
-          <span>Official Season 10 Roster &bull; 16 Housemates (15 Active, 1 Eliminated)</span>
+          <span>Official Season 10 Roster &bull; 16 Housemates (14 Active, 2 Eliminated)</span>
         </div>
         <h1 className="font-display text-4xl sm:text-6xl uppercase tracking-tight text-white">
           Contestant Directory
         </h1>
         <p className="text-sm text-zinc-300 max-w-2xl leading-relaxed">
-          The 16 canonical Bigg Boss Telugu Season 10 contenders divided into Red and Blue factions (15 active, 1 eliminated). Red Team won Task 1 led by Rohit Naidu and Temper Vamsi. Charan has been ELIMINATED based on housemates&apos; votes. Auto Ram Prasad and Chaitra Rai are in the HIGH RISK ZONE as active housemates, and 15 active housemates face Week 1 public voting.
+          The 16 canonical Bigg Boss Telugu Season 10 contenders competing as individual contenders. Auto Ram Prasad is the TASK WINNER in dominant fashion. Charan and Chaitra Rai have both been officially ELIMINATED based on housemates&apos; votes. Aman, Sudheer Kumar Reddy, and Varshini Sounderajan are in the HIGH RISK ZONE as active housemates, and 14 active contestants face Week 1 public voting.
         </p>
       </div>
 
@@ -120,22 +132,41 @@ export default function ContestantsPage() {
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
           {displayedContestants.map((contestant) => {
-            const isRed = contestant.team === "RED";
-            const isEliminated = contestant.isEliminated || contestant.status === "ELIMINATED" || contestant.slug === "charan" || contestant.id === "c-13";
-            const isLeader =
-              (contestant.role === "LEADER" || contestant.slug === "debjani-modak" || contestant.slug === "rohit-naidu") &&
-              contestant.slug !== "auto-ram-prasad" &&
-              contestant.id !== "c-05";
+            const isEliminated =
+              contestant.isEliminated ||
+              contestant.status === "ELIMINATED" ||
+              contestant.slug === "charan" ||
+              contestant.slug === "chaitra-rai" ||
+              contestant.id === "c-13" ||
+              contestant.id === "c-10";
+
             const isHighRisk =
               !isEliminated &&
-              (contestant.slug === "chaitra-rai" || contestant.slug === "auto-ram-prasad" || contestant.id === "c-10" || contestant.id === "c-02" || contestant.zone === "HIGH_RISK") &&
-              contestant.slug !== "charan" &&
-              contestant.slug !== "aman" &&
-              contestant.slug !== "mukesh-gowda" &&
-              contestant.id !== "c-13" &&
-              contestant.id !== "c-12" &&
-              contestant.id !== "c-05";
-            const isTaskWinner = contestant.stats?.tasksWon > 0 || contestant.slug === "rohit-naidu" || contestant.slug === "temper-vamsi";
+              (contestant.slug === "aman" ||
+                contestant.slug === "sudheer-kumar-reddy" ||
+                contestant.slug === "varshini-sounderajan" ||
+                contestant.id === "c-12" ||
+                contestant.id === "c-09" ||
+                contestant.id === "c-06" ||
+                contestant.zone === "HIGH_RISK" ||
+                contestant.isHighRiskZone) &&
+              contestant.slug !== "auto-ram-prasad" &&
+              contestant.slug !== "mukesh-gowda";
+
+            const isTaskWinner =
+              contestant.isTaskWinner ||
+              contestant.stats?.tasksWon > 0 ||
+              contestant.slug === "auto-ram-prasad" ||
+              contestant.id === "c-02";
+
+            const isHousemate =
+              contestant.isHousemate ||
+              contestant.slug === "rohit-naidu" ||
+              contestant.slug === "auto-ram-prasad" ||
+              contestant.slug === "temper-vamsi" ||
+              contestant.id === "c-11" ||
+              contestant.id === "c-02" ||
+              contestant.id === "c-07";
 
             return (
               <Link
@@ -143,7 +174,11 @@ export default function ContestantsPage() {
                 href={`/contestants/${contestant.slug || contestant.id}`}
                 data-active-card="true"
                 className={`group editorial-card rounded-lg overflow-hidden flex flex-col justify-between transition-all ${
-                  isEliminated ? "opacity-80 border-zinc-800" : isRed ? "hover:border-team-red/40" : "hover:border-team-blue/40"
+                  isEliminated
+                    ? "opacity-75 border-zinc-800 bg-zinc-950/60"
+                    : isHighRisk
+                    ? "border-amber-500/40 hover:border-amber-400"
+                    : "border-white/[0.08] hover:border-white/30"
                 }`}
               >
                 <div>
@@ -156,42 +191,37 @@ export default function ContestantsPage() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#13141B] via-transparent to-transparent opacity-80" />
 
-                    {/* Top Badges */}
-                    <div className="absolute top-2.5 left-2.5 flex flex-col gap-1 items-start">
-                      <span
-                        className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider ${
-                          isRed
-                            ? "bg-team-red text-white"
-                            : "bg-team-blue text-white"
-                        }`}
-                      >
-                        {contestant.team} TEAM
-                      </span>
-                      {isLeader && (
-                        <span className="px-2 py-0.5 rounded bg-bb-gold text-black text-[9px] font-black uppercase tracking-wider flex items-center gap-1">
-                          <Crown className="w-2.5 h-2.5" /> Team Leader
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="absolute top-2.5 right-2.5 flex flex-col gap-1 items-end">
+                    {/* Single Responsive Top Badges Container (prevents mobile overlap) */}
+                    <div className="absolute top-2 left-2 right-2 flex flex-wrap gap-1 items-start z-10 pointer-events-none">
                       {isEliminated ? (
-                        <span className="px-1.5 py-0.5 rounded bg-red-950 text-red-300 border border-red-800 text-[9px] font-black uppercase tracking-tight">
+                        <span className="px-2 py-0.5 rounded bg-red-950/90 text-red-300 border border-red-800 text-[9px] font-black uppercase tracking-wider shadow">
                           ELIMINATED
                         </span>
+                      ) : isHousemate ? (
+                        <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[9px] font-black uppercase tracking-wider backdrop-blur-sm">
+                          HOUSEMATE
+                        </span>
                       ) : (
-                        <span className="px-1.5 py-0.5 rounded bg-red-600/90 text-white text-[9px] font-black uppercase tracking-tight">
+                        <span className="px-2 py-0.5 rounded bg-white/[0.08] text-zinc-300 border border-white/20 text-[9px] font-black uppercase tracking-wider backdrop-blur-sm">
+                          CONTESTANT
+                        </span>
+                      )}
+
+                      {!isEliminated && (
+                        <span className="px-2 py-0.5 rounded bg-black/70 text-zinc-300 border border-white/20 text-[9px] font-black uppercase tracking-wider backdrop-blur-sm">
                           Nominated
                         </span>
                       )}
+
                       {isHighRisk && (
-                        <span className="px-1.5 py-0.5 rounded bg-amber-500/90 text-black text-[9px] font-black uppercase tracking-tight">
-                          HIGH RISK ZONE &bull; ACTIVE
+                        <span className="px-2 py-0.5 rounded bg-amber-500 text-black text-[9px] font-black uppercase tracking-wider shadow">
+                          HIGH RISK ZONE
                         </span>
                       )}
+
                       {isTaskWinner && (
-                        <span className="px-1.5 py-0.5 rounded bg-emerald-600/90 text-white text-[9px] font-black uppercase tracking-tight flex items-center gap-1">
-                          <Trophy className="w-2.5 h-2.5" /> Task 1 Win
+                        <span className="px-2 py-0.5 rounded bg-emerald-600 text-white text-[9px] font-black uppercase tracking-wider flex items-center gap-1 shadow">
+                          <Trophy className="w-2.5 h-2.5" /> TASK WINNER
                         </span>
                       )}
                     </div>
@@ -217,8 +247,12 @@ export default function ContestantsPage() {
                 {/* Card Footer Bar */}
                 <div className="p-3.5 sm:p-4 pt-0">
                   <div className="pt-2 border-t border-white/[0.06] flex items-center justify-between text-[11px]">
-                    <span className="text-zinc-400">Audience Rating</span>
-                    <span className="font-display text-base text-white">{contestant.popularityScore ?? 0}%</span>
+                    <span className="text-zinc-400 font-medium">Designation</span>
+                    <span className={`font-display text-xs uppercase tracking-wider font-bold ${
+                      isEliminated ? "text-red-400" : isHousemate ? "text-amber-400" : "text-zinc-300"
+                    }`}>
+                      {isEliminated ? "Eliminated" : isHousemate ? "Housemate" : "Contestant"}
+                    </span>
                   </div>
                 </div>
               </Link>

@@ -225,29 +225,33 @@ export default function AdminDashboardPage() {
           </h3>
           <div className="editorial-panel rounded-xl p-6 space-y-3 text-xs text-zinc-300 border border-white/[0.08]">
             <p>Contestant statistics synchronize in real-time. Statuses enforced:</p>
-            <div className="p-3 bg-black/30 rounded border border-team-red/30 flex items-center justify-between">
-              <span className="font-bold text-team-red">Rohit Naidu &bull; Red Team Leader (Active, Nominated, Task 1 Winner)</span>
-              <span className="text-bb-gold font-bold">LEADER</span>
+            <div className="p-3 bg-black/30 rounded border border-emerald-500/30 flex items-center justify-between">
+              <span className="font-bold text-white">Auto Ram Prasad &bull; Task Winner (Active, Nominated)</span>
+              <span className="text-emerald-400 font-bold">TASK WINNER</span>
             </div>
-            <div className="p-3 bg-black/30 rounded border border-team-blue/30 flex items-center justify-between">
-              <span className="font-bold text-team-blue">Debjani Modak &bull; Blue Team Leader (Active, Nominated)</span>
-              <span className="text-bb-gold font-bold">LEADER</span>
-            </div>
-            <div className="p-3 bg-black/30 rounded border border-team-blue/30 flex items-center justify-between">
-              <span className="font-bold text-team-blue">Auto Ram Prasad &bull; Blue Team &bull; High Risk Zone (Active Housemate, Nominated, Not Eliminated)</span>
+            <div className="p-3 bg-black/30 rounded border border-amber-500/30 flex items-center justify-between">
+              <span className="font-bold text-amber-300">Aman &bull; High Risk Zone (Active Housemate, Nominated, Not Eliminated)</span>
               <span className="text-amber-300 font-bold">HIGH RISK ZONE</span>
             </div>
-            <div className="p-3 bg-black/30 rounded border border-team-red/30 flex items-center justify-between">
-              <span className="font-bold text-team-red">Chaitra Rai &bull; Red Team &bull; High Risk Zone (Active Housemate, Nominated, Not Eliminated)</span>
+            <div className="p-3 bg-black/30 rounded border border-amber-500/30 flex items-center justify-between">
+              <span className="font-bold text-amber-300">Sudheer Kumar Reddy &bull; High Risk Zone (Active Housemate, Nominated, Not Eliminated)</span>
               <span className="text-amber-300 font-bold">HIGH RISK ZONE</span>
             </div>
-            <div className="p-3 bg-black/30 rounded border border-team-red/30 flex items-center justify-between">
-              <span className="font-bold text-team-red">Charan &bull; Red Team &bull; ELIMINATED (Based on Housemates' Votes)</span>
-              <span className="text-team-red font-bold">ELIMINATED</span>
+            <div className="p-3 bg-black/30 rounded border border-amber-500/30 flex items-center justify-between">
+              <span className="font-bold text-amber-300">Varshini Sounderajan &bull; High Risk Zone (Active Housemate, Nominated, Not Eliminated)</span>
+              <span className="text-amber-300 font-bold">HIGH RISK ZONE</span>
+            </div>
+            <div className="p-3 bg-black/30 rounded border border-red-900/40 flex items-center justify-between">
+              <span className="font-bold text-red-400">Chaitra Rai &bull; ELIMINATED (Based on Housemates' Votes)</span>
+              <span className="text-red-400 font-bold">ELIMINATED</span>
+            </div>
+            <div className="p-3 bg-black/30 rounded border border-red-900/40 flex items-center justify-between">
+              <span className="font-bold text-red-400">Charan &bull; ELIMINATED (Based on Housemates' Votes)</span>
+              <span className="text-red-400 font-bold">ELIMINATED</span>
             </div>
             <div className="p-3 bg-black/30 rounded border border-white/10 flex items-center justify-between">
-              <span className="text-zinc-300 font-bold">Task 1: RED TEAM WON (Rohit Naidu &amp; Temper Vamsi defeated Thrigun &amp; Mukesh Gowda)</span>
-              <span className="text-emerald-400 font-bold">RED TEAM WIN</span>
+              <span className="text-zinc-300 font-bold">Task Winner: Auto Ram Prasad dominant individual arena display</span>
+              <span className="text-emerald-400 font-bold">TASK WINNER</span>
             </div>
           </div>
         </div>
@@ -261,20 +265,20 @@ export default function AdminDashboardPage() {
           </h3>
           <div className="editorial-panel rounded-xl p-6 space-y-3 text-xs text-zinc-300 border border-white/[0.08]">
             <div className="p-3 bg-black/30 rounded border border-white/10 flex items-center justify-between">
-              <span className="text-white font-semibold">CHARAN ELIMINATED FROM BIGG BOSS BASED ON HOUSEMATES' VOTES</span>
+              <span className="text-white font-semibold">CHAITRA RAI AND CHARAN ELIMINATED FROM BIGG BOSS BASED ON HOUSEMATES' VOTES</span>
               <span className="text-bb-gold font-bold">Verified Dispatch (Eviction)</span>
             </div>
             <div className="p-3 bg-black/30 rounded border border-white/10 flex items-center justify-between">
-              <span className="text-white font-semibold">RED TEAM WINS TASK 1: ROHIT NAIDU &amp; TEMPER VAMSI DEFEAT BLUE TEAM</span>
+              <span className="text-white font-semibold">AUTO RAM PRASAD WINS TASK 1 IN DOMINANT INDIVIDUAL ARENA DISPLAY</span>
               <span className="text-bb-gold font-bold">Verified Dispatch (Tasks)</span>
             </div>
             <div className="p-3 bg-black/30 rounded border border-white/10 flex items-center justify-between">
-              <span className="text-white font-semibold">AUTO RAM PRASAD AND CHAITRA RAI ENTER HIGH RISK ZONE (Active Housemates)</span>
-              <span className="text-bb-gold font-bold">Verified Dispatch (Arena)</span>
+              <span className="text-white font-semibold">AMAN AND SUDHEER KUMAR REDDY ENTER HIGH RISK ZONE</span>
+              <span className="text-bb-gold font-bold">Verified Dispatch (Nominations)</span>
             </div>
             <div className="p-3 bg-black/30 rounded border border-white/10 flex items-center justify-between">
-              <span className="text-white font-semibold">ROHIT NAIDU (RED TEAM) AND DEBJANI MODAK (BLUE TEAM) APPOINTED TEAM LEADERS</span>
-              <span className="text-bb-gold font-bold">Verified Dispatch (Leadership)</span>
+              <span className="text-white font-semibold">COMPETITION TRANSITIONS TO INDIVIDUAL BATTLE AS 14 HOUSEMATES REMAIN</span>
+              <span className="text-bb-gold font-bold">Verified Dispatch (House Dynamics)</span>
             </div>
           </div>
         </div>

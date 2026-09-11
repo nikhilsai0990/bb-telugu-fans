@@ -28,7 +28,7 @@ export default async function HomePage() {
       {/* 2. Canonical 4-Concept Feature Icon Strip */}
       <FeatureIconStrip />
 
-      {/* 3. Season 10 Division: Red Team (7) vs Blue Team (8, Task Winner) + Elimination History */}
+      {/* 3. Season 10 Individual Arena Roster */}
       <TeamVsSection contestants={contestants} />
 
       {/* 4. Today's Highlights Editorial Section */}

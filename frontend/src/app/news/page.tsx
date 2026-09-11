@@ -77,14 +77,12 @@ export default function NewsPage() {
             const isDebjani = item.slug.includes("debjani");
 
             const fallbackImage = isEliminated
-              ? "/images/contestants/charan.webp"
-              : isHighZone
               ? "/images/contestants/chaitra-rai.webp"
+              : isHighZone
+              ? "/images/contestants/aman.webp"
               : isTaskWin
-              ? "/images/contestants/rohit-naidu.webp"
-              : isDebjani
-              ? "/images/contestants/debjani-modak.webp"
-              : "/images/contestants/rohit-naidu.webp";
+              ? "/images/contestants/auto-ram-prasad.webp"
+              : "/images/contestants/debjani-modak.webp";
 
             return (
               <Link
@@ -135,22 +133,17 @@ export default function NewsPage() {
                     ) : isEliminated ? (
                       <span className="text-[11px] font-bold text-team-red uppercase tracking-tight flex items-center gap-1.5">
                         <AlertCircle className="w-3.5 h-3.5 text-team-red" />
-                        Charan Eliminated
+                        Charan &amp; Chaitra Rai Eliminated
                       </span>
                     ) : isTaskWin ? (
                       <span className="text-[11px] font-bold text-emerald-400 uppercase tracking-tight flex items-center gap-1.5">
                         <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
-                        Red Team Won Task 1
-                      </span>
-                    ) : isDebjani ? (
-                      <span className="text-[11px] font-bold text-bb-gold uppercase tracking-tight flex items-center gap-1.5">
-                        <CheckCircle className="w-3.5 h-3.5 text-bb-gold" />
-                        Debjani Modak Leads Blue
+                        Auto Ram Prasad Task Winner
                       </span>
                     ) : (
                       <span className="text-[11px] font-bold text-bb-gold uppercase tracking-tight flex items-center gap-1.5">
                         <CheckCircle className="w-3.5 h-3.5 text-bb-gold" />
-                        15 Active Housemates on Week 1 Ballot
+                        14 Active Housemates on Week 1 Ballot
                       </span>
                     )}
                     <span className="font-bold text-zinc-400 group-hover:text-white flex items-center gap-1">

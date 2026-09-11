@@ -3,6 +3,7 @@ import {
   NotFoundException,
   BadRequestException,
   ConflictException,
+  UnauthorizedException,
   HttpStatus,
   HttpException,
 } from "@nestjs/common";
@@ -70,13 +71,18 @@ export class PollsService {
   }) {
     const { pollId, optionId, userId, voterToken, clientIp } = params;
 
-    // 1. Validate Poll Existence
+    // 1. Authenticate user identity (Part 9: Anonymous voting is NOT allowed)
+    if (!userId) {
+      throw new UnauthorizedException("Authentication required to vote. Please sign in or sign up.");
+    }
+
+    // 2. Validate Poll Existence
     const poll = this.db.polls.get(pollId);
     if (!poll) {
       throw new NotFoundException("Poll does not exist");
     }
 
-    // 2. Validate Poll Lifecycle (Sections 18, 40 TC-VOTE-004, TC-VOTE-005)
+    // 3. Validate Poll Lifecycle
     if (poll.status !== "ACTIVE") {
       if (poll.status === "CLOSED") {
         throw new BadRequestException("This poll is closed. Voting is no longer accepted.");
@@ -84,53 +90,35 @@ export class PollsService {
       throw new BadRequestException(`Poll is currently ${poll.status.toLowerCase()} and cannot accept votes.`);
     }
 
-    // 3. Validate Option Belongs to this Poll (TC-VOTE-006)
+    // 4. Validate Option Belongs to this Poll
     const option = this.db.pollOptions.get(optionId);
     if (!option || option.pollId !== pollId) {
       throw new BadRequestException("Selected option does not belong to this poll");
     }
 
-    // Validate Contestant is not eliminated (Section 21)
+    // 5. Validate Contestant is active and not eliminated (Part 27)
     if (option.contestantId) {
       const contestant = this.db.contestants.get(option.contestantId);
-      if (contestant && (contestant.status === "ELIMINATED" || contestant.isEliminated)) {
+      if (!contestant || contestant.status === "ELIMINATED" || contestant.isEliminated || !contestant.isActive) {
         throw new BadRequestException("Voting is not permitted for eliminated contestants.");
       }
     }
 
-    // 4. IP Anti-Abuse Network Rate Limit via Redis (Sections 21, 40 TC-VOTE-008, TC-VOTE-009)
+    // 6. IP Anti-Abuse Network Rate Limit via Redis (Part 13 & 14)
     const ipHash = this.rateLimiter.hashIp(clientIp);
     await this.rateLimiter.checkRateLimit(ipHash);
 
-    // 5. Voter Identity Check (Sections 20, 22)
-    let voterTokenHash: string | undefined;
-    if (!userId) {
-      if (!voterToken || voterToken.trim() === "") {
-        throw new BadRequestException("Anonymous voter token is required for unauthenticated voting");
-      }
-      voterTokenHash = crypto.createHash("sha256").update(voterToken.trim()).digest("hex");
-    }
-
-    // 6. Pre-check for duplicate vote in database (1 vote per user per day)
+    // 7. Pre-check for duplicate vote by userId in database (1 vote per user per day/poll)
     const todayStr = new Date().toISOString().slice(0, 10);
     for (const v of this.db.votes.values()) {
       if (v.pollId === pollId) {
         const voteDay = v.createdAt.toISOString().slice(0, 10);
-        if (voteDay === todayStr) {
-          if (userId && v.userId === userId) {
-            throw new ConflictException({
-              statusCode: HttpStatus.CONFLICT,
-              error: "ALREADY_VOTED",
-              message: "You have already cast your vote today. Only 1 vote per user per day is allowed.",
-            });
-          }
-          if (voterTokenHash && v.voterTokenHash === voterTokenHash) {
-            throw new ConflictException({
-              statusCode: HttpStatus.CONFLICT,
-              error: "ALREADY_VOTED",
-              message: "A vote has already been registered from this device today. Only 1 vote per user per day is allowed.",
-            });
-          }
+        if (voteDay === todayStr && v.userId === userId) {
+          throw new ConflictException({
+            statusCode: HttpStatus.CONFLICT,
+            error: "ALREADY_VOTED",
+            message: "You have already cast your vote today. Only 1 vote per user per day is allowed.",
+          });
         }
       }
     }
@@ -143,7 +131,7 @@ export class PollsService {
           pollId,
           optionId,
           userId,
-          voterTokenHash,
+          voterTokenHash: voterToken ? this.rateLimiter.hashIp(voterToken) : undefined,
           ipHash,
         });
 
@@ -197,41 +185,35 @@ export class PollsService {
   public getVoterStatus(params: {
     pollId: string;
     userId?: string;
-    voterToken?: string;
   }) {
-    const { pollId, userId, voterToken } = params;
-    let voterTokenHash: string | undefined;
-    if (voterToken && voterToken.trim() !== "") {
-      voterTokenHash = crypto.createHash("sha256").update(voterToken.trim()).digest("hex");
+    const { pollId, userId } = params;
+    if (!userId) {
+      return { hasVoted: false };
     }
 
     const todayStr = new Date().toISOString().slice(0, 10);
 
     for (const v of this.db.votes.values()) {
-      if (v.pollId === pollId) {
+      if (v.pollId === pollId && v.userId === userId) {
         const voteDay = v.createdAt.toISOString().slice(0, 10);
         if (voteDay === todayStr) {
-          const matchUser = userId && v.userId === userId;
-          const matchToken = voterTokenHash && v.voterTokenHash === voterTokenHash;
-          if (matchUser || matchToken) {
-            const option = this.db.pollOptions.get(v.optionId);
-            let contestantName: string | undefined;
-            if (option) {
-              if (option.contestantId) {
-                const contestant = this.db.contestants.get(option.contestantId);
-                if (contestant) contestantName = contestant.name;
-              }
-              if (!contestantName) {
-                contestantName = option.text.replace(/Save\s*/i, "").replace(/\s*\([^)]*\)/i, "").trim();
-              }
+          const option = this.db.pollOptions.get(v.optionId);
+          let contestantName: string | undefined;
+          if (option) {
+            if (option.contestantId) {
+              const contestant = this.db.contestants.get(option.contestantId);
+              if (contestant) contestantName = contestant.name;
             }
-
-            return {
-              hasVoted: true,
-              optionId: v.optionId,
-              contestantName: contestantName || "your selected housemate",
-            };
+            if (!contestantName) {
+              contestantName = option.text.replace(/Save\s*/i, "").replace(/\s*\([^)]*\)/i, "").trim();
+            }
           }
+
+          return {
+            hasVoted: true,
+            optionId: v.optionId,
+            contestantName: contestantName || "your selected housemate",
+          };
         }
       }
     }
