@@ -68,11 +68,11 @@ export const fallbackContestants: Contestant[] = [
     team: "RED",
     role: "PLAYER",
     isHousemate: true,
-    zone: "HIGH_RISK",
-    isHighRiskZone: true,
-    isHighZone: true,
+    zone: "NORMAL",
+    isHighRiskZone: false,
+    isHighZone: false,
     avatarUrl: "/images/contestants/aman.webp",
-    bio: "Short Film Actor • Commoner currently in the High Risk Zone as an active housemate.",
+    bio: "Short Film Actor • Commoner competing as an active housemate.",
     occupation: "Short Film Actor • Commoner",
     status: "ACTIVE",
     isActive: true,
@@ -407,12 +407,12 @@ export const fallbackContestants: Contestant[] = [
     season: 10,
     team: "BLUE",
     role: "PLAYER",
-    zone: "HIGH_RISK",
-    isHighRiskZone: true,
-    isHighZone: true,
+    zone: "NORMAL",
+    isHighRiskZone: false,
+    isHighZone: false,
     isHousemate: true,
     avatarUrl: "/images/contestants/sudheer-kumar-reddy.webp",
-    bio: "Digital creator and voice of 'Sudheer Talks' currently in the High Risk Zone as an active housemate.",
+    bio: "Digital creator and voice of 'Sudheer Talks' competing as an active housemate.",
     occupation: "Podcaster & Creator",
     status: "ACTIVE",
     isActive: true,
@@ -473,12 +473,12 @@ export const fallbackContestants: Contestant[] = [
     season: 10,
     team: "BLUE",
     role: "PLAYER",
-    zone: "HIGH_RISK",
-    isHighRiskZone: true,
-    isHighZone: true,
+    zone: "NORMAL",
+    isHighRiskZone: false,
+    isHighZone: false,
     isHousemate: true,
     avatarUrl: "/images/contestants/varshini-sounderajan.webp",
-    bio: "Spirited television host with sharp verbal clarity and charisma currently in the High Risk Zone as an active housemate.",
+    bio: "Spirited television host with sharp verbal clarity and charisma competing as an active housemate.",
     occupation: "TV Anchor & Actress",
     status: "ACTIVE",
     isActive: true,
@@ -583,13 +583,13 @@ export const fallbackPolls: Poll[] = [
       { id: "opt-save-c-03", contestantId: "c-03", text: "Save Jabardasth Naresh", imageUrl: "/images/contestants/jabardasth-naresh.webp", votesCount: 0, percentage: 0, team: "BLUE", zone: "NORMAL", isHighRiskZone: false },
       { id: "opt-save-c-04", contestantId: "c-04", text: "Save Thrigun", imageUrl: "/images/contestants/thrigun.webp", votesCount: 0, percentage: 0, team: "BLUE", zone: "NORMAL", isHighRiskZone: false },
       { id: "opt-save-c-05", contestantId: "c-05", text: "Save Mukesh Gowda", imageUrl: "/images/contestants/mukesh-gowda.webp", votesCount: 0, percentage: 0, team: "BLUE", zone: "NORMAL", isHighRiskZone: false },
-      { id: "opt-save-c-06", contestantId: "c-06", text: "Save Varshini Sounderajan", imageUrl: "/images/contestants/varshini-sounderajan.webp", votesCount: 0, percentage: 0, team: "BLUE", zone: "HIGH_RISK", isHighRiskZone: true },
+      { id: "opt-save-c-06", contestantId: "c-06", text: "Save Varshini Sounderajan", imageUrl: "/images/contestants/varshini-sounderajan.webp", votesCount: 0, percentage: 0, team: "BLUE", zone: "NORMAL", isHighRiskZone: false },
       { id: "opt-save-c-07", contestantId: "c-07", text: "Save Temper Vamsi", imageUrl: "/images/contestants/temper-vamsi.webp", votesCount: 0, percentage: 0, team: "RED", zone: "NORMAL", isHighRiskZone: false },
       { id: "opt-save-c-08", contestantId: "c-08", text: "Save Krishnudu", imageUrl: "/images/contestants/krishnudu.webp", votesCount: 0, percentage: 0, team: "BLUE", zone: "NORMAL", isHighRiskZone: false },
-      { id: "opt-save-c-09", contestantId: "c-09", text: "Save Sudheer Kumar Reddy", imageUrl: "/images/contestants/sudheer-kumar-reddy.webp", votesCount: 0, percentage: 0, team: "BLUE", zone: "HIGH_RISK", isHighRiskZone: true },
+      { id: "opt-save-c-09", contestantId: "c-09", text: "Save Sudheer Kumar Reddy", imageUrl: "/images/contestants/sudheer-kumar-reddy.webp", votesCount: 0, percentage: 0, team: "BLUE", zone: "NORMAL", isHighRiskZone: false },
       // Chaitra Rai is ELIMINATED - excluded from voting
       { id: "opt-save-c-11", contestantId: "c-11", text: "Save Rohit Naidu", imageUrl: "/images/contestants/rohit-naidu.webp", votesCount: 0, percentage: 0, team: "RED", zone: "NORMAL", isHighRiskZone: false },
-      { id: "opt-save-c-12", contestantId: "c-12", text: "Save Aman", imageUrl: "/images/contestants/aman.webp", votesCount: 0, percentage: 0, team: "RED", zone: "HIGH_RISK", isHighRiskZone: true },
+      { id: "opt-save-c-12", contestantId: "c-12", text: "Save Aman", imageUrl: "/images/contestants/aman.webp", votesCount: 0, percentage: 0, team: "RED", zone: "NORMAL", isHighRiskZone: false },
       // Charan is ELIMINATED - excluded from voting
       { id: "opt-save-c-14", contestantId: "c-14", text: "Save Shalini", imageUrl: "/images/contestants/shalini.webp", votesCount: 0, percentage: 0, team: "RED", zone: "NORMAL", isHighRiskZone: false },
       { id: "opt-save-c-15", contestantId: "c-15", text: "Save Srushti Vyakaranam", imageUrl: "/images/contestants/srushti-vyakaranam.webp", votesCount: 0, percentage: 0, team: "RED", zone: "NORMAL", isHighRiskZone: false },
@@ -682,8 +682,8 @@ const fallbackPosts: Post[] = [
     username: "TeluguBigBossLover",
     userAvatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150",
     category: "Fan Theories",
-    title: "Task Winners & High Risk Zone: Who will survive the upcoming eviction?",
-    description: "Auto Ram Prasad, Rohit Naidu, and Temper Vamsi have all won tasks, while Aman, Sudheer Kumar Reddy, and Varshini Sounderajan are in the High Risk Zone. Who is your top pick?",
+    title: "Task Winners & Season 10 Housemates: Who is making the biggest impact?",
+    description: "Auto Ram Prasad, Rohit Naidu, and Temper Vamsi have all won tasks in Week 1. Who is your top pick?",
     likesCount: 0,
     commentsCount: 0,
     isPinned: true,
@@ -726,28 +726,6 @@ export const api = {
         list = list.filter((c) => !c.isEliminated && c.status !== "ELIMINATED" && c.status !== "EVICTED");
       } else if (status.toUpperCase() === "ELIMINATED") {
         list = list.filter((c) => c.isEliminated || c.status === "ELIMINATED");
-      } else if (
-        status.toUpperCase() === "HIGH_RISK" ||
-        status.toUpperCase() === "HIGH_RISK_ZONE" ||
-        status.toUpperCase() === "HIGH RISK ZONE" ||
-        status.toUpperCase() === "HIGH_ZONE" ||
-        status.toUpperCase() === "HIGH ZONE"
-      ) {
-        list = list.filter(
-          (c) =>
-            (c.zone === "HIGH_RISK" ||
-              c.isHighRiskZone ||
-              c.slug === "aman" ||
-              c.slug === "sudheer-kumar-reddy" ||
-              c.slug === "varshini-sounderajan" ||
-              c.id === "c-06") &&
-            !c.isEliminated &&
-            c.status !== "ELIMINATED" &&
-            c.slug !== "auto-ram-prasad" &&
-            c.slug !== "mukesh-gowda" &&
-            c.slug !== "charan" &&
-            c.slug !== "chaitra-rai"
-        );
       } else if (status.toUpperCase() === "NOMINATED") {
         list = list.filter((c) => c.isNominated || c.status === "NOMINATED");
       } else {

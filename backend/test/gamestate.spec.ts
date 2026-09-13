@@ -73,39 +73,37 @@ describe("Season 10 Authoritative Game State Tests", () => {
     expect(chaitra.noReentry).toBe(true);
   });
 
-  it("4. Aman is High Risk Zone (Active housemate)", () => {
+  it("4. Aman is not in High Risk Zone (Active housemate)", () => {
     const aman = db.contestants.get("c-12")!;
-    expect(aman.zone).toBe("HIGH_RISK");
-    expect(aman.isHighRiskZone).toBe(true);
+    expect(aman.zone).toBe("NORMAL");
+    expect(aman.isHighRiskZone).toBeFalsy();
     expect(aman.isActive).toBe(true);
     expect(aman.isNominated).toBe(false);
     expect(aman.isEliminated).toBe(false);
   });
 
-  it("5. Sudheer Kumar Reddy is High Risk Zone (Active housemate)", () => {
+  it("5. Sudheer Kumar Reddy is not in High Risk Zone (Active housemate)", () => {
     const sudheer = db.contestants.get("c-09")!;
-    expect(sudheer.zone).toBe("HIGH_RISK");
-    expect(sudheer.isHighRiskZone).toBe(true);
+    expect(sudheer.zone).toBe("NORMAL");
+    expect(sudheer.isHighRiskZone).toBeFalsy();
     expect(sudheer.isActive).toBe(true);
     expect(sudheer.isNominated).toBe(false);
     expect(sudheer.isEliminated).toBe(false);
   });
 
-  it("6. Varshini Sounderajan is High Risk Zone (Active housemate)", () => {
+  it("6. Varshini Sounderajan is not in High Risk Zone (Active housemate)", () => {
     const varshini = db.contestants.get("c-06")!;
-    expect(varshini.zone).toBe("HIGH_RISK");
-    expect(varshini.isHighRiskZone).toBe(true);
+    expect(varshini.zone).toBe("NORMAL");
+    expect(varshini.isHighRiskZone).toBeFalsy();
     expect(varshini.isActive).toBe(true);
     expect(varshini.isNominated).toBe(false);
     expect(varshini.isEliminated).toBe(false);
   });
 
-  it("7. Exactly 3 High Risk Zone contestants exist (Aman, Sudheer Kumar Reddy, Varshini Sounderajan)", () => {
+  it("7. High Risk Zone is completely removed (0 High Risk Zone contestants exist)", () => {
     const all = Array.from(db.contestants.values());
     const highRisk = all.filter((c) => c.zone === "HIGH_RISK" || c.isHighRiskZone === true);
-    expect(highRisk.length).toBe(3);
-    const names = highRisk.map((c) => c.name).sort();
-    expect(names).toEqual(["Aman", "Sudheer Kumar Reddy", "Varshini Sounderajan"].sort());
+    expect(highRisk.length).toBe(0);
   });
 
   it("8. Auto Ram Prasad is NOT High Risk Zone, is TASK WINNER, and is a Housemate", () => {

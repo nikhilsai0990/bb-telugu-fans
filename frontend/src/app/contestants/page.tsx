@@ -32,22 +32,6 @@ export default function ContestantsPage() {
         c.slug !== "chaitra-rai" &&
         c.isActive
     );
-  } else if (filter === "HIGH_RISK" || filter === "HIGH_ZONE") {
-    displayedContestants = contestants.filter(
-      (c) =>
-        !c.isEliminated &&
-        c.status !== "ELIMINATED" &&
-        c.slug !== "charan" &&
-        c.slug !== "chaitra-rai" &&
-        c.slug !== "auto-ram-prasad" &&
-        c.slug !== "mukesh-gowda" &&
-        (c.isHighRiskZone ||
-          c.zone === "HIGH_RISK" ||
-          c.slug === "aman" ||
-          c.slug === "sudheer-kumar-reddy" ||
-          c.slug === "varshini-sounderajan" ||
-          c.id === "c-06")
-    );
   } else if (filter === "ELIMINATED") {
     displayedContestants = contestants.filter(
       (c) =>
@@ -63,7 +47,6 @@ export default function ContestantsPage() {
   const filterTabs = [
     { id: "ALL", label: "All Housemates (16)" },
     { id: "ACTIVE", label: "Active Housemates (14)" },
-    { id: "HIGH_RISK", label: "HIGH RISK ZONE (3)" },
     { id: "ELIMINATED", label: "Eliminated (2)" },
   ];
 
@@ -80,7 +63,7 @@ export default function ContestantsPage() {
           Housemates Directory
         </h1>
         <p className="text-sm text-zinc-300 max-w-2xl leading-relaxed">
-          The 16 Bigg Boss Telugu Season 10 housemates. Auto Ram Prasad, Rohit Naidu, and Temper Vamsi are TASK WINNERS. Charan and Chaitra Rai are ELIMINATED based on housemates&apos; votes (NO RE-ENTRY). Aman, Sudheer Kumar Reddy, and Varshini Sounderajan are in the HIGH RISK ZONE (3).
+          The 16 Bigg Boss Telugu Season 10 housemates. Auto Ram Prasad, Rohit Naidu, and Temper Vamsi are TASK WINNERS. Charan and Chaitra Rai are ELIMINATED based on housemates&apos; votes (NO RE-ENTRY). 14 active housemates remain in the competition.
         </p>
       </div>
 
@@ -140,19 +123,6 @@ export default function ContestantsPage() {
               contestant.id === "c-13" ||
               contestant.id === "c-10";
 
-            const isHighRisk =
-              !isEliminated &&
-              (contestant.slug === "aman" ||
-                contestant.slug === "sudheer-kumar-reddy" ||
-                contestant.slug === "varshini-sounderajan" ||
-                contestant.id === "c-12" ||
-                contestant.id === "c-09" ||
-                contestant.id === "c-06" ||
-                contestant.zone === "HIGH_RISK" ||
-                contestant.isHighRiskZone) &&
-              contestant.slug !== "auto-ram-prasad" &&
-              contestant.slug !== "mukesh-gowda";
-
             const isTaskWinner =
               contestant.isTaskWinner ||
               contestant.slug === "auto-ram-prasad" ||
@@ -170,8 +140,6 @@ export default function ContestantsPage() {
                 className={`group editorial-card rounded-lg overflow-hidden flex flex-col justify-between transition-all ${
                   isEliminated
                     ? "opacity-75 border-red-950/40 bg-zinc-950/60"
-                    : isHighRisk
-                    ? "border-amber-500/40 hover:border-amber-400"
                     : "border-white/[0.08] hover:border-white/30"
                 }`}
               >
@@ -194,12 +162,6 @@ export default function ContestantsPage() {
                       ) : (
                         <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[9px] font-black uppercase tracking-wider backdrop-blur-sm">
                           HOUSEMATE
-                        </span>
-                      )}
-
-                      {isHighRisk && (
-                        <span className="px-2 py-0.5 rounded bg-amber-500 text-black text-[9px] font-black uppercase tracking-wider shadow">
-                          HIGH RISK ZONE (3)
                         </span>
                       )}
 

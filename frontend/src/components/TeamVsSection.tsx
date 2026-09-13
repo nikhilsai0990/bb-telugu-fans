@@ -18,19 +18,6 @@ export const TeamVsSection: React.FC<{ contestants: Contestant[] }> = ({ contest
       contestant.id === "c-13" ||
       contestant.id === "c-10";
 
-    const isHighRisk =
-      !isEliminated &&
-      (contestant.slug === "aman" ||
-        contestant.slug === "sudheer-kumar-reddy" ||
-        contestant.slug === "varshini-sounderajan" ||
-        contestant.id === "c-12" ||
-        contestant.id === "c-09" ||
-        contestant.id === "c-06" ||
-        contestant.zone === "HIGH_RISK" ||
-        contestant.isHighRiskZone) &&
-      contestant.slug !== "auto-ram-prasad" &&
-      contestant.slug !== "mukesh-gowda";
-
     const isTaskWinner =
       contestant.isTaskWinner ||
       contestant.slug === "auto-ram-prasad" ||
@@ -47,8 +34,6 @@ export const TeamVsSection: React.FC<{ contestants: Contestant[] }> = ({ contest
         className={`group relative p-3 rounded-lg bg-[#14151D] border ${
           isEliminated
             ? "border-red-950/40 opacity-75"
-            : isHighRisk
-            ? "border-amber-500/40 hover:border-amber-400"
             : "border-white/[0.08] hover:border-white/30"
         } transition-colors flex items-center gap-3`}
       >
@@ -68,11 +53,6 @@ export const TeamVsSection: React.FC<{ contestants: Contestant[] }> = ({ contest
             ) : (
               <span className="px-1.5 py-0.2 rounded bg-white/[0.06] text-zinc-300 text-[9px] font-bold uppercase tracking-tight border border-white/10">
                 Housemate
-              </span>
-            )}
-            {isHighRisk && (
-              <span className="px-1.5 py-0.2 rounded bg-amber-400 text-black text-[9px] font-black uppercase tracking-tight">
-                HIGH RISK ZONE (3)
               </span>
             )}
             {isTaskWinner && (
@@ -108,7 +88,7 @@ export const TeamVsSection: React.FC<{ contestants: Contestant[] }> = ({ contest
               RED TEAM <span className="text-zinc-500 font-sans font-bold text-2xl sm:text-3xl align-middle">VS</span> BLUE TEAM
             </h2>
             <p className="text-sm text-zinc-400 max-w-xl">
-              Bigg Boss Telugu Season 10 features 16 housemates across Red and Blue teams. Auto Ram Prasad, Rohit Naidu, and Temper Vamsi are TASK WINNERS. Charan and Chaitra Rai are ELIMINATED with NO RE-ENTRY. Aman, Sudheer Kumar Reddy, and Varshini Sounderajan occupy the HIGH RISK ZONE (3). Latest Team Task: Krishnudu&apos;s team won against Naresh&apos;s team!
+              Bigg Boss Telugu Season 10 features 16 housemates across Red and Blue teams. Auto Ram Prasad, Rohit Naidu, and Temper Vamsi are TASK WINNERS. Charan and Chaitra Rai are ELIMINATED with NO RE-ENTRY. 14 active housemates remain in the competition. Latest Team Task: Krishnudu&apos;s team won against Naresh&apos;s team!
             </p>
           </div>
           <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-zinc-400">

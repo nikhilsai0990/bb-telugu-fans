@@ -207,19 +207,10 @@ export const PollWidget: React.FC<{ initialPoll: Poll | null }> = ({ initialPoll
         </div>
       )}
 
-      {/* Options List — 14 Active Nominated Housemates */}
+      {/* Options List — 14 Active Housemates */}
       <div className="space-y-2 max-h-[440px] overflow-y-auto pr-1">
         {poll.options.map((option) => {
           const isSelected = selectedOption === option.id;
-          const isHighRisk =
-            option.zone === "HIGH_RISK" ||
-            option.isHighRiskZone ||
-            option.contestantId === "c-12" ||
-            option.contestantId === "c-09" ||
-            option.contestantId === "c-06" ||
-            option.text.toLowerCase().includes("aman") ||
-            option.text.toLowerCase().includes("sudheer") ||
-            option.text.toLowerCase().includes("varshini");
 
           const cleanName = option.text
             .replace(/Save\s*/i, "")
@@ -262,14 +253,9 @@ export const PollWidget: React.FC<{ initialPoll: Poll | null }> = ({ initialPoll
                     <span className="text-xs font-bold text-white group-hover:text-bb-gold transition-colors truncate">
                       {cleanName}
                     </span>
-                    {isHighRisk && (
-                      <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-amber-400/20 text-amber-300 border border-amber-400/40">
-                        HIGH RISK ZONE (3)
-                      </span>
-                    )}
                   </div>
                   <span className="text-[10px] text-zinc-400 block mt-0.5">
-                    Nominated for Season 10 Eviction
+                    Season 10 Housemate
                   </span>
                 </div>
               </div>
@@ -301,20 +287,13 @@ export const PollWidget: React.FC<{ initialPoll: Poll | null }> = ({ initialPoll
       {/* Voting Action CTA */}
       <div className="pt-2 border-t border-white/[0.08] space-y-3">
         {poll.status === "CLOSED" ? (
-          <div className="space-y-2">
-            <div className="p-3 rounded bg-amber-500/10 border border-amber-500/20 text-center">
-              <span className="text-xs font-bold uppercase tracking-wider text-amber-300 flex items-center justify-center gap-1.5">
-                <Lock className="w-3.5 h-3.5" /> Voting is currently closed
-              </span>
-            </div>
-            <button
-              disabled
-              className="w-full py-3.5 rounded font-bold text-xs uppercase tracking-wider bg-white/[0.06] text-zinc-500 cursor-not-allowed border border-white/[0.08] flex items-center justify-center gap-2"
-            >
-              <Lock className="w-4 h-4 text-zinc-500" />
-              <span>Voting is Currently Closed</span>
-            </button>
-          </div>
+          <button
+            disabled
+            className="w-full py-3.5 rounded font-bold text-xs uppercase tracking-wider bg-white/[0.06] text-zinc-500 cursor-not-allowed border border-white/[0.08] flex items-center justify-center gap-2"
+          >
+            <Lock className="w-4 h-4 text-zinc-500" />
+            <span>Voting is Currently Closed</span>
+          </button>
         ) : !hasVoted ? (
           user ? (
             <button

@@ -21,29 +21,34 @@ test.describe("Complete User Journey & Authoritative Game State Verification", (
     await expect(page.locator("text=Rohit Naidu").first()).toBeVisible();
     await expect(page.locator("text=Temper Vamsi").first()).toBeVisible();
     await expect(page.locator("text=TASK WINNER").first()).toBeVisible();
-    await expect(page.locator("text=HIGH RISK ZONE (3)").first()).toBeVisible();
+    await expect(page.locator("text=Charan & Chaitra Rai").first()).toBeVisible();
+    await expect(page.locator("text=NO RE-ENTRY").first()).toBeVisible();
     await expect(page.locator("text=Aman").first()).toBeVisible();
     await expect(page.locator("text=Sudheer").first()).toBeVisible();
     await expect(page.locator("text=Chaitra Rai").first()).toBeVisible();
     await expect(page.locator("text=Charan").first()).toBeVisible();
 
-    // Verify Team Leaders removed & Latest Team Task
+    // Verify Eliminated Section on Homepage
+    await expect(page.locator("[data-testid='eliminated-section']")).toBeVisible();
+    await expect(page.locator("text=ELIMINATED CONTESTANTS").first()).toBeVisible();
+
+    // Verify Team Leaders removed & High Risk Zone removed
     const pageContent = await page.content();
     expect(pageContent).not.toContain("Red Team Leader");
     expect(pageContent).not.toContain("Blue Team Leader");
+    expect(pageContent).not.toContain("HIGH RISK ZONE");
     expect(pageContent).toContain("Krishnudu");
   });
 
-  test("Housemates directory reflects 16 housemates, High Risk Zone (3), Task Winners, and eliminations with No Re-entry", async ({
+  test("Housemates directory reflects 16 housemates, Task Winners, and eliminations with No Re-entry (No High Risk Zone)", async ({
     page,
   }) => {
     await page.goto("/contestants");
     await expect(page.locator("h1")).toContainText("Housemates Directory");
 
-    // Check filter tabs
+    // Check filter tabs (No High Risk Zone tab)
     await expect(page.locator("button:has-text('All Housemates (16)')")).toBeVisible();
     await expect(page.locator("button:has-text('Active Housemates (14)')")).toBeVisible();
-    await expect(page.locator("button:has-text('HIGH RISK ZONE (3)')")).toBeVisible();
     await expect(page.locator("button:has-text('Eliminated (2)')")).toBeVisible();
 
     // Verify Commoner descriptions on the directory page
@@ -51,27 +56,30 @@ test.describe("Complete User Journey & Authoritative Game State Verification", (
     expect(dirContent).toContain("Product Manager • Commoner");
     expect(dirContent).toContain("Short Film Actor • Commoner");
     expect(dirContent).toContain("Singer • Commoner");
+    expect(dirContent).not.toContain("HIGH RISK ZONE");
 
-    // Check Auto Ram Prasad has TASK WINNER badge and NOT High Risk Zone
+    // Check Auto Ram Prasad has TASK WINNER badge
     const ramCard = page.locator("a[href*='auto-ram-prasad']");
     await expect(ramCard).toBeVisible();
     await expect(ramCard).toContainText("TASK WINNER");
-    await expect(ramCard).not.toContainText("HIGH RISK ZONE");
 
-    // Check Aman has HIGH RISK ZONE badge
+    // Check Aman has HOUSEMATE badge and NOT High Risk Zone
     const amanCard = page.locator("a[href*='aman']").first();
     await expect(amanCard).toBeVisible();
-    await expect(amanCard).toContainText("HIGH RISK ZONE");
+    await expect(amanCard).toContainText("HOUSEMATE");
+    await expect(amanCard).not.toContainText("HIGH RISK ZONE");
 
-    // Check Sudheer Kumar Reddy has HIGH RISK ZONE badge
+    // Check Sudheer Kumar Reddy has HOUSEMATE badge and NOT High Risk Zone
     const sudheerCard = page.locator("a[href*='sudheer-kumar-reddy']").first();
     await expect(sudheerCard).toBeVisible();
-    await expect(sudheerCard).toContainText("HIGH RISK ZONE");
+    await expect(sudheerCard).toContainText("HOUSEMATE");
+    await expect(sudheerCard).not.toContainText("HIGH RISK ZONE");
 
-    // Check Varshini Sounderajan has HIGH RISK ZONE badge
+    // Check Varshini Sounderajan has HOUSEMATE badge and NOT High Risk Zone
     const varshiniCard = page.locator("a[href*='varshini-sounderajan']").first();
     await expect(varshiniCard).toBeVisible();
-    await expect(varshiniCard).toContainText("HIGH RISK ZONE");
+    await expect(varshiniCard).toContainText("HOUSEMATE");
+    await expect(varshiniCard).not.toContainText("HIGH RISK ZONE");
 
     // Check Charan and Chaitra Rai have ELIMINATED and NO RE-ENTRY
     const charanCard = page.locator("a[href*='charan']").first();
@@ -87,15 +95,6 @@ test.describe("Complete User Journey & Authoritative Game State Verification", (
     // Filter by Active Housemates (14) -> includes active housemates, excludes eliminated
     await page.click("button:has-text('Active Housemates (14)')");
     await expect(page.locator("a[href*='auto-ram-prasad']")).toBeVisible();
-    await expect(page.locator("a[href*='charan']")).not.toBeVisible();
-    await expect(page.locator("a[href*='chaitra-rai']")).not.toBeVisible();
-
-    // Filter by HIGH RISK ZONE (3) -> exactly Aman, Sudheer Kumar Reddy & Varshini Sounderajan
-    await page.click("button:has-text('HIGH RISK ZONE (3)')");
-    await expect(page.locator("a[href*='aman']")).toBeVisible();
-    await expect(page.locator("a[href*='sudheer-kumar-reddy']")).toBeVisible();
-    await expect(page.locator("a[href*='varshini-sounderajan']")).toBeVisible();
-    await expect(page.locator("a[href*='auto-ram-prasad']")).not.toBeVisible();
     await expect(page.locator("a[href*='charan']")).not.toBeVisible();
     await expect(page.locator("a[href*='chaitra-rai']")).not.toBeVisible();
 
@@ -133,23 +132,19 @@ test.describe("Complete User Journey & Authoritative Game State Verification", (
     await expect(page.locator("h1")).toContainText("WHO SHOULD BE SAVED?");
     await expect(page.locator("text=14 Active Housemates")).toBeVisible();
 
-    // Verify voting closed indicators
-    await expect(page.locator("text=Voting is Currently Closed").first()).toBeVisible();
+    // Verify voting closed indicators: exactly one disabled button
+    await expect(page.locator("button:has-text('Voting is Currently Closed')")).toHaveCount(1);
     await expect(page.locator("[data-testid='live-vote-results']")).toBeVisible();
 
-    // Verify exactly Aman, Sudheer Kumar Reddy, and Varshini Sounderajan have High Risk Zone badge on polls
+    // Verify 14 active housemates on poll card grid and NO High Risk Zone badges
     const pollCards = page.locator("div.group:has(h3)");
     await expect(pollCards).toHaveCount(14);
-    await expect(pollCards.filter({ hasText: "Aman" })).toContainText("HIGH RISK ZONE");
-    await expect(pollCards.filter({ hasText: "Sudheer" })).toContainText("HIGH RISK ZONE");
-    await expect(pollCards.filter({ hasText: "Varshini" })).toContainText("HIGH RISK ZONE");
+    const pollsContent = await page.content();
+    expect(pollsContent).not.toContain("HIGH RISK ZONE");
 
     // Charan and Chaitra Rai excluded from ballot
     await expect(pollCards.filter({ hasText: "Charan" })).toHaveCount(0);
     await expect(pollCards.filter({ hasText: "Chaitra Rai" })).toHaveCount(0);
-
-    // Auto Ram Prasad is active housemate, NOT High Risk Zone
-    await expect(pollCards.filter({ hasText: "Auto Ram Prasad" })).not.toContainText("HIGH RISK ZONE");
 
     // 2. Check News dispatches - 5 official stories
     await page.goto("/news");

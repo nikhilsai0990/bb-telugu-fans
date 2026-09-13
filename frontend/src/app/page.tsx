@@ -2,6 +2,7 @@ import React from "react";
 import { Hero } from "../components/Hero";
 import { FeatureIconStrip } from "../components/FeatureIconStrip";
 import { TeamVsSection } from "../components/TeamVsSection";
+import { EliminatedSection } from "../components/EliminatedSection";
 import { FeatureCards } from "../components/FeatureCards";
 import { TodayHighlights } from "../components/TodayHighlights";
 import { PollWidget } from "../components/PollWidget";
@@ -30,6 +31,9 @@ export default async function HomePage() {
 
       {/* 3. Season 10 Individual Arena Roster */}
       <TeamVsSection contestants={contestants} />
+
+      {/* 3b. Dedicated Eliminated Contestants Display (Home Page Only) */}
+      <EliminatedSection />
 
       {/* 4. Today's Highlights Editorial Section */}
       <TodayHighlights news={news} />

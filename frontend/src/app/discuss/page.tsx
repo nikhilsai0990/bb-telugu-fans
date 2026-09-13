@@ -389,7 +389,7 @@ export default function DiscussPage() {
             <div className="space-y-3 text-xs">
               {[
                 { tag: "#14ActiveHousemates", count: "14 Active Housemates" },
-                { tag: "#HighRiskZone3", count: "Aman, Sudheer & Varshini" },
+                { tag: "#Season10Housemates", count: "Aman, Sudheer & Varshini" },
                 { tag: "#KrishnuduTeamWin", count: "Latest Team Task" },
                 { tag: "#TaskWinners", count: "Auto, Rohit & Vamsi" },
                 { tag: "#NoEliminationSunday", count: "Voting Closed" },

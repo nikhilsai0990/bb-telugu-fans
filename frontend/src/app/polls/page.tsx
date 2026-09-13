@@ -236,15 +236,6 @@ export default function PollsPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
             {poll.options.map((option) => {
               const isSelected = selectedOption === option.id;
-              const isHighRisk =
-                option.zone === "HIGH_RISK" ||
-                option.isHighRiskZone ||
-                option.contestantId === "c-12" ||
-                option.contestantId === "c-09" ||
-                option.contestantId === "c-06" ||
-                option.text.toLowerCase().includes("aman") ||
-                option.text.toLowerCase().includes("sudheer") ||
-                option.text.toLowerCase().includes("varshini");
 
               const cleanName = option.text
                 .replace(/Save\s*/i, "")
@@ -286,11 +277,6 @@ export default function PollsPage() {
                       <h3 className="font-display text-xl uppercase tracking-wide text-white group-hover:text-bb-gold transition-colors leading-tight truncate">
                         {cleanName}
                       </h3>
-                      {isHighRisk && (
-                        <span className="text-[9px] font-bold text-amber-300 uppercase block mt-0.5">
-                          HIGH RISK ZONE (3)
-                        </span>
-                      )}
                     </div>
                   </div>
 
@@ -320,22 +306,17 @@ export default function PollsPage() {
           <div className="pt-4 border-t border-white/[0.08] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
             <div className="flex items-center gap-2 text-xs text-zinc-400">
               <ShieldCheck className="w-4 h-4 text-bb-gold flex-shrink-0" />
-              <span>{poll.status === "CLOSED" ? "Voting is currently closed." : "Verified fan authentication active. 1 vote per user per day enforced."}</span>
+              <span>Verified fan authentication active. 1 vote per user per day enforced.</span>
             </div>
 
             {poll.status === "CLOSED" ? (
-              <div className="flex items-center gap-3">
-                <span className="text-xs font-bold uppercase tracking-wider text-amber-300 flex items-center gap-1.5 px-3 py-2 rounded bg-amber-500/10 border border-amber-500/20">
-                  <Lock className="w-3.5 h-3.5" /> Voting is currently closed
-                </span>
-                <button
-                  disabled
-                  className="px-8 py-3.5 rounded font-bold text-xs uppercase tracking-wider bg-white/[0.06] text-zinc-500 cursor-not-allowed border border-white/[0.08] flex items-center justify-center gap-2"
-                >
-                  <Lock className="w-4 h-4 text-zinc-500" />
-                  <span>Voting is Currently Closed</span>
-                </button>
-              </div>
+              <button
+                disabled
+                className="px-8 py-3.5 rounded font-bold text-xs uppercase tracking-wider bg-white/[0.06] text-zinc-500 cursor-not-allowed border border-white/[0.08] flex items-center justify-center gap-2"
+              >
+                <Lock className="w-4 h-4 text-zinc-500" />
+                <span>Voting is Currently Closed</span>
+              </button>
             ) : !hasVoted ? (
               user ? (
                 <button

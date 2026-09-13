@@ -14,27 +14,6 @@ export class ContestantsService {
         list = list.filter((c) => !c.isEliminated && c.status !== "ELIMINATED" && c.status !== "EVICTED");
       } else if (status.toUpperCase() === "ELIMINATED") {
         list = list.filter((c) => c.isEliminated || c.status === "ELIMINATED");
-      } else if (
-        status.toUpperCase() === "HIGH_RISK" ||
-        status.toUpperCase() === "HIGH_RISK_ZONE" ||
-        status.toUpperCase() === "HIGH RISK ZONE" ||
-        status.toUpperCase() === "HIGH_ZONE" ||
-        status.toUpperCase() === "HIGH ZONE"
-      ) {
-        list = list.filter(
-          (c) =>
-            !c.isEliminated &&
-            c.status !== "ELIMINATED" &&
-            (c.zone === "HIGH_RISK" ||
-              c.isHighRiskZone ||
-              c.slug === "aman" ||
-              c.slug === "sudheer-kumar-reddy" ||
-              c.slug === "varshini-sounderajan") &&
-            c.slug !== "charan" &&
-            c.slug !== "chaitra-rai" &&
-            c.slug !== "auto-ram-prasad" &&
-            c.slug !== "mukesh-gowda"
-        );
       } else if (status.toUpperCase() === "NOMINATED") {
         list = list.filter((c) => c.isNominated || c.status === "NOMINATED");
       } else {

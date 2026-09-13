@@ -39,7 +39,7 @@ export const Hero = () => {
 
             {/* Editorial Context */}
             <p className="text-sm sm:text-base text-zinc-300 font-normal leading-relaxed max-w-xl">
-              The premier fan community for Bigg Boss Telugu Season 10. Auto Ram Prasad, Rohit Naidu, and Temper Vamsi are TASK WINNERS. Charan and Chaitra Rai have both been officially ELIMINATED based on housemates&apos; votes with NO RE-ENTRY. Exactly three active housemates &mdash; Aman, Sudheer Kumar Reddy, and Varshini Sounderajan &mdash; are in the HIGH RISK ZONE (3). In the latest team task, Krishnudu&apos;s team defeated Naresh&apos;s team!
+              The premier fan community for Bigg Boss Telugu Season 10. Auto Ram Prasad, Rohit Naidu, and Temper Vamsi are TASK WINNERS. Charan and Chaitra Rai have both been officially ELIMINATED based on housemates&apos; votes with NO RE-ENTRY. 14 active housemates remain in the competition. In the latest team task, Krishnudu&apos;s team defeated Naresh&apos;s team!
             </p>
 
             {/* Official Match State Board */}
@@ -65,24 +65,24 @@ export const Hero = () => {
                   <span className="text-[10px] font-semibold text-zinc-400 uppercase">TASK WINNER (1 Win Each)</span>
                 </div>
 
-                {/* High Risk Zone Box */}
-                <div className="p-2.5 rounded bg-white/[0.03] border border-amber-500/30">
+                {/* Eliminated Box */}
+                <div className="p-2.5 rounded bg-white/[0.03] border border-red-500/30">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-amber-400 block">
-                      High Risk Zone (3)
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-red-400 block">
+                      Eliminated
                     </span>
-                    <AlertCircle className="w-3.5 h-3.5 text-amber-400" />
+                    <AlertCircle className="w-3.5 h-3.5 text-red-400" />
                   </div>
-                  <p className="text-sm font-extrabold text-white mt-0.5 truncate">Aman, Sudheer &amp; Varshini</p>
-                  <span className="text-[10px] font-semibold text-zinc-400 uppercase">Active Housemates</span>
+                  <p className="text-sm font-extrabold text-white mt-0.5 truncate">Charan &amp; Chaitra Rai</p>
+                  <span className="text-[10px] font-semibold text-zinc-400 uppercase">NO RE-ENTRY</span>
                 </div>
               </div>
 
-              {/* High Risk Zone Notice Banner */}
-              <div className="flex items-start gap-2 px-3 py-2.5 rounded bg-amber-500/10 border border-amber-500/20 text-[11px] text-zinc-300">
-                <AlertCircle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+              {/* Elimination Notice Banner */}
+              <div className="flex items-start gap-2 px-3 py-2.5 rounded bg-red-950/30 border border-red-800/40 text-[11px] text-zinc-300">
+                <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
                 <span>
-                  <strong className="text-amber-300 uppercase font-bold">HIGH RISK ZONE (3):</strong> Aman, Sudheer Kumar Reddy, and Varshini Sounderajan are the 3 active housemates in the HIGH RISK ZONE (3). All three remain active housemates. Auto Ram Prasad, Mukesh Gowda, Charan, and Chaitra Rai are NOT in the High Risk Zone.
+                  <strong className="text-red-300 uppercase font-bold">ELIMINATED:</strong> Charan and Chaitra Rai have both been officially eliminated from Bigg Boss Telugu Season 10 based on housemates&apos; votes with <strong>NO RE-ENTRY</strong>. 14 active housemates remain in the competition.
                 </span>
               </div>
 
@@ -203,11 +203,11 @@ export const Hero = () => {
 
                   <div className="grid grid-cols-5 gap-1.5 sm:gap-2">
                     {[
-                      { name: "Aman", role: "High Risk", img: "/images/contestants/aman.webp", slug: "aman", tag: "HIGH RISK (3)" },
-                      { name: "Sudheer", role: "High Risk", img: "/images/contestants/sudheer-kumar-reddy.webp", slug: "sudheer-kumar-reddy", tag: "HIGH RISK (3)" },
-                      { name: "Varshini", role: "High Risk", img: "/images/contestants/varshini-sounderajan.webp", slug: "varshini-sounderajan", tag: "HIGH RISK (3)" },
-                      { name: "Chaitra Rai", role: "Eliminated", img: "/images/contestants/chaitra-rai.webp", slug: "chaitra-rai", tag: "NO RE-ENTRY" },
-                      { name: "Charan", role: "Eliminated", img: "/images/contestants/charan.webp", slug: "charan", tag: "NO RE-ENTRY" },
+                      { name: "Rohit", role: "Housemate", img: "/images/contestants/rohit-naidu.webp", slug: "rohit-naidu", tag: "TASK WINNER" },
+                      { name: "Vamsi", role: "Housemate", img: "/images/contestants/temper-vamsi.webp", slug: "temper-vamsi", tag: "TASK WINNER" },
+                      { name: "Naresh", role: "Housemate", img: "/images/contestants/jabardasth-naresh.webp", slug: "jabardasth-naresh", tag: "HOUSEMATE" },
+                      { name: "Chaitra Rai", role: "Eliminated", img: "/images/contestants/chaitra-rai.webp", slug: "chaitra-rai", tag: "ELIMINATED" },
+                      { name: "Charan", role: "Eliminated", img: "/images/contestants/charan.webp", slug: "charan", tag: "ELIMINATED" },
                     ].map((item) => (
                       <Link
                         key={item.slug}
@@ -225,7 +225,7 @@ export const Hero = () => {
                           {item.name}
                         </span>
                         <span className={`text-[8px] sm:text-[9px] font-semibold uppercase ${
-                          item.tag === "NO RE-ENTRY" ? "text-red-400" : "text-amber-400"
+                          item.tag === "ELIMINATED" ? "text-red-400" : item.tag === "TASK WINNER" ? "text-emerald-400" : "text-amber-400"
                         }`}>
                           {item.tag}
                         </span>

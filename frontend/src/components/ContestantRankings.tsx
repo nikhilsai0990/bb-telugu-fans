@@ -50,15 +50,6 @@ export const ContestantRankings: React.FC<{ contestants: Contestant[] }> = ({ co
         {topList.map((contestant, index) => {
           const rank = index + 1;
           const isLeaderRank = rank === 1;
-          const isHighRisk =
-            contestant.slug === "aman" ||
-            contestant.slug === "sudheer-kumar-reddy" ||
-            contestant.slug === "varshini-sounderajan" ||
-            contestant.id === "c-12" ||
-            contestant.id === "c-09" ||
-            contestant.id === "c-06" ||
-            contestant.zone === "HIGH_RISK" ||
-            contestant.isHighRiskZone;
 
           const isTaskWinner =
             contestant.isTaskWinner ||
@@ -106,11 +97,6 @@ export const ContestantRankings: React.FC<{ contestants: Contestant[] }> = ({ co
                     <h4 className="text-xs font-bold text-white group-hover:text-bb-gold transition-colors truncate">
                       {contestant.name}
                     </h4>
-                    {isHighRisk && (
-                      <span className="text-[9px] font-black uppercase px-1.5 py-0.2 rounded bg-amber-400 text-black">
-                        HIGH RISK ZONE
-                      </span>
-                    )}
                     {isTaskWinner && (
                       <span className="text-[9px] font-black uppercase px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1">
                         <Trophy className="w-2.5 h-2.5 text-emerald-400" /> TASK WINNER
@@ -127,7 +113,7 @@ export const ContestantRankings: React.FC<{ contestants: Contestant[] }> = ({ co
               <div className="flex items-center gap-2.5 flex-shrink-0 pl-2">
                 <div className="text-right">
                   <span className="font-display text-xs text-zinc-300 uppercase block leading-none">
-                    {isHighRisk ? "High Risk" : "Active"}
+                    Active
                   </span>
                   <span className="text-[9px] font-semibold text-zinc-500 uppercase">
                     Housemate

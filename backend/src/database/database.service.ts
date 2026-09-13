@@ -369,7 +369,6 @@ export class DatabaseService implements OnModuleInit {
     // 2. Canonical Season 10 Master Roster (16 Contestants)
     // EXACTLY 14 ACTIVE CONTESTANTS, 2 ELIMINATED CONTESTANTS (Charan & Chaitra Rai).
     // The competition is now purely INDIVIDUAL with NO teams and NO team leaders.
-    // EXACTLY THREE in HIGH RISK ZONE: Aman, Sudheer Kumar Reddy, and Varshini Sounderajan.
     // TASK WINNER: Auto Ram Prasad (tasksWon = 1).
     // CURRENT HOUSEMATES: Rohit Naidu, Auto Ram Prasad, Temper Vamsi.
     // 2. Canonical Season 10 Master Roster (16 Housemates)
@@ -377,9 +376,8 @@ export class DatabaseService implements OnModuleInit {
     // ALL 16 participants are treated as HOUSEMATES (isHousemate: true).
     // NO TEAM LEADERS: All leadership roles removed completely.
     // ZERO NOMINATIONS: isNominated = false for all housemates.
-    // HIGH RISK ZONE (3): Aman, Sudheer Kumar Reddy, and Varshini Sounderajan (isNominated = false).
     // TASK WINNERS: Auto Ram Prasad (1), Rohit Naidu (1), Temper Vamsi (1) -> Label MUST be "TASK WINNER".
-    // ELIMINATED: Charan and Chaitra Rai (noReentry: true, reEntryEligible: false). Not in active poll, not in High Risk Zone.
+    // ELIMINATED: Charan and Chaitra Rai (noReentry: true, reEntryEligible: false). Not in active poll.
     const contestantsList: Contestant[] = [
       {
         id: "c-11",
@@ -421,11 +419,11 @@ export class DatabaseService implements OnModuleInit {
         team: "RED",
         role: "PLAYER",
         isHousemate: true,
-        zone: "HIGH_RISK",
-        isHighRiskZone: true,
-        isHighZone: true,
+        zone: "NORMAL",
+        isHighRiskZone: false,
+        isHighZone: false,
         avatarUrl: "/images/contestants/aman.webp",
-        bio: "Short Film Actor • Commoner currently in the High Risk Zone as an active housemate.",
+        bio: "Short Film Actor • Commoner competing as an active housemate.",
         occupation: "Short Film Actor • Commoner",
         status: "ACTIVE",
         isActive: true,
@@ -746,11 +744,11 @@ export class DatabaseService implements OnModuleInit {
         team: "BLUE",
         role: "PLAYER",
         isHousemate: true,
-        zone: "HIGH_RISK",
-        isHighRiskZone: true,
-        isHighZone: true,
+        zone: "NORMAL",
+        isHighRiskZone: false,
+        isHighZone: false,
         avatarUrl: "/images/contestants/sudheer-kumar-reddy.webp",
-        bio: "Digital creator and voice of 'Sudheer Talks' currently in the High Risk Zone as an active housemate.",
+        bio: "Digital creator and voice of 'Sudheer Talks' competing as an active housemate.",
         occupation: "Podcaster & Creator",
         status: "ACTIVE",
         isActive: true,
@@ -809,11 +807,11 @@ export class DatabaseService implements OnModuleInit {
         team: "BLUE",
         role: "PLAYER",
         isHousemate: true,
-        zone: "HIGH_RISK",
-        isHighRiskZone: true,
-        isHighZone: true,
+        zone: "NORMAL",
+        isHighRiskZone: false,
+        isHighZone: false,
         avatarUrl: "/images/contestants/varshini-sounderajan.webp",
-        bio: "Spirited television host with sharp verbal clarity and charisma currently in the High Risk Zone as an active housemate.",
+        bio: "Spirited television host with sharp verbal clarity and charisma competing as an active housemate.",
         occupation: "TV Anchor & Actress",
         status: "ACTIVE",
         isActive: true,
@@ -897,9 +895,9 @@ export class DatabaseService implements OnModuleInit {
     ];
 
     for (const c of contestantsList) {
-      c.zone = c.zone || "NORMAL";
-      c.isHighRiskZone = c.zone === "HIGH_RISK";
-      c.isHighZone = c.zone === "HIGH_RISK";
+      c.zone = "NORMAL";
+      c.isHighRiskZone = false;
+      c.isHighZone = false;
       c.isHousemate = true;
       this.contestants.set(c.id, c);
     }
@@ -914,13 +912,13 @@ export class DatabaseService implements OnModuleInit {
       "c-03", // Jabardasth Naresh
       "c-04", // Thrigun
       "c-05", // Mukesh Gowda
-      "c-06", // Varshini Sounderajan (HIGH RISK ZONE)
+      "c-06", // Varshini Sounderajan
       "c-07", // Temper Vamsi
       "c-08", // Krishnudu
-      "c-09", // Sudheer Kumar Reddy (HIGH RISK ZONE)
+      "c-09", // Sudheer Kumar Reddy
       // c-10 Chaitra Rai is ELIMINATED - Excluded from poll!
       "c-11", // Rohit Naidu
-      "c-12", // Aman (HIGH RISK ZONE)
+      "c-12", // Aman
       // c-13 Charan is ELIMINATED - Excluded from poll!
       "c-14", // Shalini
       "c-15", // Srushti Vyakaranam
@@ -936,9 +934,9 @@ export class DatabaseService implements OnModuleInit {
         text: `Save ${c.name}`,
         imageUrl: c.avatarUrl,
         team: c.team,
-        zone: c.zone,
-        isHighRiskZone: c.isHighRiskZone,
-        isHighZone: c.isHighRiskZone,
+        zone: "NORMAL",
+        isHighRiskZone: false,
+        isHighZone: false,
         votesCount: 0,
       };
     });
@@ -1046,8 +1044,8 @@ export class DatabaseService implements OnModuleInit {
       username: fanUser.username,
       userAvatar: fanUser.avatarUrl,
       category: "Fan Theories",
-      title: "Task Winners & High Risk Zone: Who will survive the upcoming eviction?",
-      description: "Auto Ram Prasad, Rohit Naidu, and Temper Vamsi have all won tasks, while Aman, Sudheer Kumar Reddy, and Varshini Sounderajan are in the High Risk Zone. Who is your top pick?",
+      title: "Task Winners & Season 10 Housemates: Who is making the biggest impact?",
+      description: "Auto Ram Prasad, Rohit Naidu, and Temper Vamsi have all won tasks in Week 1. Who is your top pick?",
       likesCount: 0,
       commentsCount: 0,
       isPinned: true,

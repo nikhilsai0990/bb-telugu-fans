@@ -226,20 +226,20 @@ export default function AdminDashboardPage() {
           <div className="editorial-panel rounded-xl p-6 space-y-3 text-xs text-zinc-300 border border-white/[0.08]">
             <p>Contestant statistics synchronize in real-time. Statuses enforced:</p>
             <div className="p-3 bg-black/30 rounded border border-emerald-500/30 flex items-center justify-between">
-              <span className="font-bold text-white">Auto Ram Prasad &bull; Task Winner (Active, Nominated)</span>
+              <span className="font-bold text-white">Auto Ram Prasad &bull; Task Winner (Active Housemate)</span>
               <span className="text-emerald-400 font-bold">TASK WINNER</span>
             </div>
-            <div className="p-3 bg-black/30 rounded border border-amber-500/30 flex items-center justify-between">
-              <span className="font-bold text-amber-300">Aman &bull; High Risk Zone (Active Housemate, Nominated, Not Eliminated)</span>
-              <span className="text-amber-300 font-bold">HIGH RISK ZONE</span>
+            <div className="p-3 bg-black/30 rounded border border-white/10 flex items-center justify-between">
+              <span className="font-bold text-zinc-300">Aman &bull; Active Housemate (Not Eliminated)</span>
+              <span className="text-amber-300 font-bold">HOUSEMATE</span>
             </div>
-            <div className="p-3 bg-black/30 rounded border border-amber-500/30 flex items-center justify-between">
-              <span className="font-bold text-amber-300">Sudheer Kumar Reddy &bull; High Risk Zone (Active Housemate, Nominated, Not Eliminated)</span>
-              <span className="text-amber-300 font-bold">HIGH RISK ZONE</span>
+            <div className="p-3 bg-black/30 rounded border border-white/10 flex items-center justify-between">
+              <span className="font-bold text-zinc-300">Sudheer Kumar Reddy &bull; Active Housemate (Not Eliminated)</span>
+              <span className="text-amber-300 font-bold">HOUSEMATE</span>
             </div>
-            <div className="p-3 bg-black/30 rounded border border-amber-500/30 flex items-center justify-between">
-              <span className="font-bold text-amber-300">Varshini Sounderajan &bull; High Risk Zone (Active Housemate, Nominated, Not Eliminated)</span>
-              <span className="text-amber-300 font-bold">HIGH RISK ZONE</span>
+            <div className="p-3 bg-black/30 rounded border border-white/10 flex items-center justify-between">
+              <span className="font-bold text-zinc-300">Varshini Sounderajan &bull; Active Housemate (Not Eliminated)</span>
+              <span className="text-amber-300 font-bold">HOUSEMATE</span>
             </div>
             <div className="p-3 bg-black/30 rounded border border-red-900/40 flex items-center justify-between">
               <span className="font-bold text-red-400">Chaitra Rai &bull; ELIMINATED (Based on Housemates' Votes)</span>
@@ -273,8 +273,8 @@ export default function AdminDashboardPage() {
               <span className="text-bb-gold font-bold">Verified Dispatch (Tasks)</span>
             </div>
             <div className="p-3 bg-black/30 rounded border border-white/10 flex items-center justify-between">
-              <span className="text-white font-semibold">AMAN AND SUDHEER KUMAR REDDY ENTER HIGH RISK ZONE</span>
-              <span className="text-bb-gold font-bold">Verified Dispatch (Nominations)</span>
+              <span className="text-white font-semibold">KRISHNUDU'S TEAM DEFEATS NARESH'S TEAM IN WEEK 1 TEAM TASK</span>
+              <span className="text-bb-gold font-bold">Verified Dispatch (Tasks)</span>
             </div>
             <div className="p-3 bg-black/30 rounded border border-white/10 flex items-center justify-between">
               <span className="text-white font-semibold">COMPETITION TRANSITIONS TO INDIVIDUAL BATTLE AS 14 HOUSEMATES REMAIN</span>
