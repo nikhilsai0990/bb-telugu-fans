@@ -14,6 +14,12 @@ describe("Voting System - Comprehensive Automated Tests", () => {
     rateLimiter = new RedisRateLimiterService();
     rateLimiter.setMaxVotesPerIp(50);
     pollsService = new PollsService(db, rateLimiter);
+
+    // Set poll to ACTIVE for voting mechanics tests (seed data has it CLOSED for Sunday)
+    const p = db.polls.get("poll-eviction-01");
+    if (p) {
+      p.status = "ACTIVE";
+    }
   });
 
   // TC-VOTE-001: Valid authenticated vote succeeds
@@ -121,6 +127,18 @@ describe("Voting System - Comprehensive Automated Tests", () => {
         pollId: closedPoll.id,
         optionId: closedPoll.options[0].id,
         userId: "user-005",
+        clientIp: "192.168.1.105",
+      })
+    ).rejects.toThrow(BadRequestException);
+
+    // Also verify eviction poll when closed
+    const evictionPoll = db.polls.get("poll-eviction-01")!;
+    evictionPoll.status = "CLOSED";
+    await expect(
+      pollsService.castVote({
+        pollId: "poll-eviction-01",
+        optionId: evictionPoll.options[0].id,
+        userId: "user-005-b",
         clientIp: "192.168.1.105",
       })
     ).rejects.toThrow(BadRequestException);

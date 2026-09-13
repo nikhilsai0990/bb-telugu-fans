@@ -77,10 +77,10 @@ export default function ContestantsPage() {
           <span>Official Season 10 Roster &bull; 16 Housemates (14 Active, 2 Eliminated)</span>
         </div>
         <h1 className="font-display text-4xl sm:text-6xl uppercase tracking-tight text-white">
-          Contestant Directory
+          Housemates Directory
         </h1>
         <p className="text-sm text-zinc-300 max-w-2xl leading-relaxed">
-          The 16 canonical Bigg Boss Telugu Season 10 contenders competing as individual contenders. Auto Ram Prasad is the TASK WINNER in dominant fashion. Charan and Chaitra Rai have both been officially ELIMINATED based on housemates&apos; votes. Aman, Sudheer Kumar Reddy, and Varshini Sounderajan are in the HIGH RISK ZONE as active housemates, and 14 active contestants face Week 1 public voting.
+          The 16 Bigg Boss Telugu Season 10 housemates. Auto Ram Prasad, Rohit Naidu, and Temper Vamsi are TASK WINNERS. Charan and Chaitra Rai are ELIMINATED based on housemates&apos; votes (NO RE-ENTRY). Aman, Sudheer Kumar Reddy, and Varshini Sounderajan are in the HIGH RISK ZONE (3). Blue Team Leader: Debjani Modak, Red Team Leader: Rohit Naidu.
         </p>
       </div>
 
@@ -155,18 +155,15 @@ export default function ContestantsPage() {
 
             const isTaskWinner =
               contestant.isTaskWinner ||
-              contestant.stats?.tasksWon > 0 ||
               contestant.slug === "auto-ram-prasad" ||
-              contestant.id === "c-02";
-
-            const isHousemate =
-              contestant.isHousemate ||
               contestant.slug === "rohit-naidu" ||
-              contestant.slug === "auto-ram-prasad" ||
               contestant.slug === "temper-vamsi" ||
-              contestant.id === "c-11" ||
               contestant.id === "c-02" ||
+              contestant.id === "c-11" ||
               contestant.id === "c-07";
+
+            const isRedLeader = contestant.slug === "rohit-naidu" || (contestant.role === "LEADER" && contestant.team === "RED");
+            const isBlueLeader = contestant.slug === "debjani-modak" || (contestant.role === "LEADER" && contestant.team === "BLUE");
 
             return (
               <Link
@@ -175,7 +172,7 @@ export default function ContestantsPage() {
                 data-active-card="true"
                 className={`group editorial-card rounded-lg overflow-hidden flex flex-col justify-between transition-all ${
                   isEliminated
-                    ? "opacity-75 border-zinc-800 bg-zinc-950/60"
+                    ? "opacity-75 border-red-950/40 bg-zinc-950/60"
                     : isHighRisk
                     ? "border-amber-500/40 hover:border-amber-400"
                     : "border-white/[0.08] hover:border-white/30"
@@ -195,15 +192,23 @@ export default function ContestantsPage() {
                     <div className="absolute top-2 left-2 right-2 flex flex-wrap gap-1 items-start z-10 pointer-events-none">
                       {isEliminated ? (
                         <span className="px-2 py-0.5 rounded bg-red-950/90 text-red-300 border border-red-800 text-[9px] font-black uppercase tracking-wider shadow">
-                          ELIMINATED
+                          ELIMINATED &bull; NO RE-ENTRY
                         </span>
-                      ) : isHousemate ? (
+                      ) : (
                         <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[9px] font-black uppercase tracking-wider backdrop-blur-sm">
                           HOUSEMATE
                         </span>
-                      ) : (
-                        <span className="px-2 py-0.5 rounded bg-white/[0.08] text-zinc-300 border border-white/20 text-[9px] font-black uppercase tracking-wider backdrop-blur-sm">
-                          CONTESTANT
+                      )}
+
+                      {isRedLeader && (
+                        <span className="px-2 py-0.5 rounded bg-red-600 text-white text-[9px] font-black uppercase tracking-wider shadow">
+                          RED LEADER
+                        </span>
+                      )}
+
+                      {isBlueLeader && (
+                        <span className="px-2 py-0.5 rounded bg-blue-600 text-white text-[9px] font-black uppercase tracking-wider shadow">
+                          BLUE LEADER
                         </span>
                       )}
 
@@ -215,7 +220,7 @@ export default function ContestantsPage() {
 
                       {isHighRisk && (
                         <span className="px-2 py-0.5 rounded bg-amber-500 text-black text-[9px] font-black uppercase tracking-wider shadow">
-                          HIGH RISK ZONE
+                          HIGH RISK ZONE (3)
                         </span>
                       )}
 
@@ -249,9 +254,9 @@ export default function ContestantsPage() {
                   <div className="pt-2 border-t border-white/[0.06] flex items-center justify-between text-[11px]">
                     <span className="text-zinc-400 font-medium">Designation</span>
                     <span className={`font-display text-xs uppercase tracking-wider font-bold ${
-                      isEliminated ? "text-red-400" : isHousemate ? "text-amber-400" : "text-zinc-300"
+                      isEliminated ? "text-red-400" : "text-amber-400"
                     }`}>
-                      {isEliminated ? "Eliminated" : isHousemate ? "Housemate" : "Contestant"}
+                      {isEliminated ? "Eliminated (No Re-entry)" : "Housemate"}
                     </span>
                   </div>
                 </div>

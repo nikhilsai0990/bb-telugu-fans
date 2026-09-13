@@ -62,9 +62,12 @@ export const ContestantRankings: React.FC<{ contestants: Contestant[] }> = ({ co
 
           const isTaskWinner =
             contestant.isTaskWinner ||
-            contestant.stats?.tasksWon > 0 ||
             contestant.slug === "auto-ram-prasad" ||
-            contestant.id === "c-02";
+            contestant.slug === "rohit-naidu" ||
+            contestant.slug === "temper-vamsi" ||
+            contestant.id === "c-02" ||
+            contestant.id === "c-11" ||
+            contestant.id === "c-07";
 
           return (
             <Link
@@ -141,8 +144,8 @@ export const ContestantRankings: React.FC<{ contestants: Contestant[] }> = ({ co
 
       {/* Footnote */}
       <div className="pt-2 border-t border-white/[0.08] flex items-center justify-between text-[11px] text-zinc-400">
-        <span>Individual Battle &bull; Task Winner: Auto Ram Prasad</span>
-        <span className="text-bb-gold font-semibold">14 Active &bull; 2 Eliminated</span>
+        <span>Task Winners: Auto Ram Prasad, Rohit Naidu, Temper Vamsi</span>
+        <span className="text-bb-gold font-semibold">14 Active Housemates &bull; 2 Eliminated</span>
       </div>
 
     </div>

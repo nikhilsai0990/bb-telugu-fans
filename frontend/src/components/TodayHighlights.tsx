@@ -32,30 +32,35 @@ export const TodayHighlights: React.FC<{ news: NewsItem[] }> = ({ news }) => {
           </Link>
         </div>
 
-        {/* 4-Story Editorial Grid */}
+        {/* 5-Story Editorial Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
-          {news.slice(0, 4).map((item, idx) => {
-            const isHighZone = item.slug.includes("high-zone") || item.slug.includes("high-risk");
-            const isEliminated = item.slug.includes("eliminated") || item.slug.includes("charan");
-            const isTaskWin = item.slug.includes("task") || item.slug.includes("win") || item.slug.includes("victory");
-            const isDebjani = item.slug.includes("debjani");
+          {news.slice(0, 5).map((item, idx) => {
+            const isEliminated = item.slug.includes("eliminated") || item.slug.includes("re-entry") || item.slug.includes("charan");
+            const isPowerKey = item.slug.includes("power-key") || item.slug.includes("srushti");
+            const isSudheer = item.slug.includes("sudheer");
+            const isTeamTask = item.slug.includes("krishnudu") || item.slug.includes("naresh");
+            const isNoElimination = item.slug.includes("no-elimination");
 
             const fallbackImage = isEliminated
               ? "/images/contestants/chaitra-rai.webp"
-              : isHighZone
-              ? "/images/contestants/aman.webp"
-              : isTaskWin
-              ? "/images/contestants/auto-ram-prasad.webp"
+              : isPowerKey
+              ? "/images/contestants/srushti-vyakaranam.webp"
+              : isSudheer
+              ? "/images/contestants/sudheer-kumar-reddy.webp"
+              : isTeamTask
+              ? "/images/contestants/krishnudu.webp"
               : "/images/contestants/debjani-modak.webp";
 
             return (
               <Link
                 key={item.id}
                 href={`/news/${item.slug}`}
-                className="group editorial-card rounded-xl overflow-hidden flex flex-col sm:flex-row hover:border-white/20 transition-all"
+                className={`group editorial-card rounded-xl overflow-hidden flex flex-col sm:flex-row hover:border-white/20 transition-all ${
+                  idx === 0 ? "lg:col-span-2" : ""
+                }`}
               >
                 {/* Contestant Portrait Side */}
-                <div className="sm:w-2/5 relative h-52 sm:h-auto min-h-[200px] bg-black flex-shrink-0 overflow-hidden">
+                <div className={`sm:w-2/5 relative ${idx === 0 ? "h-64 sm:h-auto" : "h-52 sm:h-auto"} min-h-[200px] bg-black flex-shrink-0 overflow-hidden`}>
                   <img
                     src={item.imageUrl || fallbackImage}
                     alt={item.title}
@@ -73,10 +78,10 @@ export const TodayHighlights: React.FC<{ news: NewsItem[] }> = ({ news }) => {
                     <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-zinc-400">
                       <span>Dispatch #{idx + 1}</span>
                       <span>&bull;</span>
-                      <span className="text-bb-gold">Week 1 Verified</span>
+                      <span className="text-bb-gold">Season 10 Official</span>
                     </div>
 
-                    <h3 className="font-display text-2xl uppercase tracking-wide text-white group-hover:text-bb-gold transition-colors leading-tight">
+                    <h3 className={`font-display ${idx === 0 ? "text-2xl sm:text-3xl" : "text-xl sm:text-2xl"} uppercase tracking-wide text-white group-hover:text-bb-gold transition-colors leading-tight`}>
                       {item.title}
                     </h3>
 
@@ -87,25 +92,35 @@ export const TodayHighlights: React.FC<{ news: NewsItem[] }> = ({ news }) => {
 
                   {/* Clarification or Read Link */}
                   <div className="pt-2 border-t border-white/[0.06] flex items-center justify-between text-xs">
-                    {isHighZone ? (
-                      <span className="text-[10px] font-bold text-amber-300 uppercase tracking-tight flex items-center gap-1">
-                        <AlertCircle className="w-3.5 h-3.5 text-amber-400" />
-                        HIGH RISK ZONE • ACTIVE
-                      </span>
-                    ) : isEliminated ? (
-                      <span className="text-[10px] font-bold text-team-red uppercase tracking-tight flex items-center gap-1">
-                        <AlertCircle className="w-3.5 h-3.5 text-team-red" />
-                        Charan &amp; Chaitra Rai Eliminated
-                      </span>
-                    ) : isTaskWin ? (
+                    {isNoElimination ? (
                       <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-tight flex items-center gap-1">
                         <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
-                        Auto Ram Prasad Task Winner
+                        No Eviction on Sunday &bull; All 14 Safe
+                      </span>
+                    ) : isPowerKey ? (
+                      <span className="text-[10px] font-bold text-amber-300 uppercase tracking-tight flex items-center gap-1">
+                        <AlertCircle className="w-3.5 h-3.5 text-amber-400" />
+                        Power Key Lost &bull; House Votes
+                      </span>
+                    ) : isSudheer ? (
+                      <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-tight flex items-center gap-1">
+                        <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
+                        Sudheer Won Challenge
+                      </span>
+                    ) : isTeamTask ? (
+                      <span className="text-[10px] font-bold text-blue-400 uppercase tracking-tight flex items-center gap-1">
+                        <CheckCircle className="w-3.5 h-3.5 text-blue-400" />
+                        Krishnudu Team Won Against Naresh Team
+                      </span>
+                    ) : isEliminated ? (
+                      <span className="text-[10px] font-bold text-red-400 uppercase tracking-tight flex items-center gap-1">
+                        <AlertCircle className="w-3.5 h-3.5 text-red-400" />
+                        No Re-entry for Chaitra Rai &amp; Charan
                       </span>
                     ) : (
                       <span className="text-[10px] font-bold text-bb-gold uppercase tracking-tight flex items-center gap-1">
                         <CheckCircle className="w-3.5 h-3.5 text-bb-gold" />
-                        14 Active Housemates on Ballot
+                        14 Active Housemates
                       </span>
                     )}
                     <span className="font-bold text-zinc-400 group-hover:text-white flex items-center gap-1">

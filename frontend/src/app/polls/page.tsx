@@ -35,7 +35,7 @@ export default function PollsPage() {
     // 2. Fetch fresh poll data and verify voter status against backend
     async function load() {
       try {
-        const data = await api.getPolls("ACTIVE");
+        const data = await api.getPolls();
         const currentPoll = data && data.length > 0 ? data[0] : fallbackPolls[0];
         if (currentPoll) {
           setPoll(currentPoll);
@@ -256,9 +256,9 @@ export default function PollsPage() {
               return (
                 <div
                   key={option.id}
-                  onClick={() => !hasVoted && setSelectedOption(option.id)}
+                  onClick={() => !hasVoted && poll.status !== "CLOSED" && setSelectedOption(option.id)}
                   className={`group relative p-3.5 rounded-lg border transition-all flex flex-col justify-between min-h-[115px] ${
-                    hasVoted
+                    hasVoted || poll.status === "CLOSED"
                       ? "cursor-default bg-white/[0.02] border-white/[0.06]"
                       : isSelected
                       ? "bg-bb-gold/10 border-bb-gold ring-1 ring-bb-gold cursor-pointer"
@@ -288,7 +288,7 @@ export default function PollsPage() {
                       </h3>
                       {isHighRisk && (
                         <span className="text-[9px] font-bold text-amber-300 uppercase block mt-0.5">
-                          HIGH RISK ZONE
+                          HIGH RISK ZONE (3)
                         </span>
                       )}
                     </div>
@@ -297,9 +297,9 @@ export default function PollsPage() {
                   {/* Radio Selector */}
                   <div className="pt-2 border-t border-white/[0.05] flex items-center justify-between mt-2">
                     <span className="text-[10px] text-zinc-400 font-semibold uppercase tracking-wider">
-                      {hasVoted ? `${option.votesCount || 0} Votes` : "Select Housemate"}
+                      {hasVoted || poll.status === "CLOSED" ? `${option.votesCount || 0} Votes` : "Select Housemate"}
                     </span>
-                    {!hasVoted && (
+                    {!hasVoted && poll.status !== "CLOSED" && (
                       <div
                         className={`w-4 h-4 rounded-full border flex items-center justify-center transition-colors ${
                           isSelected
@@ -320,10 +320,23 @@ export default function PollsPage() {
           <div className="pt-4 border-t border-white/[0.08] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
             <div className="flex items-center gap-2 text-xs text-zinc-400">
               <ShieldCheck className="w-4 h-4 text-bb-gold flex-shrink-0" />
-              <span>Verified fan authentication active. 1 vote per user per day enforced.</span>
+              <span>{poll.status === "CLOSED" ? "Voting is currently closed." : "Verified fan authentication active. 1 vote per user per day enforced."}</span>
             </div>
 
-            {!hasVoted ? (
+            {poll.status === "CLOSED" ? (
+              <div className="flex items-center gap-3">
+                <span className="text-xs font-bold uppercase tracking-wider text-amber-300 flex items-center gap-1.5 px-3 py-2 rounded bg-amber-500/10 border border-amber-500/20">
+                  <Lock className="w-3.5 h-3.5" /> Voting is currently closed
+                </span>
+                <button
+                  disabled
+                  className="px-8 py-3.5 rounded font-bold text-xs uppercase tracking-wider bg-white/[0.06] text-zinc-500 cursor-not-allowed border border-white/[0.08] flex items-center justify-center gap-2"
+                >
+                  <Lock className="w-4 h-4 text-zinc-500" />
+                  <span>Voting is Currently Closed</span>
+                </button>
+              </div>
+            ) : !hasVoted ? (
               user ? (
                 <button
                   onClick={handleVote}

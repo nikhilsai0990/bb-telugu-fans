@@ -45,18 +45,15 @@ export default async function ContestantDetailPage({
 
   const isTaskWinner =
     contestant.isTaskWinner ||
-    contestant.stats?.tasksWon > 0 ||
     contestant.slug === "auto-ram-prasad" ||
-    contestant.id === "c-02";
-
-  const isHousemate =
-    contestant.isHousemate ||
     contestant.slug === "rohit-naidu" ||
-    contestant.slug === "auto-ram-prasad" ||
     contestant.slug === "temper-vamsi" ||
-    contestant.id === "c-11" ||
     contestant.id === "c-02" ||
+    contestant.id === "c-11" ||
     contestant.id === "c-07";
+
+  const isRedLeader = contestant.slug === "rohit-naidu" || (contestant.role === "LEADER" && contestant.team === "RED");
+  const isBlueLeader = contestant.slug === "debjani-modak" || (contestant.role === "LEADER" && contestant.team === "BLUE");
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 space-y-10">
@@ -94,30 +91,31 @@ export default async function ContestantDetailPage({
               <div className="flex flex-wrap items-center gap-1.5">
                 {isEliminated ? (
                   <span className="px-2.5 py-0.5 rounded bg-red-950 text-red-300 text-[10px] font-black uppercase tracking-wider border border-red-800">
-                    ELIMINATED
+                    ELIMINATED &bull; NO RE-ENTRY
                   </span>
-                ) : isHousemate ? (
-                  <>
-                    <span className="px-2.5 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-bold uppercase tracking-wider border border-amber-500/40">
-                      Current Housemate
-                    </span>
-                    <span className="px-2.5 py-0.5 rounded bg-bb-gold/20 text-bb-gold text-[10px] font-black uppercase tracking-wider border border-bb-gold/40">
-                      Nominated
-                    </span>
-                  </>
                 ) : (
                   <>
-                    <span className="px-2.5 py-0.5 rounded bg-white/[0.06] text-zinc-300 text-[10px] font-bold uppercase tracking-wider border border-white/10">
-                      Contestant
+                    <span className="px-2.5 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-bold uppercase tracking-wider border border-amber-500/40">
+                      Housemate
                     </span>
                     <span className="px-2.5 py-0.5 rounded bg-bb-gold/20 text-bb-gold text-[10px] font-black uppercase tracking-wider border border-bb-gold/40">
                       Nominated
                     </span>
                   </>
                 )}
+                {isRedLeader && (
+                  <span className="px-2.5 py-0.5 rounded bg-red-600 text-white text-[10px] font-bold uppercase tracking-wider">
+                    RED TEAM LEADER
+                  </span>
+                )}
+                {isBlueLeader && (
+                  <span className="px-2.5 py-0.5 rounded bg-blue-600 text-white text-[10px] font-bold uppercase tracking-wider">
+                    BLUE TEAM LEADER
+                  </span>
+                )}
                 {isHighRisk && (
                   <span className="px-2.5 py-0.5 rounded bg-amber-400/20 text-amber-300 border border-amber-400/40 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
-                    <AlertCircle className="w-3 h-3 text-amber-400" /> HIGH RISK ZONE &bull; ACTIVE
+                    <AlertCircle className="w-3 h-3 text-amber-400" /> HIGH RISK ZONE (3)
                   </span>
                 )}
                 {isTaskWinner && (
@@ -141,7 +139,7 @@ export default async function ContestantDetailPage({
           <div className="flex flex-col sm:flex-row md:flex-col gap-2.5 w-full sm:w-auto flex-shrink-0">
             {isEliminated ? (
               <div className="px-6 py-3 rounded bg-zinc-800 text-zinc-400 font-bold text-xs uppercase tracking-wider text-center cursor-not-allowed">
-                VOTING DISABLED — ELIMINATED
+                VOTING DISABLED — NO RE-ENTRY
               </div>
             ) : (
               <Link
@@ -178,7 +176,7 @@ export default async function ContestantDetailPage({
           <div className="bg-red-950/40 border-t border-red-800/40 px-6 sm:px-10 py-3 flex items-center gap-2.5 text-xs text-red-200">
             <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
             <span>
-              <strong>Elimination Notice:</strong> {contestant.name} has been officially ELIMINATED from Bigg Boss Telugu Season 10 based on housemates&apos; votes. {contestant.name} is not eligible for active voting.
+              <strong>Elimination Notice:</strong> {contestant.name} has been officially ELIMINATED from Bigg Boss Telugu Season 10 based on housemates&apos; votes with <strong>NO RE-ENTRY</strong>. {contestant.name} is not eligible for active voting.
             </span>
           </div>
         )}

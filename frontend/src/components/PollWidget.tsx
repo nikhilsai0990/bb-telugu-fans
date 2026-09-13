@@ -121,7 +121,9 @@ export const PollWidget: React.FC<{ initialPoll: Poll | null }> = ({ initialPoll
             {poll.title}
           </h3>
           <p className="text-xs text-zinc-300 max-w-lg leading-relaxed pt-1">
-            14 active housemates are nominated for eviction (Charan and Chaitra Rai eliminated). Cast your verified vote to save your favorite housemate (1 vote per user per day).
+            {poll.status === "CLOSED"
+              ? "14 active housemates are currently nominated. Voting is currently closed."
+              : "14 active housemates are nominated for eviction (Charan and Chaitra Rai eliminated). Cast your verified vote to save your favorite housemate (1 vote per user per day)."}
           </p>
         </div>
 
@@ -129,7 +131,11 @@ export const PollWidget: React.FC<{ initialPoll: Poll | null }> = ({ initialPoll
           <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 block">
             Ballot Status
           </span>
-          {poll.totalVotes === 0 ? (
+          {poll.status === "CLOSED" ? (
+            <span className="text-xs font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 inline-block mt-0.5">
+              Voting Closed
+            </span>
+          ) : poll.totalVotes === 0 ? (
             <span className="text-xs font-bold uppercase tracking-wider text-bb-gold bg-bb-gold/10 px-2 py-0.5 rounded border border-bb-gold/20 inline-block mt-0.5">
               No Votes Yet &bull; Cast First Vote
             </span>
@@ -225,9 +231,9 @@ export const PollWidget: React.FC<{ initialPoll: Poll | null }> = ({ initialPoll
           return (
             <div
               key={option.id}
-              onClick={() => !hasVoted && setSelectedOption(option.id)}
+              onClick={() => !hasVoted && poll.status !== "CLOSED" && setSelectedOption(option.id)}
               className={`group flex items-center justify-between p-3 rounded-lg border transition-all ${
-                hasVoted
+                hasVoted || poll.status === "CLOSED"
                   ? "cursor-default bg-white/[0.02] border-white/[0.06]"
                   : isSelected
                   ? "bg-bb-gold/10 border-bb-gold ring-1 ring-bb-gold/40 cursor-pointer"
@@ -258,19 +264,19 @@ export const PollWidget: React.FC<{ initialPoll: Poll | null }> = ({ initialPoll
                     </span>
                     {isHighRisk && (
                       <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-amber-400/20 text-amber-300 border border-amber-400/40">
-                        HIGH RISK ZONE
+                        HIGH RISK ZONE (3)
                       </span>
                     )}
                   </div>
                   <span className="text-[10px] text-zinc-400 block mt-0.5">
-                    Nominated for Week 1 Eviction
+                    Nominated for Season 10 Eviction
                   </span>
                 </div>
               </div>
 
               {/* Radio / Selection State */}
               <div className="flex-shrink-0 pl-3">
-                {!hasVoted && (
+                {!hasVoted && poll.status !== "CLOSED" && (
                   <div
                     className={`w-5 h-5 rounded-full border flex items-center justify-center transition-colors ${
                       isSelected
@@ -281,7 +287,7 @@ export const PollWidget: React.FC<{ initialPoll: Poll | null }> = ({ initialPoll
                     {isSelected && <div className="w-2 h-2 rounded-full bg-black" />}
                   </div>
                 )}
-                {hasVoted && (
+                {(hasVoted || poll.status === "CLOSED") && (
                   <span className="text-[11px] font-semibold text-zinc-400">
                     {poll.totalVotes === 0 ? "No Votes" : `${option.votesCount} votes`}
                   </span>
@@ -294,7 +300,22 @@ export const PollWidget: React.FC<{ initialPoll: Poll | null }> = ({ initialPoll
 
       {/* Voting Action CTA */}
       <div className="pt-2 border-t border-white/[0.08] space-y-3">
-        {!hasVoted ? (
+        {poll.status === "CLOSED" ? (
+          <div className="space-y-2">
+            <div className="p-3 rounded bg-amber-500/10 border border-amber-500/20 text-center">
+              <span className="text-xs font-bold uppercase tracking-wider text-amber-300 flex items-center justify-center gap-1.5">
+                <Lock className="w-3.5 h-3.5" /> Voting is currently closed
+              </span>
+            </div>
+            <button
+              disabled
+              className="w-full py-3.5 rounded font-bold text-xs uppercase tracking-wider bg-white/[0.06] text-zinc-500 cursor-not-allowed border border-white/[0.08] flex items-center justify-center gap-2"
+            >
+              <Lock className="w-4 h-4 text-zinc-500" />
+              <span>Voting is Currently Closed</span>
+            </button>
+          </div>
+        ) : !hasVoted ? (
           user ? (
             <button
               onClick={handleVote}
@@ -334,7 +355,7 @@ export const PollWidget: React.FC<{ initialPoll: Poll | null }> = ({ initialPoll
         )}
 
         {/* Live Results Section Below Contestant Selection */}
-        {hasVoted && (
+        {(hasVoted || poll.status === "CLOSED") && (
           <div className="pt-4 border-t border-white/[0.08] space-y-3" data-testid="live-vote-results">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-400 flex items-center gap-1.5">

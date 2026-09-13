@@ -2,12 +2,12 @@
 
 import React from "react";
 import Link from "next/link";
-import { Trophy, AlertCircle, ArrowUpRight } from "lucide-react";
+import { Trophy, AlertCircle, ArrowUpRight, Crown, Shield } from "lucide-react";
 import { Contestant } from "../types";
 
 export const TeamVsSection: React.FC<{ contestants: Contestant[] }> = ({ contestants }) => {
-  const cohort1 = contestants.slice(0, 8);
-  const cohort2 = contestants.slice(8, 16);
+  const redTeam = contestants.filter((c) => c.team === "RED");
+  const blueTeam = contestants.filter((c) => c.team === "BLUE");
 
   const renderCard = (contestant: Contestant) => {
     const isEliminated =
@@ -33,9 +33,15 @@ export const TeamVsSection: React.FC<{ contestants: Contestant[] }> = ({ contest
 
     const isTaskWinner =
       contestant.isTaskWinner ||
-      contestant.stats?.tasksWon > 0 ||
       contestant.slug === "auto-ram-prasad" ||
-      contestant.id === "c-02";
+      contestant.slug === "rohit-naidu" ||
+      contestant.slug === "temper-vamsi" ||
+      contestant.id === "c-02" ||
+      contestant.id === "c-11" ||
+      contestant.id === "c-07";
+
+    const isRedLeader = contestant.slug === "rohit-naidu" || (contestant.role === "LEADER" && contestant.team === "RED");
+    const isBlueLeader = contestant.slug === "debjani-modak" || (contestant.role === "LEADER" && contestant.team === "BLUE");
 
     return (
       <Link
@@ -43,9 +49,13 @@ export const TeamVsSection: React.FC<{ contestants: Contestant[] }> = ({ contest
         href={`/contestants/${contestant.slug || contestant.id}`}
         className={`group relative p-3 rounded-lg bg-[#14151D] border ${
           isEliminated
-            ? "border-zinc-800 opacity-75"
+            ? "border-red-950/40 opacity-75"
             : isHighRisk
             ? "border-amber-500/40 hover:border-amber-400"
+            : isRedLeader
+            ? "border-red-500/40 hover:border-red-400"
+            : isBlueLeader
+            ? "border-blue-500/40 hover:border-blue-400"
             : "border-white/[0.08] hover:border-white/30"
         } transition-colors flex items-center gap-3`}
       >
@@ -58,9 +68,19 @@ export const TeamVsSection: React.FC<{ contestants: Contestant[] }> = ({ contest
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-1 mb-0.5">
+            {isRedLeader && (
+              <span className="px-1.5 py-0.2 rounded bg-red-600 text-white text-[9px] font-black uppercase tracking-tight flex items-center gap-1">
+                <Crown className="w-2.5 h-2.5" /> RED LEADER
+              </span>
+            )}
+            {isBlueLeader && (
+              <span className="px-1.5 py-0.2 rounded bg-blue-600 text-white text-[9px] font-black uppercase tracking-tight flex items-center gap-1">
+                <Crown className="w-2.5 h-2.5" /> BLUE LEADER
+              </span>
+            )}
             {isEliminated ? (
               <span className="px-1.5 py-0.2 rounded bg-red-950/90 text-red-300 border border-red-800 text-[9px] font-black uppercase tracking-tight">
-                ELIMINATED
+                ELIMINATED &bull; NO RE-ENTRY
               </span>
             ) : (
               <span className="px-1.5 py-0.2 rounded bg-white/[0.06] text-zinc-300 text-[9px] font-bold uppercase tracking-tight border border-white/10">
@@ -69,7 +89,7 @@ export const TeamVsSection: React.FC<{ contestants: Contestant[] }> = ({ contest
             )}
             {isHighRisk && (
               <span className="px-1.5 py-0.2 rounded bg-amber-400 text-black text-[9px] font-black uppercase tracking-tight">
-                HIGH RISK ZONE
+                HIGH RISK ZONE (3)
               </span>
             )}
             {isTaskWinner && (
@@ -82,7 +102,7 @@ export const TeamVsSection: React.FC<{ contestants: Contestant[] }> = ({ contest
             {contestant.name}
           </h4>
           <p className="text-[10px] text-zinc-400 truncate">
-            {isEliminated ? "Eliminated based on housemates' votes" : contestant.occupation}
+            {isEliminated ? "Eliminated based on housemates' votes (No re-entry)" : contestant.occupation}
           </p>
         </div>
         <ArrowUpRight className="w-3.5 h-3.5 text-zinc-500 group-hover:text-white transition-colors" />
@@ -99,13 +119,13 @@ export const TeamVsSection: React.FC<{ contestants: Contestant[] }> = ({ contest
           <div className="space-y-1.5">
             <div className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-zinc-400">
               <span className="w-2 h-2 rounded-full bg-bb-gold" />
-              <span>Contender Hierarchy &bull; Season 10</span>
+              <span>Team Hierarchy &bull; Season 10</span>
             </div>
             <h2 className="font-display text-4xl sm:text-5xl uppercase tracking-tight text-white">
-              INDIVIDUAL <span className="text-bb-gold font-sans font-bold text-2xl sm:text-3xl align-middle">ARENA</span> ROSTER
+              RED TEAM <span className="text-zinc-500 font-sans font-bold text-2xl sm:text-3xl align-middle">VS</span> BLUE TEAM
             </h2>
             <p className="text-sm text-zinc-400 max-w-xl">
-              16 housemates competing in the individual Bigg Boss Telugu Season 10 battle. Auto Ram Prasad is the TASK WINNER in dominant fashion. Charan and Chaitra Rai have both been officially ELIMINATED based on housemates&apos; votes. Aman, Sudheer Kumar Reddy, and Varshini Sounderajan are in the HIGH RISK ZONE as active housemates, and 14 active housemates face Week 1 public voting.
+              Bigg Boss Telugu Season 10 features 16 housemates led by Rohit Naidu (Red Team Leader) and Debjani Modak (Blue Team Leader). Auto Ram Prasad, Rohit Naidu, and Temper Vamsi are TASK WINNERS. Charan and Chaitra Rai are ELIMINATED with NO RE-ENTRY. Aman, Sudheer Kumar Reddy, and Varshini Sounderajan occupy the HIGH RISK ZONE (3). Latest Team Task: Krishnudu&apos;s team won against Naresh&apos;s team!
             </p>
           </div>
           <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-zinc-400">
@@ -113,63 +133,63 @@ export const TeamVsSection: React.FC<{ contestants: Contestant[] }> = ({ contest
               14 Active Housemates
             </span>
             <span className="px-2.5 py-1 rounded bg-red-950/40 border border-red-800/40 text-red-300">
-              2 Eliminated
+              2 Eliminated (No Re-entry)
             </span>
           </div>
         </div>
 
-        {/* Editorial Split-Screen Layout */}
+        {/* Editorial Split-Screen Layout: Red Team vs Blue Team */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           
-          {/* Cohort 1 */}
-          <div className="editorial-panel rounded-xl p-6 space-y-6 border border-white/[0.1]">
+          {/* Red Team */}
+          <div className="editorial-panel rounded-xl p-6 space-y-6 border border-red-500/20">
             <div className="flex items-start justify-between border-b border-white/[0.08] pb-4">
               <div>
-                <h3 className="font-display text-3xl uppercase tracking-wide text-white leading-none">
-                  CONTENDERS &bull; COHORT 1
+                <h3 className="font-display text-3xl uppercase tracking-wide text-red-400 leading-none">
+                  RED TEAM
                 </h3>
                 <p className="text-xs font-semibold text-zinc-400 mt-1">
-                  Individual Housemates &bull; Week 1 Standings
+                  Leader: <span className="text-white font-bold">Rohit Naidu</span> &bull; 8 Housemates
                 </p>
               </div>
-              <span className="text-[11px] font-bold uppercase tracking-wider text-bb-gold bg-bb-gold/10 border border-bb-gold/25 px-2.5 py-1 rounded flex items-center gap-1.5">
-                Cohort A
+              <span className="text-[11px] font-bold uppercase tracking-wider text-red-400 bg-red-500/10 border border-red-500/25 px-2.5 py-1 rounded flex items-center gap-1.5">
+                <Crown className="w-3.5 h-3.5" /> Rohit Naidu Leader
               </span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {cohort1.map(renderCard)}
+              {redTeam.map(renderCard)}
+            </div>
+
+            <div className="pt-2 border-t border-white/[0.06] flex items-center justify-between text-[11px] text-zinc-400">
+              <span>Task Winners: Rohit Naidu, Temper Vamsi</span>
+              <span className="text-red-400 font-semibold">Charan &amp; Chaitra Rai Eliminated</span>
+            </div>
+          </div>
+
+          {/* Blue Team */}
+          <div className="editorial-panel rounded-xl p-6 space-y-6 border border-blue-500/20">
+            <div className="flex items-start justify-between border-b border-white/[0.08] pb-4">
+              <div>
+                <h3 className="font-display text-3xl uppercase tracking-wide text-blue-400 leading-none">
+                  BLUE TEAM
+                </h3>
+                <p className="text-xs font-semibold text-zinc-400 mt-1">
+                  Leader: <span className="text-white font-bold">Debjani Modak</span> &bull; 8 Housemates
+                </p>
+              </div>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-blue-400 bg-blue-500/10 border border-blue-500/25 px-2.5 py-1 rounded flex items-center gap-1.5">
+                <Crown className="w-3.5 h-3.5" /> Debjani Modak Leader
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {blueTeam.map(renderCard)}
             </div>
 
             <div className="pt-2 border-t border-white/[0.06] flex items-center justify-between text-[11px] text-zinc-400">
               <span>Task Winner: Auto Ram Prasad</span>
-              <span className="text-bb-gold font-semibold">14 Active in Save Poll</span>
-            </div>
-          </div>
-
-          {/* Cohort 2 */}
-          <div className="editorial-panel rounded-xl p-6 space-y-6 border border-white/[0.1]">
-            <div className="flex items-start justify-between border-b border-white/[0.08] pb-4">
-              <div>
-                <h3 className="font-display text-3xl uppercase tracking-wide text-white leading-none">
-                  CONTENDERS &bull; COHORT 2
-                </h3>
-                <p className="text-xs font-semibold text-zinc-400 mt-1">
-                  Individual Housemates &bull; Week 1 Standings
-                </p>
-              </div>
-              <span className="text-[11px] font-bold uppercase tracking-wider text-bb-gold bg-bb-gold/10 border border-bb-gold/25 px-2.5 py-1 rounded flex items-center gap-1.5">
-                Cohort B
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {cohort2.map(renderCard)}
-            </div>
-
-            <div className="pt-2 border-t border-white/[0.06] flex items-center justify-between text-[11px] text-zinc-400">
-              <span>High Risk Zone (3): Aman, Sudheer &amp; Varshini</span>
-              <span className="text-red-400 font-semibold">Charan &amp; Chaitra Rai Eliminated</span>
+              <span className="text-blue-400 font-semibold">Latest Task Winner: Krishnudu&apos;s Team</span>
             </div>
           </div>
 

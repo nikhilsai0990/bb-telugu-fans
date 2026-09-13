@@ -21,7 +21,7 @@ export default function NewsPage() {
     load();
   }, [category]);
 
-  const categories = ["All", "Nominations", "Tasks", "Arena", "Leadership"];
+  const categories = ["All", "Evictions", "Tasks", "Nominations", "House Dynamics"];
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 space-y-10">
@@ -71,17 +71,20 @@ export default function NewsPage() {
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {news.map((item, idx) => {
-            const isHighZone = item.slug.includes("high-zone") || item.slug.includes("high-risk");
-            const isEliminated = item.slug.includes("eliminated") || item.slug.includes("charan");
-            const isTaskWin = item.slug.includes("task") || item.slug.includes("win") || item.slug.includes("victory");
-            const isDebjani = item.slug.includes("debjani");
+            const isEliminated = item.slug.includes("eliminated") || item.slug.includes("re-entry") || item.slug.includes("charan");
+            const isPowerKey = item.slug.includes("power-key") || item.slug.includes("srushti");
+            const isSudheer = item.slug.includes("sudheer");
+            const isTeamTask = item.slug.includes("krishnudu") || item.slug.includes("naresh");
+            const isNoElimination = item.slug.includes("no-elimination");
 
             const fallbackImage = isEliminated
               ? "/images/contestants/chaitra-rai.webp"
-              : isHighZone
-              ? "/images/contestants/aman.webp"
-              : isTaskWin
-              ? "/images/contestants/auto-ram-prasad.webp"
+              : isPowerKey
+              ? "/images/contestants/srushti-vyakaranam.webp"
+              : isSudheer
+              ? "/images/contestants/sudheer-kumar-reddy.webp"
+              : isTeamTask
+              ? "/images/contestants/krishnudu.webp"
               : "/images/contestants/debjani-modak.webp";
 
             return (
@@ -125,25 +128,35 @@ export default function NewsPage() {
                 {/* Footer Banner */}
                 <div className="p-6 pt-0">
                   <div className="pt-3 border-t border-white/[0.06] flex items-center justify-between text-xs">
-                    {isHighZone ? (
-                      <span className="text-[11px] font-bold text-amber-300 uppercase tracking-tight flex items-center gap-1.5">
-                        <AlertCircle className="w-3.5 h-3.5 text-amber-400" />
-                        HIGH RISK ZONE • ACTIVE
-                      </span>
-                    ) : isEliminated ? (
-                      <span className="text-[11px] font-bold text-team-red uppercase tracking-tight flex items-center gap-1.5">
-                        <AlertCircle className="w-3.5 h-3.5 text-team-red" />
-                        Charan &amp; Chaitra Rai Eliminated
-                      </span>
-                    ) : isTaskWin ? (
+                    {isNoElimination ? (
                       <span className="text-[11px] font-bold text-emerald-400 uppercase tracking-tight flex items-center gap-1.5">
                         <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
-                        Auto Ram Prasad Task Winner
+                        No Eviction on Sunday &bull; All 14 Safe
+                      </span>
+                    ) : isPowerKey ? (
+                      <span className="text-[11px] font-bold text-amber-300 uppercase tracking-tight flex items-center gap-1.5">
+                        <AlertCircle className="w-3.5 h-3.5 text-amber-400" />
+                        Power Key Lost &bull; House Votes
+                      </span>
+                    ) : isSudheer ? (
+                      <span className="text-[11px] font-bold text-emerald-400 uppercase tracking-tight flex items-center gap-1.5">
+                        <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
+                        Sudheer Won Challenge
+                      </span>
+                    ) : isTeamTask ? (
+                      <span className="text-[11px] font-bold text-blue-400 uppercase tracking-tight flex items-center gap-1.5">
+                        <CheckCircle className="w-3.5 h-3.5 text-blue-400" />
+                        Krishnudu Team Won Against Naresh Team
+                      </span>
+                    ) : isEliminated ? (
+                      <span className="text-[11px] font-bold text-red-400 uppercase tracking-tight flex items-center gap-1.5">
+                        <AlertCircle className="w-3.5 h-3.5 text-red-400" />
+                        No Re-entry for Chaitra Rai &amp; Charan
                       </span>
                     ) : (
                       <span className="text-[11px] font-bold text-bb-gold uppercase tracking-tight flex items-center gap-1.5">
                         <CheckCircle className="w-3.5 h-3.5 text-bb-gold" />
-                        14 Active Housemates on Week 1 Ballot
+                        14 Active Housemates
                       </span>
                     )}
                     <span className="font-bold text-zinc-400 group-hover:text-white flex items-center gap-1">

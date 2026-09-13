@@ -15,7 +15,7 @@ describe("Season 10 Authoritative Game State Tests", () => {
     pollsService = new PollsService(db, rateLimiter);
   });
 
-  it("1. Exactly 14 active contestants and 2 eliminated contestants (Charan & Chaitra Rai)", () => {
+  it("1. Exactly 14 active housemates and 2 eliminated housemates (Charan & Chaitra Rai)", () => {
     const all = Array.from(db.contestants.values());
     expect(all.length).toBe(16);
     const active = all.filter((c) => c.isActive && !c.isEliminated);
@@ -30,6 +30,8 @@ describe("Season 10 Authoritative Game State Tests", () => {
       expect(c.status).toBe("ELIMINATED");
       expect(c.isActive).toBe(false);
       expect(c.isNominated).toBe(false);
+      expect(c.noReentry).toBe(true);
+      expect(c.reEntryEligible).toBe(false);
     }
   });
 
@@ -40,7 +42,8 @@ describe("Season 10 Authoritative Game State Tests", () => {
     expect(charanOption).toBeUndefined();
     expect(chaitraOption).toBeUndefined();
 
-    // Even if a malformed option was constructed targeting an eliminated contestant, castVote rejects it
+    // Even if a malformed option was constructed targeting an eliminated contestant on an active poll, castVote rejects it
+    poll.status = "ACTIVE";
     const fakeCharanOpt = {
       id: "opt-save-charan-fake",
       pollId: "poll-eviction-01",
@@ -59,13 +62,15 @@ describe("Season 10 Authoritative Game State Tests", () => {
     ).rejects.toThrow(BadRequestException);
   });
 
-  it("3. Charan and Chaitra Rai are not High Risk Zone", () => {
+  it("3. Charan and Chaitra Rai are not High Risk Zone and have No Re-entry", () => {
     const charan = db.contestants.get("c-13")!;
     const chaitra = db.contestants.get("c-10")!;
     expect(charan.zone).toBe("NORMAL");
     expect(charan.isHighRiskZone).toBeFalsy();
+    expect(charan.noReentry).toBe(true);
     expect(chaitra.zone).toBe("NORMAL");
     expect(chaitra.isHighRiskZone).toBeFalsy();
+    expect(chaitra.noReentry).toBe(true);
   });
 
   it("4. Aman is High Risk Zone (Active & Nominated)", () => {
@@ -121,15 +126,49 @@ describe("Season 10 Authoritative Game State Tests", () => {
     expect(mukesh.isHighRiskZone).toBeFalsy();
   });
 
-  it("10. Current Housemates are Rohit Naidu, Auto Ram Prasad, and Temper Vamsi", () => {
+  it("10. All 16 participants are Housemates with unified terminology", () => {
     const all = Array.from(db.contestants.values());
+    expect(all.length).toBe(16);
     const housemates = all.filter((c) => c.isHousemate);
-    expect(housemates.length).toBe(3);
-    const names = housemates.map((c) => c.name).sort();
-    expect(names).toEqual(["Auto Ram Prasad", "Rohit Naidu", "Temper Vamsi"].sort());
+    expect(housemates.length).toBe(16);
   });
 
-  it("11. Voting poll has exactly 14 options (Charan & Chaitra Rai excluded)", () => {
+  it("11. Task Winners are Auto Ram Prasad, Rohit Naidu, and Temper Vamsi (TASK WINNER label)", () => {
+    const all = Array.from(db.contestants.values());
+    const taskWinners = all.filter((c) => c.isTaskWinner);
+    expect(taskWinners.length).toBe(3);
+    const names = taskWinners.map((c) => c.name).sort();
+    expect(names).toEqual(["Auto Ram Prasad", "Rohit Naidu", "Temper Vamsi"].sort());
+    for (const tw of taskWinners) {
+      expect(tw.taskTitle).toBe("TASK WINNER");
+      expect(tw.stats.tasksWon).toBe(1);
+    }
+  });
+
+  it("12. Team Leaders: Debjani Modak is Blue Team Leader, Rohit Naidu is Red Team Leader", () => {
+    const debjani = db.contestants.get("c-01")!;
+    const rohit = db.contestants.get("c-11")!;
+    expect(debjani.role).toBe("LEADER");
+    expect(debjani.team).toBe("BLUE");
+    expect(rohit.role).toBe("LEADER");
+    expect(rohit.team).toBe("RED");
+  });
+
+  it("13. Sunday voting poll is CLOSED and rejects vote casting", async () => {
+    const poll = db.polls.get("poll-eviction-01")!;
+    expect(poll.status).toBe("CLOSED");
+
+    await expect(
+      pollsService.castVote({
+        pollId: "poll-eviction-01",
+        optionId: poll.options[0].id,
+        userId: "sunday-vote-attempt-user",
+        clientIp: "192.168.1.100",
+      })
+    ).rejects.toThrow(BadRequestException);
+  });
+
+  it("14. Voting poll has exactly 14 options (Charan & Chaitra Rai excluded)", () => {
     const poll = db.polls.get("poll-eviction-01")!;
     expect(poll.options.length).toBe(14);
     for (const opt of poll.options) {
@@ -138,7 +177,20 @@ describe("Season 10 Authoritative Game State Tests", () => {
     }
   });
 
-  it("12. User cannot vote more than once per day (authenticated check)", async () => {
+  it("15. Latest News contains the 5 official stories", () => {
+    const news = Array.from(db.news.values());
+    expect(news.length).toBe(5);
+    const titles = news.map((n) => n.title);
+    expect(titles.some((t) => t.includes("No Elimination on Sunday"))).toBe(true);
+    expect(titles.some((t) => t.includes("Srushti Vyakaranam lost the Power Key"))).toBe(true);
+    expect(titles.some((t) => t.includes("Sudheer Kumar Reddy won"))).toBe(true);
+    expect(titles.some((t) => t.includes("Krishnudu's team won the task"))).toBe(true);
+    expect(titles.some((t) => t.includes("No re-entry for Chaitra Rai and Charan"))).toBe(true);
+  });
+
+  it("16. User cannot vote more than once per day when poll is active", async () => {
+    const poll = db.polls.get("poll-eviction-01")!;
+    poll.status = "ACTIVE";
     const pollId = "poll-eviction-01";
     const optionId = "opt-save-c-01";
     const userId = "test-daily-user-1";

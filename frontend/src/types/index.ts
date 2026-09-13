@@ -28,6 +28,8 @@ export interface Contestant {
   isEliminated?: boolean;
   eliminatedAt?: string;
   eliminationReason?: string;
+  noReentry?: boolean;
+  reEntryEligible?: boolean;
   popularityScore: number;
   trend: "UP" | "DOWN" | "STABLE";
   weekNumber: number;

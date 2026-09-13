@@ -252,9 +252,9 @@ export function PollDetailClient({ initialPoll }: { initialPoll: Poll }) {
             return (
               <div
                 key={option.id}
-                onClick={() => !hasVoted && setSelectedOption(option.id)}
+                onClick={() => !hasVoted && poll.status !== "CLOSED" && setSelectedOption(option.id)}
                 className={`group relative p-3 rounded-lg border transition-all flex flex-col justify-between min-h-[110px] ${
-                  hasVoted
+                  hasVoted || poll.status === "CLOSED"
                     ? "cursor-default bg-white/[0.02] border-white/[0.06]"
                     : isSelected
                     ? "bg-bb-gold/10 border-bb-gold ring-1 ring-bb-gold cursor-pointer"
@@ -282,7 +282,7 @@ export function PollDetailClient({ initialPoll }: { initialPoll: Poll }) {
                     </h3>
                     {isHighRisk && (
                       <span className="text-[9px] font-bold text-amber-300 uppercase block mt-0.5">
-                        HIGH RISK ZONE
+                        HIGH RISK ZONE (3)
                       </span>
                     )}
                   </div>
@@ -290,9 +290,9 @@ export function PollDetailClient({ initialPoll }: { initialPoll: Poll }) {
 
                 <div className="pt-2 border-t border-white/[0.05] flex items-center justify-between mt-2">
                   <span className="text-[10px] text-zinc-400 font-semibold uppercase">
-                    {hasVoted ? `${option.votesCount} Votes` : "Select"}
+                    {hasVoted || poll.status === "CLOSED" ? `${option.votesCount} Votes` : "Select"}
                   </span>
-                  {!hasVoted && (
+                  {!hasVoted && poll.status !== "CLOSED" && (
                     <div
                       className={`w-4 h-4 rounded-full border flex items-center justify-center transition-colors ${
                         isSelected
@@ -313,10 +313,23 @@ export function PollDetailClient({ initialPoll }: { initialPoll: Poll }) {
         <div className="pt-4 border-t border-white/[0.08] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
           <div className="flex items-center gap-2 text-xs text-zinc-400">
             <ShieldCheck className="w-4 h-4 text-bb-gold flex-shrink-0" />
-            <span>Verified Fan Voting active. 1 authenticated vote per user per day enforced.</span>
+            <span>{poll.status === "CLOSED" ? "Voting is currently closed." : "Verified Fan Voting active. 1 authenticated vote per user per day enforced."}</span>
           </div>
 
-          {!hasVoted ? (
+          {poll.status === "CLOSED" ? (
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-bold uppercase tracking-wider text-amber-300 flex items-center gap-1.5 px-3 py-2 rounded bg-amber-500/10 border border-amber-500/20">
+                <Lock className="w-3.5 h-3.5" /> Voting is currently closed
+              </span>
+              <button
+                disabled
+                className="px-8 py-3.5 rounded font-bold text-xs uppercase tracking-wider bg-white/[0.06] text-zinc-500 cursor-not-allowed border border-white/[0.08] flex items-center justify-center gap-2"
+              >
+                <Lock className="w-4 h-4 text-zinc-500" />
+                <span>Voting is Currently Closed</span>
+              </button>
+            </div>
+          ) : !hasVoted ? (
             user ? (
               <button
                 onClick={handleVote}

@@ -28,7 +28,7 @@ export const Hero = () => {
             {/* Monumental Headline */}
             <div className="space-y-1">
               <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl tracking-tight uppercase text-white leading-[0.92]">
-                <span>INDIVIDUAL</span>{" "}
+                <span>HOUSEMATE</span>{" "}
                 <span className="text-bb-gold">BATTLE.</span>
                 <br />
                 <span className="text-white">SEASON 10</span>
@@ -39,30 +39,30 @@ export const Hero = () => {
 
             {/* Editorial Context */}
             <p className="text-sm sm:text-base text-zinc-300 font-normal leading-relaxed max-w-xl">
-              The premier fan community for Bigg Boss Telugu Season 10. Auto Ram Prasad is the TASK WINNER in a dominant individual display. Charan and Chaitra Rai have both been officially ELIMINATED based on housemates&apos; votes. Exactly three contestants &mdash; Aman, Sudheer Kumar Reddy, and Varshini Sounderajan &mdash; are in the HIGH RISK ZONE as active nominated contenders. 14 active contestants face the public save vote!
+              The premier fan community for Bigg Boss Telugu Season 10. Auto Ram Prasad, Rohit Naidu, and Temper Vamsi are TASK WINNERS. Charan and Chaitra Rai have both been officially ELIMINATED based on housemates&apos; votes with NO RE-ENTRY. Exactly three active housemates &mdash; Aman, Sudheer Kumar Reddy, and Varshini Sounderajan &mdash; are in the HIGH RISK ZONE (3). In the latest team task, Krishnudu&apos;s team defeated Naresh&apos;s team!
             </p>
 
             {/* Official Match State Board */}
             <div className="editorial-panel rounded-lg p-4 space-y-3 max-w-xl">
               <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider pb-2 border-b border-white/[0.08]">
-                <span className="text-zinc-400">Current Week 1 Status</span>
+                <span className="text-zinc-400">Current Season 10 Status</span>
                 <span className="text-emerald-400 flex items-center gap-1.5 font-bold">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  14 Active Nominated &bull; 2 Eliminated
+                  14 Active Housemates &bull; 2 Eliminated (No Re-entry)
                 </span>
               </div>
 
               <div className="grid grid-cols-2 gap-3 pt-1">
-                {/* Task Winner Box */}
+                {/* Task Winners Box */}
                 <div className="p-2.5 rounded bg-white/[0.03] border border-emerald-500/30">
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-400 block">
-                      Task Winner
+                      Task Winners
                     </span>
                     <Trophy className="w-3.5 h-3.5 text-emerald-400" />
                   </div>
-                  <p className="text-sm font-extrabold text-white mt-0.5">Auto Ram Prasad</p>
-                  <span className="text-[10px] font-semibold text-zinc-400 uppercase">Individual Arena Victory</span>
+                  <p className="text-sm font-extrabold text-white mt-0.5 truncate">Auto Ram Prasad, Rohit &amp; Vamsi</p>
+                  <span className="text-[10px] font-semibold text-zinc-400 uppercase">TASK WINNER (1 Win Each)</span>
                 </div>
 
                 {/* High Risk Zone Box */}
@@ -73,8 +73,8 @@ export const Hero = () => {
                     </span>
                     <AlertCircle className="w-3.5 h-3.5 text-amber-400" />
                   </div>
-                  <p className="text-sm font-extrabold text-white mt-0.5">Aman, Sudheer &amp; Varshini</p>
-                  <span className="text-[10px] font-semibold text-zinc-400 uppercase">Active Nominated Contenders</span>
+                  <p className="text-sm font-extrabold text-white mt-0.5 truncate">Aman, Sudheer &amp; Varshini</p>
+                  <span className="text-[10px] font-semibold text-zinc-400 uppercase">Active Nominated Housemates</span>
                 </div>
               </div>
 
@@ -82,15 +82,15 @@ export const Hero = () => {
               <div className="flex items-start gap-2 px-3 py-2.5 rounded bg-amber-500/10 border border-amber-500/20 text-[11px] text-zinc-300">
                 <AlertCircle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
                 <span>
-                  <strong className="text-amber-300 uppercase font-bold">HIGH RISK ZONE Notice:</strong> Aman, Sudheer Kumar Reddy, and Varshini Sounderajan are the 3 contestants in the HIGH RISK ZONE. All three remain ACTIVE nominated contenders! Auto Ram Prasad, Mukesh Gowda, Charan, and Chaitra Rai are NOT in the High Risk Zone.
+                  <strong className="text-amber-300 uppercase font-bold">HIGH RISK ZONE (3):</strong> Aman, Sudheer Kumar Reddy, and Varshini Sounderajan are the 3 active housemates in the HIGH RISK ZONE (3). All three remain active nominated housemates. Auto Ram Prasad, Mukesh Gowda, Charan, and Chaitra Rai are NOT in the High Risk Zone.
                 </span>
               </div>
 
-              {/* Task Result Banner */}
+              {/* Team Task Result Banner */}
               <div className="flex items-start gap-2 px-3 py-2 rounded bg-white/[0.03] border border-white/[0.08] text-[11px] text-zinc-300">
                 <Trophy className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
                 <span>
-                  <strong className="text-white uppercase font-bold">Task Winner: Auto Ram Prasad</strong> &mdash; Secured dominant individual victory in the arena challenge of Season 10.
+                  <strong className="text-white uppercase font-bold">Latest Team Task:</strong> Team A (Naresh) vs Team B (Krishnudu) &mdash; <span className="text-emerald-400 font-bold">Winner: Krishnudu&apos;s Team!</span>
                 </span>
               </div>
             </div>
@@ -102,7 +102,7 @@ export const Hero = () => {
                 className="px-6 py-3 rounded bg-bb-gold hover:bg-bb-gold-light text-black font-bold text-xs uppercase tracking-wider transition-colors flex items-center gap-2 shadow-sm"
               >
                 <Vote className="w-4 h-4" />
-                <span>Vote In Save Poll</span>
+                <span>View Poll &amp; Results</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
@@ -131,17 +131,17 @@ export const Hero = () => {
                       className="w-5 h-3.5 object-contain"
                     />
                     <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-300">
-                      Season 10 Arena &bull; Individual Contenders
+                      Season 10 Arena &bull; Housemates
                     </span>
                   </div>
                   <span className="text-[10px] font-extrabold uppercase tracking-widest text-bb-gold bg-bb-gold/10 px-2 py-0.5 rounded border border-bb-gold/20">
-                    Week 1 Ballot Live
+                    Sunday Closed &bull; 14 Nominated
                   </span>
                 </div>
 
                 {/* Contenders Showcase: Auto Ram Prasad & Debjani Modak */}
                 <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                  {/* Auto Ram Prasad - Task 1 Winner */}
+                  {/* Auto Ram Prasad - Task Winner */}
                   <Link
                     href="/contestants/auto-ram-prasad"
                     className="group relative rounded-lg overflow-hidden border border-emerald-500/30 bg-gradient-to-t from-black via-zinc-900 to-transparent p-3 flex flex-col justify-end min-h-[220px] sm:min-h-[260px] transition-transform duration-300 hover:scale-[1.02]"
@@ -162,14 +162,14 @@ export const Hero = () => {
                       <h3 className="font-display text-xl sm:text-2xl text-white tracking-wide leading-none">
                         Auto Ram Prasad
                       </h3>
-                      <p className="text-[10px] text-zinc-300">Comedian &bull; Active Nominated</p>
+                      <p className="text-[10px] text-zinc-300">Task Winner &bull; Housemate</p>
                     </div>
                   </Link>
 
-                  {/* Debjani Modak */}
+                  {/* Debjani Modak - Blue Team Leader */}
                   <Link
                     href="/contestants/debjani-modak"
-                    className="group relative rounded-lg overflow-hidden border border-white/20 bg-gradient-to-t from-black via-zinc-900 to-transparent p-3 flex flex-col justify-end min-h-[220px] sm:min-h-[260px] transition-transform duration-300 hover:scale-[1.02]"
+                    className="group relative rounded-lg overflow-hidden border border-blue-500/30 bg-gradient-to-t from-black via-zinc-900 to-transparent p-3 flex flex-col justify-end min-h-[220px] sm:min-h-[260px] transition-transform duration-300 hover:scale-[1.02]"
                   >
                     <img
                       src="/images/contestants/debjani-modak.webp"
@@ -180,22 +180,22 @@ export const Hero = () => {
                     
                     <div className="relative z-10 space-y-1">
                       <div className="flex items-center gap-1">
-                        <span className="inline-block px-1.5 py-0.5 rounded bg-white/[0.1] text-zinc-300 border border-white/20 text-[9px] font-black uppercase tracking-wider">
-                          CONTENDER
+                        <span className="inline-block px-1.5 py-0.5 rounded bg-blue-500/30 text-blue-300 border border-blue-400/40 text-[9px] font-black uppercase tracking-wider">
+                          BLUE TEAM LEADER
                         </span>
                       </div>
                       <h3 className="font-display text-xl sm:text-2xl text-white tracking-wide leading-none">
                         Debjani Modak
                       </h3>
-                      <p className="text-[10px] text-zinc-300">Television Actress &bull; Active Nominated</p>
+                      <p className="text-[10px] text-zinc-300">Blue Leader &bull; Housemate</p>
                     </div>
                   </Link>
                 </div>
 
-                {/* Sub-Strip: Key Contestants in Focus */}
+                {/* Sub-Strip: Key Housemates in Focus */}
                 <div className="pt-2 border-t border-white/[0.08] space-y-2">
                   <div className="flex items-center justify-between text-[11px] text-zinc-400">
-                    <span className="font-semibold uppercase tracking-wider">CONTESTANTS IN FOCUS</span>
+                    <span className="font-semibold uppercase tracking-wider">HOUSEMATES IN FOCUS</span>
                     <Link href="/contestants" className="text-bb-gold hover:underline font-bold">
                       View All 16 &rarr;
                     </Link>
@@ -203,11 +203,11 @@ export const Hero = () => {
 
                   <div className="grid grid-cols-5 gap-1.5 sm:gap-2">
                     {[
-                      { name: "Aman", role: "High Risk", img: "/images/contestants/aman.webp", slug: "aman", tag: "HIGH RISK" },
-                      { name: "Sudheer", role: "High Risk", img: "/images/contestants/sudheer-kumar-reddy.webp", slug: "sudheer-kumar-reddy", tag: "HIGH RISK" },
-                      { name: "Varshini", role: "High Risk", img: "/images/contestants/varshini-sounderajan.webp", slug: "varshini-sounderajan", tag: "HIGH RISK" },
-                      { name: "Chaitra Rai", role: "Eliminated", img: "/images/contestants/chaitra-rai.webp", slug: "chaitra-rai", tag: "ELIMINATED" },
-                      { name: "Charan", role: "Eliminated", img: "/images/contestants/charan.webp", slug: "charan", tag: "ELIMINATED" },
+                      { name: "Aman", role: "High Risk", img: "/images/contestants/aman.webp", slug: "aman", tag: "HIGH RISK (3)" },
+                      { name: "Sudheer", role: "High Risk", img: "/images/contestants/sudheer-kumar-reddy.webp", slug: "sudheer-kumar-reddy", tag: "HIGH RISK (3)" },
+                      { name: "Varshini", role: "High Risk", img: "/images/contestants/varshini-sounderajan.webp", slug: "varshini-sounderajan", tag: "HIGH RISK (3)" },
+                      { name: "Chaitra Rai", role: "Eliminated", img: "/images/contestants/chaitra-rai.webp", slug: "chaitra-rai", tag: "NO RE-ENTRY" },
+                      { name: "Charan", role: "Eliminated", img: "/images/contestants/charan.webp", slug: "charan", tag: "NO RE-ENTRY" },
                     ].map((item) => (
                       <Link
                         key={item.slug}
@@ -225,7 +225,7 @@ export const Hero = () => {
                           {item.name}
                         </span>
                         <span className={`text-[8px] sm:text-[9px] font-semibold uppercase ${
-                          item.tag === "ELIMINATED" ? "text-zinc-500" : "text-amber-400"
+                          item.tag === "NO RE-ENTRY" ? "text-red-400" : "text-amber-400"
                         }`}>
                           {item.tag}
                         </span>
