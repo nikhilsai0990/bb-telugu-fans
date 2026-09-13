@@ -82,10 +82,10 @@ export class AuthService {
   public async register(dto: { username: string; email: string; password: string }) {
     for (const u of this.db.users.values()) {
       if (u.email.toLowerCase() === dto.email.toLowerCase()) {
-        throw new ConflictException("An account with this email already exists");
+        throw new ConflictException("Username or email already registered.");
       }
       if (u.username.toLowerCase() === dto.username.toLowerCase()) {
-        throw new ConflictException("Username is already taken");
+        throw new ConflictException("Username or email already registered.");
       }
     }
 

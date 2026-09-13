@@ -197,6 +197,7 @@ export class DatabaseService implements OnModuleInit {
 
   onModuleInit() {
     this.seedInitialData();
+    this.resetPollVotes("poll-captain-week-02");
     this.resetPollVotes("poll-eviction-01");
   }
 
@@ -902,10 +903,14 @@ export class DatabaseService implements OnModuleInit {
       this.contestants.set(c.id, c);
     }
 
-    // 3. Official Season 10 Poll — ONLY "WHO SHOULD BE SAVED?"
-    // Contains EXACTLY the 14 active nominated housemates (Charan and Chaitra Rai are ELIMINATED and excluded).
-    // Status is CLOSED for Sunday!
-    const pollSaveId = "poll-eviction-01";
+    // 3. Official Season 10 Polls
+    // WEEK 2 FEATURE 1 — "POWER OF PEOPLE" / YOU CHOOSE THE CAPTAIN
+    // Poll ID: poll-captain-week-02
+    // Title: Power of People — You Choose the Captain
+    // Category: Captaincy
+    // Contains EXACTLY the 14 active housemates (Charan and Chaitra Rai are ELIMINATED and excluded).
+    // Starts with 0 votes, 0%. Status is CLOSED for Sunday outside Mon-Fri schedule.
+    const pollCaptainId = "poll-captain-week-02";
     const canonicalPollContestantsOrder = [
       "c-01", // Debjani Modak
       "c-02", // Auto Ram Prasad
@@ -925,6 +930,42 @@ export class DatabaseService implements OnModuleInit {
       "c-16", // Singer Jhansi
     ];
 
+    const captainPollOptions: PollOption[] = canonicalPollContestantsOrder.map((cId) => {
+      const c = this.contestants.get(cId)!;
+      return {
+        id: `opt-captain-${c.id}`,
+        pollId: pollCaptainId,
+        contestantId: c.id,
+        text: `Vote ${c.name} for Captain`,
+        imageUrl: c.avatarUrl,
+        team: c.team,
+        zone: "NORMAL",
+        isHighRiskZone: false,
+        isHighZone: false,
+        votesCount: 0,
+      };
+    });
+
+    for (const opt of captainPollOptions) {
+      this.pollOptions.set(opt.id, opt);
+    }
+
+    const pollCaptain: Poll = {
+      id: pollCaptainId,
+      title: "Power of People — You Choose the Captain",
+      description: "For the first time, the power is in the hands of the people. Vote for the housemate you want to see as Captain.",
+      category: "Captaincy",
+      status: "CLOSED",
+      totalVotes: 0,
+      options: captainPollOptions,
+      startsAt: new Date(Date.now() - 86400000),
+      endsAt: new Date(),
+      createdAt: new Date(),
+    };
+    this.polls.set(pollCaptain.id, pollCaptain);
+
+    // Historical Week 1 Save Poll — Retained for backward compatibility
+    const pollSaveId = "poll-eviction-01";
     const pollOptions: PollOption[] = canonicalPollContestantsOrder.map((cId) => {
       const c = this.contestants.get(cId)!;
       return {
@@ -953,14 +994,42 @@ export class DatabaseService implements OnModuleInit {
       status: "CLOSED",
       totalVotes: 0,
       options: pollOptions,
-      startsAt: new Date(Date.now() - 86400000),
-      endsAt: new Date(),
-      createdAt: new Date(Date.now() - 86400000),
+      startsAt: new Date(Date.now() - 86400000 * 2),
+      endsAt: new Date(Date.now() - 86400000),
+      createdAt: new Date(Date.now() - 86400000 * 2),
     };
     this.polls.set(pollSave.id, pollSave);
 
-    // 4. Official Season 10 News Dispatches (5 Required Stories)
+    // 4. Official Season 10 News Dispatches (Week 2 Updates + Historical Stories)
     const newsItems: NewsItem[] = [
+      {
+        id: "news-w02-01",
+        title: "Power of People begins in Week 2 — audience gets the power to choose the Captain.",
+        slug: "power-of-people-begins-in-week-2-audience-gets-power-to-choose-captain",
+        summary: "Bigg Boss Telugu Season 10 introduces the groundbreaking 'Power of People' initiative, giving fans direct authority to elect the house Captain.",
+        content: `For the first time in Bigg Boss Telugu history, the ultimate authority shifts to the audience. Under the 'Power of People' initiative in Week 2, viewers hold the key to captaincy, voting directly for the housemate they want to see lead the house. The official audience captain poll is now live.`,
+        category: "Captaincy",
+        imageUrl: "/images/contestants/debjani-modak.webp",
+        viewsCount: 0,
+        isTrending: true,
+        isPublished: true,
+        publishedAt: new Date(Date.now() - 1000 * 60 * 30),
+        createdAt: new Date(Date.now() - 1000 * 60 * 30),
+      },
+      {
+        id: "news-w02-02",
+        title: "Housemates enter the nomination battle — nominations are decided inside the house, while nominated contestants must fight through the game.",
+        slug: "housemates-enter-nomination-battle-nominations-decided-inside-house",
+        summary: "Week 2 nomination dynamics unfold inside the house as housemates cast internal votes, leaving nominated contenders to battle for survival in the arena.",
+        content: `The intensity reaches a boiling point in Bigg Boss Telugu Season 10 as Week 2 nominations get underway. Unlike public voting nominations, housemates decide the nominations face-to-face inside the house. Those put on the block must prove their mettle through physical, mental, and endurance challenges to stay alive in the game.`,
+        category: "Nominations",
+        imageUrl: "/images/contestants/auto-ram-prasad.webp",
+        viewsCount: 0,
+        isTrending: true,
+        isPublished: true,
+        publishedAt: new Date(Date.now() - 1000 * 60 * 60),
+        createdAt: new Date(Date.now() - 1000 * 60 * 60),
+      },
       {
         id: "news-01",
         title: "No Elimination on Sunday",

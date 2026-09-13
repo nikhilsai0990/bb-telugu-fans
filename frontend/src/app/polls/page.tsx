@@ -6,6 +6,7 @@ import { Vote, CheckCircle, AlertCircle, ShieldCheck, Lock, LogIn, UserPlus } fr
 import { Poll } from "../../types";
 import { api, fallbackPolls } from "../../lib/api";
 import { useAuth } from "../../context/AuthContext";
+import { HousemateNominationsSection } from "../../components/HousemateNominationsSection";
 
 export default function PollsPage() {
   const { user, token } = useAuth();
@@ -20,7 +21,9 @@ export default function PollsPage() {
 
   useEffect(() => {
     // 1. Immediate sync check from localStorage
-    const saved = typeof window !== "undefined" ? localStorage.getItem("bb_voted_poll-eviction-01") : null;
+    const saved = typeof window !== "undefined"
+      ? (localStorage.getItem("bb_voted_poll-captain-week-02") || localStorage.getItem("bb_voted_poll-eviction-01"))
+      : null;
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -49,7 +52,7 @@ export default function PollsPage() {
               const opt = currentPoll.options.find((o) => o.id === status.optionId);
               if (opt) {
                 setVotedContestantName(
-                  opt.text.replace(/Save\s*/i, "").replace(/\s*\([^)]*\)/i, "").trim()
+                  opt.text.replace(/Save\s*/i, "").replace(/Vote\s*/i, "").replace(/\s*for Captain/i, "").trim()
                 );
               }
             }
@@ -58,6 +61,7 @@ export default function PollsPage() {
             setSelectedOption(null);
             setVotedContestantName(null);
             if (typeof window !== "undefined") {
+              localStorage.removeItem("bb_voted_poll-captain-week-02");
               localStorage.removeItem("bb_voted_poll-eviction-01");
               localStorage.removeItem(`bb_voted_${currentPoll.id}`);
             }
@@ -119,13 +123,13 @@ export default function PollsPage() {
       <div className="space-y-3 border-b border-white/[0.08] pb-6">
         <div className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-zinc-400">
           <span className="w-2 h-2 rounded-full bg-bb-gold animate-pulse" />
-          <span>OFFICIAL FAN BALLOT &bull; WEEK 1</span>
+          <span>WEEK 2 &bull; POWER OF PEOPLE</span>
         </div>
         <h1 className="font-display text-4xl sm:text-6xl uppercase tracking-tight text-white leading-none">
-          WHO SHOULD BE SAVED?
+          WHO DO YOU WANT TO SEE AS CAPTAIN?
         </h1>
         <p className="text-sm text-zinc-300 max-w-2xl leading-relaxed">
-          14 active Bigg Boss Telugu Season 10 housemates (Charan and Chaitra Rai eliminated). Select your choice below and submit your verified fan vote (1 vote per authenticated account).
+          For the first time, the power is in the hands of the people. Vote for the housemate you want to see as Captain. 14 active housemates (Charan and Chaitra Rai eliminated). Select your choice below and submit your verified fan vote (1 vote per authenticated account).
         </p>
       </div>
 
@@ -239,6 +243,8 @@ export default function PollsPage() {
 
               const cleanName = option.text
                 .replace(/Save\s*/i, "")
+                .replace(/Vote\s*/i, "")
+                .replace(/\s*for Captain/i, "")
                 .replace(/\s*\(RED TEAM\)/i, "")
                 .replace(/\s*\(BLUE TEAM\)/i, "")
                 .replace(/\s*\([^)]*\)/i, "")
@@ -333,7 +339,7 @@ export default function PollsPage() {
                     {voting
                       ? "Submitting Vote..."
                       : selectedItem
-                      ? `Vote to Save ${selectedItem.text.replace(/Save\s*/i, "").replace(/\s*\([^)]*\)/i, "").trim()}`
+                      ? `Vote for ${selectedItem.text.replace(/Save\s*/i, "").replace(/Vote\s*/i, "").replace(/\s*for Captain/i, "").trim()} as Captain`
                       : "Select a Housemate to Vote"}
                   </span>
                 </button>
@@ -379,6 +385,8 @@ export default function PollsPage() {
               {poll.options.map((option) => {
                 const contestantName = option.text
                   .replace(/Save\s*/i, "")
+                  .replace(/Vote\s*/i, "")
+                  .replace(/\s*for Captain/i, "")
                   .replace(/\s*\(RED TEAM\)/i, "")
                   .replace(/\s*\(BLUE TEAM\)/i, "")
                   .replace(/\s*\([^)]*\)/i, "")
@@ -443,6 +451,9 @@ export default function PollsPage() {
 
         </div>
       )}
+
+      {/* Week 2 Feature 2: Housemate Nominations Mechanic */}
+      <HousemateNominationsSection />
 
     </div>
   );

@@ -567,9 +567,67 @@ export const fallbackContestants: Contestant[] = [
   },
 ];
 
-// Fallback Poll — ONLY "WHO SHOULD BE SAVED?" with 14 active housemates (Charan and Chaitra Rai excluded)
+export function isVotingScheduleOpen(now: Date = new Date()): boolean {
+  if (typeof process !== "undefined" && process.env.NEXT_PUBLIC_FORCE_VOTING_OPEN === "true") return true;
+  if (typeof process !== "undefined" && process.env.NEXT_PUBLIC_FORCE_VOTING_CLOSED === "true") return false;
+
+  try {
+    const formatter = new Intl.DateTimeFormat("en-US", {
+      timeZone: "Asia/Kolkata",
+      weekday: "short",
+      hour: "numeric",
+      minute: "numeric",
+      second: "numeric",
+      hour12: false,
+    });
+    const parts = formatter.formatToParts(now);
+    const weekday = parts.find((p) => p.type === "weekday")?.value;
+    // Window: START Monday 00:00:00 IST to STOP Friday 23:59:59 IST
+    // Saturday and Sunday are CLOSED
+    if (weekday === "Sat" || weekday === "Sun") {
+      return false;
+    }
+    return true;
+  } catch (e) {
+    const utcTime = now.getTime() + now.getTimezoneOffset() * 60000;
+    const istTime = new Date(utcTime + 3600000 * 5.5);
+    const day = istTime.getDay(); // 0 is Sun, 6 is Sat
+    return day >= 1 && day <= 5;
+  }
+}
+
+// Fallback Polls — Week 2 Power of People Captain Poll (Primary) + Week 1 Eviction Poll
 // Status is CLOSED for Sunday!
 export const fallbackPolls: Poll[] = [
+  {
+    id: "poll-captain-week-02",
+    title: "Power of People — You Choose the Captain",
+    description: "For the first time, the power is in the hands of the people. Vote for the housemate you want to see as Captain.",
+    category: "Captaincy",
+    status: isVotingScheduleOpen() ? "ACTIVE" : "CLOSED",
+    totalVotes: 0,
+    options: [
+      { id: "opt-captain-c-01", contestantId: "c-01", text: "Vote Debjani Modak for Captain", imageUrl: "/images/contestants/debjani-modak.webp", votesCount: 0, percentage: 0, team: "BLUE", zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-captain-c-02", contestantId: "c-02", text: "Vote Auto Ram Prasad for Captain", imageUrl: "/images/contestants/auto-ram-prasad.webp", votesCount: 0, percentage: 0, team: "BLUE", zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-captain-c-03", contestantId: "c-03", text: "Vote Jabardasth Naresh for Captain", imageUrl: "/images/contestants/jabardasth-naresh.webp", votesCount: 0, percentage: 0, team: "BLUE", zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-captain-c-04", contestantId: "c-04", text: "Vote Thrigun for Captain", imageUrl: "/images/contestants/thrigun.webp", votesCount: 0, percentage: 0, team: "BLUE", zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-captain-c-05", contestantId: "c-05", text: "Vote Mukesh Gowda for Captain", imageUrl: "/images/contestants/mukesh-gowda.webp", votesCount: 0, percentage: 0, team: "BLUE", zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-captain-c-06", contestantId: "c-06", text: "Vote Varshini Sounderajan for Captain", imageUrl: "/images/contestants/varshini-sounderajan.webp", votesCount: 0, percentage: 0, team: "BLUE", zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-captain-c-07", contestantId: "c-07", text: "Vote Temper Vamsi for Captain", imageUrl: "/images/contestants/temper-vamsi.webp", votesCount: 0, percentage: 0, team: "RED", zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-captain-c-08", contestantId: "c-08", text: "Vote Krishnudu for Captain", imageUrl: "/images/contestants/krishnudu.webp", votesCount: 0, percentage: 0, team: "BLUE", zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-captain-c-09", contestantId: "c-09", text: "Vote Sudheer Kumar Reddy for Captain", imageUrl: "/images/contestants/sudheer-kumar-reddy.webp", votesCount: 0, percentage: 0, team: "BLUE", zone: "NORMAL", isHighRiskZone: false },
+      // Chaitra Rai (c-10) is ELIMINATED - excluded from voting
+      { id: "opt-captain-c-11", contestantId: "c-11", text: "Vote Rohit Naidu for Captain", imageUrl: "/images/contestants/rohit-naidu.webp", votesCount: 0, percentage: 0, team: "RED", zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-captain-c-12", contestantId: "c-12", text: "Vote Aman for Captain", imageUrl: "/images/contestants/aman.webp", votesCount: 0, percentage: 0, team: "RED", zone: "NORMAL", isHighRiskZone: false },
+      // Charan (c-13) is ELIMINATED - excluded from voting
+      { id: "opt-captain-c-14", contestantId: "c-14", text: "Vote Shalini for Captain", imageUrl: "/images/contestants/shalini.webp", votesCount: 0, percentage: 0, team: "RED", zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-captain-c-15", contestantId: "c-15", text: "Vote Srushti Vyakaranam for Captain", imageUrl: "/images/contestants/srushti-vyakaranam.webp", votesCount: 0, percentage: 0, team: "RED", zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-captain-c-16", contestantId: "c-16", text: "Vote Singer Jhansi for Captain", imageUrl: "/images/contestants/singer-jhansi.webp", votesCount: 0, percentage: 0, team: "RED", zone: "NORMAL", isHighRiskZone: false },
+    ],
+    startsAt: new Date(Date.now() - 86400000).toISOString(),
+    endsAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
+  },
   {
     id: "poll-eviction-01",
     title: "Who Should Be Saved?",
@@ -587,22 +645,48 @@ export const fallbackPolls: Poll[] = [
       { id: "opt-save-c-07", contestantId: "c-07", text: "Save Temper Vamsi", imageUrl: "/images/contestants/temper-vamsi.webp", votesCount: 0, percentage: 0, team: "RED", zone: "NORMAL", isHighRiskZone: false },
       { id: "opt-save-c-08", contestantId: "c-08", text: "Save Krishnudu", imageUrl: "/images/contestants/krishnudu.webp", votesCount: 0, percentage: 0, team: "BLUE", zone: "NORMAL", isHighRiskZone: false },
       { id: "opt-save-c-09", contestantId: "c-09", text: "Save Sudheer Kumar Reddy", imageUrl: "/images/contestants/sudheer-kumar-reddy.webp", votesCount: 0, percentage: 0, team: "BLUE", zone: "NORMAL", isHighRiskZone: false },
-      // Chaitra Rai is ELIMINATED - excluded from voting
       { id: "opt-save-c-11", contestantId: "c-11", text: "Save Rohit Naidu", imageUrl: "/images/contestants/rohit-naidu.webp", votesCount: 0, percentage: 0, team: "RED", zone: "NORMAL", isHighRiskZone: false },
       { id: "opt-save-c-12", contestantId: "c-12", text: "Save Aman", imageUrl: "/images/contestants/aman.webp", votesCount: 0, percentage: 0, team: "RED", zone: "NORMAL", isHighRiskZone: false },
-      // Charan is ELIMINATED - excluded from voting
       { id: "opt-save-c-14", contestantId: "c-14", text: "Save Shalini", imageUrl: "/images/contestants/shalini.webp", votesCount: 0, percentage: 0, team: "RED", zone: "NORMAL", isHighRiskZone: false },
       { id: "opt-save-c-15", contestantId: "c-15", text: "Save Srushti Vyakaranam", imageUrl: "/images/contestants/srushti-vyakaranam.webp", votesCount: 0, percentage: 0, team: "RED", zone: "NORMAL", isHighRiskZone: false },
       { id: "opt-save-c-16", contestantId: "c-16", text: "Save Singer Jhansi", imageUrl: "/images/contestants/singer-jhansi.webp", votesCount: 0, percentage: 0, team: "RED", zone: "NORMAL", isHighRiskZone: false },
     ],
-    startsAt: new Date(Date.now() - 86400000).toISOString(),
-    endsAt: new Date().toISOString(),
-    createdAt: new Date(Date.now() - 86400000).toISOString(),
+    startsAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+    endsAt: new Date(Date.now() - 86400000).toISOString(),
+    createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
   },
 ];
 
-// Fallback News — 5 Official Stories
-const fallbackNews: NewsItem[] = [
+// Fallback News — Week 2 Updates + 5 Historical Stories
+export const fallbackNews: NewsItem[] = [
+  {
+    id: "news-w02-01",
+    title: "Power of People begins in Week 2 — audience gets the power to choose the Captain.",
+    slug: "power-of-people-begins-in-week-2-audience-gets-power-to-choose-captain",
+    summary: "Bigg Boss Telugu Season 10 introduces the groundbreaking 'Power of People' initiative, giving fans direct authority to elect the house Captain.",
+    content: "For the first time in Bigg Boss Telugu history, the ultimate authority shifts to the audience. Under the 'Power of People' initiative in Week 2, viewers hold the key to captaincy, voting directly for the housemate they want to see lead the house. The official audience captain poll is now live.",
+    category: "Captaincy",
+    imageUrl: "/images/contestants/debjani-modak.webp",
+    viewsCount: 0,
+    isTrending: true,
+    isPublished: true,
+    publishedAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
+    createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
+  },
+  {
+    id: "news-w02-02",
+    title: "Housemates enter the nomination battle — nominations are decided inside the house, while nominated contestants must fight through the game.",
+    slug: "housemates-enter-nomination-battle-nominations-decided-inside-house",
+    summary: "Week 2 nomination dynamics unfold inside the house as housemates cast internal votes, leaving nominated contenders to battle for survival in the arena.",
+    content: "The intensity reaches a boiling point in Bigg Boss Telugu Season 10 as Week 2 nominations get underway. Unlike public voting nominations, housemates decide the nominations face-to-face inside the house. Those put on the block must prove their mettle through physical, mental, and endurance challenges to stay alive in the game.",
+    category: "Nominations",
+    imageUrl: "/images/contestants/auto-ram-prasad.webp",
+    viewsCount: 0,
+    isTrending: true,
+    isPublished: true,
+    publishedAt: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
+    createdAt: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
+  },
   {
     id: "news-01",
     title: "No Elimination on Sunday",

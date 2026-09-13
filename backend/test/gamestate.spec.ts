@@ -182,19 +182,26 @@ describe("Season 10 Authoritative Game State Tests", () => {
     ).rejects.toThrow(BadRequestException);
   });
 
-  it("14. Voting poll has exactly 14 options (Charan & Chaitra Rai excluded)", () => {
-    const poll = db.polls.get("poll-eviction-01")!;
+  it("14. Primary Week 2 Captain Poll (poll-captain-week-02) has exactly 14 options (Charan & Chaitra Rai excluded)", () => {
+    const poll = db.polls.get("poll-captain-week-02")!;
+    expect(poll).toBeDefined();
+    expect(poll.title).toBe("Power of People — You Choose the Captain");
+    expect(poll.category).toBe("Captaincy");
+    expect(poll.totalVotes).toBe(0);
     expect(poll.options.length).toBe(14);
     for (const opt of poll.options) {
-      expect(opt.contestantId).not.toBe("c-13");
-      expect(opt.contestantId).not.toBe("c-10");
+      expect(opt.contestantId).not.toBe("c-13"); // Charan excluded
+      expect(opt.contestantId).not.toBe("c-10"); // Chaitra Rai excluded
+      expect(opt.votesCount).toBe(0);
     }
   });
 
-  it("15. Latest News contains the 5 official stories", () => {
+  it("15. Latest News contains all 7 official stories (2 Week 2 + 5 historical)", () => {
     const news = Array.from(db.news.values());
-    expect(news.length).toBe(5);
+    expect(news.length).toBe(7);
     const titles = news.map((n) => n.title);
+    expect(titles.some((t) => t.includes("Power of People begins in Week 2"))).toBe(true);
+    expect(titles.some((t) => t.includes("Housemates enter the nomination battle"))).toBe(true);
     expect(titles.some((t) => t.includes("No Elimination on Sunday"))).toBe(true);
     expect(titles.some((t) => t.includes("Srushti Vyakaranam lost the Power Key"))).toBe(true);
     expect(titles.some((t) => t.includes("Sudheer Kumar Reddy won"))).toBe(true);
@@ -203,10 +210,10 @@ describe("Season 10 Authoritative Game State Tests", () => {
   });
 
   it("16. User cannot vote more than once per day when poll is active", async () => {
-    const poll = db.polls.get("poll-eviction-01")!;
+    const poll = db.polls.get("poll-captain-week-02")!;
     poll.status = "ACTIVE";
-    const pollId = "poll-eviction-01";
-    const optionId = "opt-save-c-01";
+    const pollId = "poll-captain-week-02";
+    const optionId = "opt-captain-c-01";
     const userId = "test-daily-user-1";
     const clientIp = "192.168.1.200";
 
@@ -221,7 +228,7 @@ describe("Season 10 Authoritative Game State Tests", () => {
     await expect(
       pollsService.castVote({
         pollId,
-        optionId: "opt-save-c-02",
+        optionId: "opt-captain-c-02",
         userId,
         clientIp,
       })

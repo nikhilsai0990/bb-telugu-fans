@@ -20,35 +20,45 @@ export const Hero = () => {
             {/* Kicker Badge */}
             <div className="inline-flex items-center gap-2.5 px-3 py-1 bg-white/[0.04] border border-white/[0.1] rounded text-[11px] font-bold tracking-widest uppercase text-zinc-300">
               <span className="w-2 h-2 rounded-full bg-bb-gold" />
+              <span>WEEK 2</span>
+              <span className="text-zinc-600">•</span>
               <span>BIGG BOSS TELUGU 10</span>
               <span className="text-zinc-600">•</span>
-              <span className="text-bb-gold">OFFICIAL FAN ARENA</span>
+              <span className="text-bb-gold">POWER OF PEOPLE</span>
             </div>
 
             {/* Monumental Headline */}
             <div className="space-y-1">
               <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl tracking-tight uppercase text-white leading-[0.92]">
-                <span>HOUSEMATE</span>{" "}
-                <span className="text-bb-gold">BATTLE.</span>
+                <span>POWER OF</span>{" "}
+                <span className="text-bb-gold">PEOPLE.</span>
                 <br />
-                <span className="text-white">SEASON 10</span>
+                <span className="text-white">YOU CHOOSE</span>
                 <br />
-                <span className="text-zinc-300">DRAMA UNLEASHED.</span>
+                <span className="text-zinc-300">THE CAPTAIN.</span>
               </h1>
             </div>
 
             {/* Editorial Context */}
             <p className="text-sm sm:text-base text-zinc-300 font-normal leading-relaxed max-w-xl">
-              The premier fan community for Bigg Boss Telugu Season 10. Auto Ram Prasad, Rohit Naidu, and Temper Vamsi are TASK WINNERS. Charan and Chaitra Rai have both been officially ELIMINATED based on housemates&apos; votes with NO RE-ENTRY. 14 active housemates remain in the individual competition.
+              For the first time, the power is in the hands of the people. Under Week 2 &ldquo;Power of People&rdquo;, audience fans vote directly for who will lead as Captain. In the house, nominations are decided by housemates who must battle through arena tasks for survival. Charan and Chaitra Rai are ELIMINATED (NO RE-ENTRY). 14 active housemates remain.
             </p>
 
             {/* Official Match State Board */}
             <div className="editorial-panel rounded-lg p-4 space-y-3 max-w-xl">
               <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider pb-2 border-b border-white/[0.08]">
-                <span className="text-zinc-400">Current Season 10 Status</span>
+                <span className="text-zinc-400">Week 2 Game State</span>
                 <span className="text-emerald-400 flex items-center gap-1.5 font-bold">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  14 Active Housemates &bull; 2 Eliminated (No Re-entry)
+                  14 Active Housemates &bull; 2 Eliminated
+                </span>
+              </div>
+
+              {/* Power of People Feature Banner */}
+              <div className="flex items-start gap-2 px-3 py-2 rounded bg-bb-gold/10 border border-bb-gold/30 text-[11px] text-zinc-200">
+                <Vote className="w-4 h-4 text-bb-gold flex-shrink-0 mt-0.5" />
+                <span>
+                  <strong className="text-bb-gold uppercase font-bold">POWER OF PEOPLE:</strong> You Choose the Captain. Cast your vote for the housemate you want to see as Captain.
                 </span>
               </div>
 
@@ -82,15 +92,7 @@ export const Hero = () => {
               <div className="flex items-start gap-2 px-3 py-2.5 rounded bg-red-950/30 border border-red-800/40 text-[11px] text-zinc-300">
                 <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
                 <span>
-                  <strong className="text-red-300 uppercase font-bold">ELIMINATED:</strong> Charan and Chaitra Rai have both been officially eliminated from Bigg Boss Telugu Season 10 based on housemates&apos; votes with <strong>NO RE-ENTRY</strong>. 14 active housemates remain in the competition.
-                </span>
-              </div>
-
-              {/* Individual Task Winners Banner */}
-              <div className="flex items-start gap-2 px-3 py-2 rounded bg-white/[0.03] border border-white/[0.08] text-[11px] text-zinc-300">
-                <Trophy className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
-                <span>
-                  <strong className="text-white uppercase font-bold">Individual Task Winners:</strong> Auto Ram Prasad, Rohit Naidu, and Temper Vamsi have all secured individual task victories.
+                  <strong className="text-red-300 uppercase font-bold">ELIMINATED:</strong> Charan and Chaitra Rai have both been officially eliminated from Bigg Boss Telugu Season 10 based on housemates&apos; votes with <strong>NO RE-ENTRY</strong>.
                 </span>
               </div>
             </div>
@@ -102,7 +104,7 @@ export const Hero = () => {
                 className="px-6 py-3 rounded bg-bb-gold hover:bg-bb-gold-light text-black font-bold text-xs uppercase tracking-wider transition-colors flex items-center gap-2 shadow-sm"
               >
                 <Vote className="w-4 h-4" />
-                <span>View Poll &amp; Results</span>
+                <span>Vote For Captain</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
@@ -135,7 +137,7 @@ export const Hero = () => {
                     </span>
                   </div>
                   <span className="text-[10px] font-extrabold uppercase tracking-widest text-bb-gold bg-bb-gold/10 px-2 py-0.5 rounded border border-bb-gold/20">
-                    Sunday Closed &bull; 14 Active Housemates
+                    Week 2 &bull; Power of People
                   </span>
                 </div>
 

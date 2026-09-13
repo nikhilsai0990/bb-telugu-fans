@@ -89,4 +89,28 @@ describe("Security Tests - Section 41", () => {
       authService.verifyToken(tamperedToken);
     }).toThrow(UnauthorizedException);
   });
+
+  it("SEC-006: Duplicate username or email registration returns ConflictException with exact message", async () => {
+    await authService.register({
+      username: "DuplicateFan",
+      email: "duplicate@bbtelugufans.com",
+      password: "StrongPass123!",
+    });
+
+    await expect(
+      authService.register({
+        username: "DuplicateFan2",
+        email: "duplicate@bbtelugufans.com",
+        password: "StrongPass123!",
+      })
+    ).rejects.toThrow("Username or email already registered.");
+
+    await expect(
+      authService.register({
+        username: "DuplicateFan",
+        email: "other@bbtelugufans.com",
+        password: "StrongPass123!",
+      })
+    ).rejects.toThrow("Username or email already registered.");
+  });
 });

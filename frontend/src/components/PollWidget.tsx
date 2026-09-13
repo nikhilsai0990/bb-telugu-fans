@@ -115,15 +115,15 @@ export const PollWidget: React.FC<{ initialPoll: Poll | null }> = ({ initialPoll
         <div className="space-y-1">
           <div className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-zinc-400">
             <span className="w-2 h-2 rounded-full bg-bb-gold animate-pulse" />
-            <span>OFFICIAL FAN BALLOT &bull; WEEK 1</span>
+            <span>WEEK 2 &bull; POWER OF PEOPLE</span>
           </div>
           <h3 className="font-display text-3xl sm:text-4xl uppercase tracking-wide text-white leading-none">
             {poll.title}
           </h3>
           <p className="text-xs text-zinc-300 max-w-lg leading-relaxed pt-1">
             {poll.status === "CLOSED"
-              ? "14 active housemates. Voting is currently closed."
-              : "14 active housemates in the Season 10 house (Charan and Chaitra Rai eliminated). Cast your verified vote to save your favorite housemate (1 vote per user per day)."}
+              ? "For the first time, the power is in the hands of the people. Voting is currently closed."
+              : "For the first time, the power is in the hands of the people. Vote for the housemate you want to see as Captain (1 vote per user per day)."}
           </p>
         </div>
 
@@ -214,6 +214,8 @@ export const PollWidget: React.FC<{ initialPoll: Poll | null }> = ({ initialPoll
 
           const cleanName = option.text
             .replace(/Save\s*/i, "")
+            .replace(/Vote\s*/i, "")
+            .replace(/\s*for Captain/i, "")
             .replace(/\s*\(RED TEAM\)/i, "")
             .replace(/\s*\(BLUE TEAM\)/i, "")
             .replace(/\s*\([^)]*\)/i, "")
@@ -310,8 +312,8 @@ export const PollWidget: React.FC<{ initialPoll: Poll | null }> = ({ initialPoll
                 {voting
                   ? "Recording Vote..."
                   : selectedItem
-                  ? `Cast Vote to Save ${selectedItem.text.replace(/Save\s*/i, "").replace(/\s*\([^)]*\)/i, "").trim()}`
-                  : "Select a Housemate to Cast Vote"}
+                  ? `Vote for ${selectedItem.text.replace(/Save\s*/i, "").replace(/Vote\s*/i, "").replace(/\s*for Captain/i, "").trim()} as Captain`
+                  : "Select a Housemate to Vote"}
               </span>
             </button>
           ) : (
@@ -350,6 +352,8 @@ export const PollWidget: React.FC<{ initialPoll: Poll | null }> = ({ initialPoll
               {poll.options.map((option) => {
                 const contestantName = option.text
                   .replace(/Save\s*/i, "")
+                  .replace(/Vote\s*/i, "")
+                  .replace(/\s*for Captain/i, "")
                   .replace(/\s*\(RED TEAM\)/i, "")
                   .replace(/\s*\(BLUE TEAM\)/i, "")
                   .replace(/\s*\([^)]*\)/i, "")

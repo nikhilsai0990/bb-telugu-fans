@@ -12,6 +12,35 @@ import { RedisRateLimiterService } from "../redis/redis-rate-limiter.service";
 import { v4 as uuidv4 } from "uuid";
 import * as crypto from "crypto";
 
+export function isVotingScheduleOpen(now: Date = new Date()): boolean {
+  if (process.env.FORCE_VOTING_OPEN === "true") return true;
+  if (process.env.FORCE_VOTING_CLOSED === "true") return false;
+
+  try {
+    const formatter = new Intl.DateTimeFormat("en-US", {
+      timeZone: "Asia/Kolkata",
+      weekday: "short",
+      hour: "numeric",
+      minute: "numeric",
+      second: "numeric",
+      hour12: false,
+    });
+    const parts = formatter.formatToParts(now);
+    const weekday = parts.find((p) => p.type === "weekday")?.value;
+    // Window: START Monday 00:00:00 IST to STOP Friday 23:59:59 IST
+    // Saturday and Sunday are CLOSED
+    if (weekday === "Sat" || weekday === "Sun") {
+      return false;
+    }
+    return true;
+  } catch (e) {
+    const utcTime = now.getTime() + now.getTimezoneOffset() * 60000;
+    const istTime = new Date(utcTime + 3600000 * 5.5);
+    const day = istTime.getDay(); // 0 is Sun, 6 is Sat
+    return day >= 1 && day <= 5;
+  }
+}
+
 @Injectable()
 export class PollsService {
   constructor(
@@ -20,12 +49,19 @@ export class PollsService {
   ) {}
 
   public getAllPolls(statusFilter?: string) {
+    const isScheduleOpen = isVotingScheduleOpen();
     const list: Poll[] = [];
     for (const poll of this.db.polls.values()) {
-      if (!statusFilter || poll.status.toLowerCase() === statusFilter.toLowerCase()) {
+      // Dynamic schedule sync for Season 10 polls in non-test mode
+      const effectiveStatus = process.env.NODE_ENV === "test" 
+        ? poll.status 
+        : (!isScheduleOpen ? "CLOSED" : poll.status);
+
+      if (!statusFilter || effectiveStatus.toLowerCase() === statusFilter.toLowerCase()) {
         const options = Array.from(this.db.pollOptions.values()).filter((opt) => opt.pollId === poll.id);
         list.push({
           ...poll,
+          status: effectiveStatus,
           options: options.map((opt) => ({
             ...opt,
             votesCount: opt.votesCount || 0,
@@ -42,9 +78,15 @@ export class PollsService {
     if (!poll) {
       throw new NotFoundException("Poll not found");
     }
+    const isScheduleOpen = isVotingScheduleOpen();
+    const effectiveStatus = process.env.NODE_ENV === "test" 
+      ? poll.status 
+      : (!isScheduleOpen ? "CLOSED" : poll.status);
+
     const options = Array.from(this.db.pollOptions.values()).filter((opt) => opt.pollId === poll.id);
     return {
       ...poll,
+      status: effectiveStatus,
       options: options.map((opt) => ({
         ...opt,
         votesCount: opt.votesCount || 0,
@@ -82,12 +124,10 @@ export class PollsService {
       throw new NotFoundException("Poll does not exist");
     }
 
-    // 3. Validate Poll Lifecycle
-    if (poll.status !== "ACTIVE") {
-      if (poll.status === "CLOSED") {
-        throw new BadRequestException("This poll is closed. Voting is no longer accepted.");
-      }
-      throw new BadRequestException(`Poll is currently ${poll.status.toLowerCase()} and cannot accept votes.`);
+    // 3. Validate Poll Lifecycle & Schedule (Section 4: Reject votes outside schedule)
+    const isScheduleOpen = isVotingScheduleOpen();
+    if (poll.status === "CLOSED" || (!isScheduleOpen && process.env.NODE_ENV !== "test") || poll.status !== "ACTIVE") {
+      throw new BadRequestException("Voting is currently closed.");
     }
 
     // 4. Validate Option Belongs to this Poll

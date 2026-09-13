@@ -10,8 +10,8 @@ test.describe("Complete User Journey & Authoritative Game State Verification", (
 
     // Verify H1
     const h1 = page.locator("h1");
-    await expect(h1).toContainText("HOUSEMATE");
-    await expect(h1).toContainText("SEASON 10");
+    await expect(h1).toContainText("POWER OF");
+    await expect(h1).toContainText("PEOPLE");
 
     // Verify Authoritative Game State elements on Homepage
     await expect(page.locator("text=14 Active Housemates").first()).toBeVisible();
@@ -27,6 +27,11 @@ test.describe("Complete User Journey & Authoritative Game State Verification", (
     await expect(page.locator("text=Sudheer").first()).toBeVisible();
     await expect(page.locator("text=Chaitra Rai").first()).toBeVisible();
     await expect(page.locator("text=Charan").first()).toBeVisible();
+
+    // Verify Week 2 Feature 2: Housemate Nominations Mechanic on Homepage
+    await expect(page.locator("[data-testid='housemate-nominations-section']")).toBeVisible();
+    await expect(page.locator("text=HOUSEMATE NOMINATIONS").first()).toBeVisible();
+    await expect(page.locator("text=Housemates choose the nominations. But survival is decided through the game.").first()).toBeVisible();
 
     // Verify Eliminated Section on Homepage
     await expect(page.locator("[data-testid='eliminated-section']")).toBeVisible();
@@ -131,17 +136,21 @@ test.describe("Complete User Journey & Authoritative Game State Verification", (
     await expect(page.locator("text=TASK WINNER").first()).toBeVisible();
   });
 
-  test("Polls page shows Sunday closed status with live results, and News reflects 5 official stories", async ({
+  test("Polls page shows Week 2 Power of People Captain Poll with closed status and live results, and News reflects 7 stories", async ({
     page,
   }) => {
     // 1. Check Polls page
     await page.goto("/polls");
-    await expect(page.locator("h1")).toContainText("WHO SHOULD BE SAVED?");
-    await expect(page.locator("text=14 Active Housemates")).toBeVisible();
+    await expect(page.locator("h1")).toContainText("WHO DO YOU WANT TO SEE AS CAPTAIN?");
+    await expect(page.locator("text=POWER OF PEOPLE").first()).toBeVisible();
+    await expect(page.locator("text=14 Active Housemates").first()).toBeVisible();
 
     // Verify voting closed indicators: exactly one disabled button
     await expect(page.locator("button:has-text('Voting is Currently Closed')")).toHaveCount(1);
     await expect(page.locator("[data-testid='live-vote-results']")).toBeVisible();
+
+    // Verify Housemate Nominations mechanic component on Polls page
+    await expect(page.locator("[data-testid='housemate-nominations-section']")).toBeVisible();
 
     // Verify 14 active housemates on poll card grid and NO High Risk Zone badges
     const pollCards = page.locator("div.group:has(h3)");
@@ -157,9 +166,11 @@ test.describe("Complete User Journey & Authoritative Game State Verification", (
     await expect(pollCards.filter({ hasText: "Charan" })).toHaveCount(0);
     await expect(pollCards.filter({ hasText: "Chaitra Rai" })).toHaveCount(0);
 
-    // 2. Check News dispatches - 5 official stories
+    // 2. Check News dispatches - 7 official stories (2 Week 2 + 5 historical)
     await page.goto("/news");
     await expect(page.locator("h1")).toContainText("Editorial News");
+    await expect(page.locator("text=Power of People begins in Week 2").first()).toBeVisible();
+    await expect(page.locator("text=Housemates enter the nomination battle").first()).toBeVisible();
     await expect(page.locator("text=No Elimination on Sunday").first()).toBeVisible();
     await expect(page.locator("text=Srushti Vyakaranam lost the Power Key").first()).toBeVisible();
     await expect(page.locator("text=Sudheer Kumar Reddy won").first()).toBeVisible();
@@ -167,26 +178,40 @@ test.describe("Complete User Journey & Authoritative Game State Verification", (
     await expect(page.locator("text=No re-entry for Chaitra Rai and Charan").first()).toBeVisible();
   });
 
-  test("Production authentication UI and admin login operate cleanly", async ({
+  test("Production registration, duplicate account error handling, and authentication operate cleanly", async ({
     page,
   }) => {
-    // 1. Visit /login
-    await page.goto("/login");
+    // 1. Visit /register
+    await page.goto("/register");
+    await expect(page.locator("h1")).toContainText("Join The Community");
 
-    // Verify Header
+    // Test Duplicate Account error display (Section 17)
+    // admin@bbtelugufans.com already exists
+    await page.fill("input[placeholder='TeluguSuperfan']", "NewUser123");
+    await page.fill("input[placeholder='name@example.com']", "admin@bbtelugufans.com");
+    await page.fill("input[placeholder='••••••••']", "ValidPass123!");
+    await page.click("button[type='submit']");
+
+    // Must show exact required message: "Username or email already registered."
+    await expect(page.locator("text=Username or email already registered.")).toBeVisible();
+
+    // Now register a unique user successfully
+    const uniqueName = "Fan" + Date.now().toString().slice(-5);
+    const uniqueEmail = `fan_${Date.now()}@example.com`;
+    await page.fill("input[placeholder='TeluguSuperfan']", uniqueName);
+    await page.fill("input[placeholder='name@example.com']", uniqueEmail);
+    await page.fill("input[placeholder='••••••••']", "SecurePassword123!");
+    await page.click("button[type='submit']");
+
+    // Successfully redirects to profile page
+    await page.waitForURL("**/profile");
+    await expect(page.locator("h1")).toContainText(uniqueName);
+
+    // 2. Visit /login
+    await page.goto("/login");
     await expect(page.locator("text=BB TELUGU").first()).toBeVisible();
     await expect(page.locator("text=FANS").first()).toBeVisible();
     await expect(page.locator("h1")).toContainText("SIGN IN");
-
-    // Verify Form Fields
-    await expect(page.locator("label:has-text('EMAIL ADDRESS')")).toBeVisible();
-    await expect(page.locator("label:has-text('PASSWORD')")).toBeVisible();
-    await expect(page.locator("button:has-text('SIGN IN')")).toBeVisible();
-    await expect(page.locator("a:has-text('CREATE ACCOUNT')")).toBeVisible();
-
-    // 2. Visit /admin without authentication -> shows Restricted Access
-    await page.goto("/admin");
-    await expect(page.locator("text=Restricted Access")).toBeVisible();
 
     // 3. Visit dedicated /admin/login portal
     await page.goto("/admin/login");

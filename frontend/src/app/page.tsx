@@ -3,6 +3,7 @@ import { Hero } from "../components/Hero";
 import { FeatureIconStrip } from "../components/FeatureIconStrip";
 import { TeamVsSection } from "../components/TeamVsSection";
 import { EliminatedSection } from "../components/EliminatedSection";
+import { HousemateNominationsSection } from "../components/HousemateNominationsSection";
 import { FeatureCards } from "../components/FeatureCards";
 import { TodayHighlights } from "../components/TodayHighlights";
 import { PollWidget } from "../components/PollWidget";
@@ -15,7 +16,7 @@ export const revalidate = 0;
 export default async function HomePage() {
   const [contestants, polls, news] = await Promise.all([
     api.getContestants(),
-    api.getPolls("ACTIVE"),
+    api.getPolls(),
     api.getNews(),
   ]);
 
@@ -28,6 +29,9 @@ export default async function HomePage() {
 
       {/* 2. Canonical 4-Concept Feature Icon Strip */}
       <FeatureIconStrip />
+
+      {/* 2b. Week 2 Feature 2: Housemate Nominations Mechanic */}
+      <HousemateNominationsSection />
 
       {/* 3. Season 10 Individual Arena Roster */}
       <TeamVsSection contestants={contestants} />
