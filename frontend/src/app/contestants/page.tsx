@@ -23,14 +23,14 @@ export default function ContestantsPage() {
   }, [search]);
 
   let displayedContestants = contestants;
-  if (filter === "NOMINATED") {
+  if (filter === "ACTIVE" || filter === "NOMINATED") {
     displayedContestants = contestants.filter(
       (c) =>
         !c.isEliminated &&
         c.status !== "ELIMINATED" &&
         c.slug !== "charan" &&
         c.slug !== "chaitra-rai" &&
-        (c.isNominated || c.status === "NOMINATED")
+        c.isActive
     );
   } else if (filter === "HIGH_RISK" || filter === "HIGH_ZONE") {
     displayedContestants = contestants.filter(
@@ -62,7 +62,7 @@ export default function ContestantsPage() {
 
   const filterTabs = [
     { id: "ALL", label: "All Housemates (16)" },
-    { id: "NOMINATED", label: "Active Nominated (14)" },
+    { id: "ACTIVE", label: "Active Housemates (14)" },
     { id: "HIGH_RISK", label: "HIGH RISK ZONE (3)" },
     { id: "ELIMINATED", label: "Eliminated (2)" },
   ];
@@ -80,7 +80,7 @@ export default function ContestantsPage() {
           Housemates Directory
         </h1>
         <p className="text-sm text-zinc-300 max-w-2xl leading-relaxed">
-          The 16 Bigg Boss Telugu Season 10 housemates. Auto Ram Prasad, Rohit Naidu, and Temper Vamsi are TASK WINNERS. Charan and Chaitra Rai are ELIMINATED based on housemates&apos; votes (NO RE-ENTRY). Aman, Sudheer Kumar Reddy, and Varshini Sounderajan are in the HIGH RISK ZONE (3). Blue Team Leader: Debjani Modak, Red Team Leader: Rohit Naidu.
+          The 16 Bigg Boss Telugu Season 10 housemates. Auto Ram Prasad, Rohit Naidu, and Temper Vamsi are TASK WINNERS. Charan and Chaitra Rai are ELIMINATED based on housemates&apos; votes (NO RE-ENTRY). Aman, Sudheer Kumar Reddy, and Varshini Sounderajan are in the HIGH RISK ZONE (3).
         </p>
       </div>
 
@@ -162,9 +162,6 @@ export default function ContestantsPage() {
               contestant.id === "c-11" ||
               contestant.id === "c-07";
 
-            const isRedLeader = contestant.slug === "rohit-naidu" || (contestant.role === "LEADER" && contestant.team === "RED");
-            const isBlueLeader = contestant.slug === "debjani-modak" || (contestant.role === "LEADER" && contestant.team === "BLUE");
-
             return (
               <Link
                 key={contestant.id}
@@ -197,24 +194,6 @@ export default function ContestantsPage() {
                       ) : (
                         <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[9px] font-black uppercase tracking-wider backdrop-blur-sm">
                           HOUSEMATE
-                        </span>
-                      )}
-
-                      {isRedLeader && (
-                        <span className="px-2 py-0.5 rounded bg-red-600 text-white text-[9px] font-black uppercase tracking-wider shadow">
-                          RED LEADER
-                        </span>
-                      )}
-
-                      {isBlueLeader && (
-                        <span className="px-2 py-0.5 rounded bg-blue-600 text-white text-[9px] font-black uppercase tracking-wider shadow">
-                          BLUE LEADER
-                        </span>
-                      )}
-
-                      {!isEliminated && (
-                        <span className="px-2 py-0.5 rounded bg-black/70 text-zinc-300 border border-white/20 text-[9px] font-black uppercase tracking-wider backdrop-blur-sm">
-                          Nominated
                         </span>
                       )}
 

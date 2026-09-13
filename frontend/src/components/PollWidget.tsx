@@ -122,8 +122,8 @@ export const PollWidget: React.FC<{ initialPoll: Poll | null }> = ({ initialPoll
           </h3>
           <p className="text-xs text-zinc-300 max-w-lg leading-relaxed pt-1">
             {poll.status === "CLOSED"
-              ? "14 active housemates are currently nominated. Voting is currently closed."
-              : "14 active housemates are nominated for eviction (Charan and Chaitra Rai eliminated). Cast your verified vote to save your favorite housemate (1 vote per user per day)."}
+              ? "14 active housemates. Voting is currently closed."
+              : "14 active housemates in the Season 10 house (Charan and Chaitra Rai eliminated). Cast your verified vote to save your favorite housemate (1 vote per user per day)."}
           </p>
         </div>
 

@@ -147,7 +147,7 @@ export function PollDetailClient({ initialPoll }: { initialPoll: Poll }) {
               {poll.title}
             </h1>
             <p className="text-xs sm:text-sm text-zinc-300 max-w-xl leading-relaxed pt-1">
-              14 active housemates are nominated for eviction (Charan and Chaitra Rai eliminated). Cast your verified fan vote to save your favorite housemate (1 vote per user per day).
+              14 active housemates in the Season 10 house (Charan and Chaitra Rai eliminated). Cast your verified fan vote to save your favorite housemate (1 vote per user per day).
             </p>
           </div>
 

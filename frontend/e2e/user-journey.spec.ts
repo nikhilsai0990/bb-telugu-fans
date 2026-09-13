@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("Complete User Journey & Authoritative Game State Verification", () => {
-  test("Homepage displays authoritative Season 10 housemate state with team leaders and task winners", async ({
+  test("Homepage displays authoritative Season 10 housemate state with 14 active housemates and task winners", async ({
     page,
   }) => {
     // 1. Arrive on Homepage
@@ -27,10 +27,10 @@ test.describe("Complete User Journey & Authoritative Game State Verification", (
     await expect(page.locator("text=Chaitra Rai").first()).toBeVisible();
     await expect(page.locator("text=Charan").first()).toBeVisible();
 
-    // Verify Team Leaders & Latest Team Task
+    // Verify Team Leaders removed & Latest Team Task
     const pageContent = await page.content();
-    expect(pageContent).toContain("Red Team Leader");
-    expect(pageContent).toContain("Blue Team Leader");
+    expect(pageContent).not.toContain("Red Team Leader");
+    expect(pageContent).not.toContain("Blue Team Leader");
     expect(pageContent).toContain("Krishnudu");
   });
 
@@ -42,9 +42,15 @@ test.describe("Complete User Journey & Authoritative Game State Verification", (
 
     // Check filter tabs
     await expect(page.locator("button:has-text('All Housemates (16)')")).toBeVisible();
-    await expect(page.locator("button:has-text('Active Nominated (14)')")).toBeVisible();
+    await expect(page.locator("button:has-text('Active Housemates (14)')")).toBeVisible();
     await expect(page.locator("button:has-text('HIGH RISK ZONE (3)')")).toBeVisible();
     await expect(page.locator("button:has-text('Eliminated (2)')")).toBeVisible();
+
+    // Verify Commoner descriptions on the directory page
+    const dirContent = await page.content();
+    expect(dirContent).toContain("Product Manager • Commoner");
+    expect(dirContent).toContain("Short Film Actor • Commoner");
+    expect(dirContent).toContain("Singer • Commoner");
 
     // Check Auto Ram Prasad has TASK WINNER badge and NOT High Risk Zone
     const ramCard = page.locator("a[href*='auto-ram-prasad']");
@@ -77,6 +83,12 @@ test.describe("Complete User Journey & Authoritative Game State Verification", (
     await expect(chaitraCard).toBeVisible();
     await expect(chaitraCard).toContainText("ELIMINATED");
     await expect(chaitraCard).toContainText("NO RE-ENTRY");
+
+    // Filter by Active Housemates (14) -> includes active housemates, excludes eliminated
+    await page.click("button:has-text('Active Housemates (14)')");
+    await expect(page.locator("a[href*='auto-ram-prasad']")).toBeVisible();
+    await expect(page.locator("a[href*='charan']")).not.toBeVisible();
+    await expect(page.locator("a[href*='chaitra-rai']")).not.toBeVisible();
 
     // Filter by HIGH RISK ZONE (3) -> exactly Aman, Sudheer Kumar Reddy & Varshini Sounderajan
     await page.click("button:has-text('HIGH RISK ZONE (3)')");
@@ -119,7 +131,7 @@ test.describe("Complete User Journey & Authoritative Game State Verification", (
     // 1. Check Polls page
     await page.goto("/polls");
     await expect(page.locator("h1")).toContainText("WHO SHOULD BE SAVED?");
-    await expect(page.locator("text=14 Housemates Nominated")).toBeVisible();
+    await expect(page.locator("text=14 Active Housemates")).toBeVisible();
 
     // Verify voting closed indicators
     await expect(page.locator("text=Voting is Currently Closed").first()).toBeVisible();
@@ -136,7 +148,7 @@ test.describe("Complete User Journey & Authoritative Game State Verification", (
     await expect(pollCards.filter({ hasText: "Charan" })).toHaveCount(0);
     await expect(pollCards.filter({ hasText: "Chaitra Rai" })).toHaveCount(0);
 
-    // Auto Ram Prasad is nominated, NOT High Risk Zone
+    // Auto Ram Prasad is active housemate, NOT High Risk Zone
     await expect(pollCards.filter({ hasText: "Auto Ram Prasad" })).not.toContainText("HIGH RISK ZONE");
 
     // 2. Check News dispatches - 5 official stories

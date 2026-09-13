@@ -40,10 +40,10 @@ export default function DiscussPage() {
   const categories = [
     "All Discussions",
     "General Talk",
-    "Contestants",
+    "Housemates",
     "Tasks",
     "Nominations",
-    "Leadership",
+    "Strategy",
     "Fan Theories",
     "Predictions",
     "Off Topic",
@@ -99,9 +99,9 @@ export default function DiscussPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 space-y-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 space-y-10">
       
-      {/* Editorial Header */}
+      {/* Editorial Page Header */}
       <div className="space-y-3 border-b border-white/[0.08] pb-6">
         <div className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-zinc-400">
           <MessageSquare className="w-3.5 h-3.5 text-bb-gold" />
@@ -111,7 +111,7 @@ export default function DiscussPage() {
           Fan Discussions
         </h1>
         <p className="text-sm text-zinc-300 max-w-2xl leading-relaxed">
-          The central salon for Telugu Bigg Boss fans. Analyze leadership strategies, first task cancellation fallout, High Risk Zone developments, and Week 1 mass nomination voting.
+          The central salon for Telugu Bigg Boss fans. Analyze housemate strategies, task results, High Risk Zone developments, and Season 10 dynamics.
         </p>
       </div>
 
@@ -388,12 +388,12 @@ export default function DiscussPage() {
             </h4>
             <div className="space-y-3 text-xs">
               {[
-                { tag: "#15ActiveNominated", count: "Mass Ballot" },
-                { tag: "#HighRiskZoneDebate", count: "Auto Ram & Chaitra" },
-                { tag: "#RohitNaiduLeader", count: "Red Leader" },
-                { tag: "#DebjaniModakLeader", count: "Blue Leader" },
-                { tag: "#RedTeamTask1Win", count: "Rohit & Vamsi" },
-                { tag: "#CharanEliminated", count: "Housemates Vote" },
+                { tag: "#14ActiveHousemates", count: "14 Active Housemates" },
+                { tag: "#HighRiskZone3", count: "Aman, Sudheer & Varshini" },
+                { tag: "#KrishnuduTeamWin", count: "Latest Team Task" },
+                { tag: "#TaskWinners", count: "Auto, Rohit & Vamsi" },
+                { tag: "#NoEliminationSunday", count: "Voting Closed" },
+                { tag: "#NoReEntry", count: "Charan & Chaitra" },
               ].map((t) => (
                 <div key={t.tag} className="flex items-center justify-between hover:text-white cursor-pointer">
                   <span className="font-bold text-zinc-300">{t.tag}</span>

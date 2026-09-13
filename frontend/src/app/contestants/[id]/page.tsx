@@ -52,9 +52,6 @@ export default async function ContestantDetailPage({
     contestant.id === "c-11" ||
     contestant.id === "c-07";
 
-  const isRedLeader = contestant.slug === "rohit-naidu" || (contestant.role === "LEADER" && contestant.team === "RED");
-  const isBlueLeader = contestant.slug === "debjani-modak" || (contestant.role === "LEADER" && contestant.team === "BLUE");
-
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 space-y-10">
       
@@ -94,23 +91,8 @@ export default async function ContestantDetailPage({
                     ELIMINATED &bull; NO RE-ENTRY
                   </span>
                 ) : (
-                  <>
-                    <span className="px-2.5 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-bold uppercase tracking-wider border border-amber-500/40">
-                      Housemate
-                    </span>
-                    <span className="px-2.5 py-0.5 rounded bg-bb-gold/20 text-bb-gold text-[10px] font-black uppercase tracking-wider border border-bb-gold/40">
-                      Nominated
-                    </span>
-                  </>
-                )}
-                {isRedLeader && (
-                  <span className="px-2.5 py-0.5 rounded bg-red-600 text-white text-[10px] font-bold uppercase tracking-wider">
-                    RED TEAM LEADER
-                  </span>
-                )}
-                {isBlueLeader && (
-                  <span className="px-2.5 py-0.5 rounded bg-blue-600 text-white text-[10px] font-bold uppercase tracking-wider">
-                    BLUE TEAM LEADER
+                  <span className="px-2.5 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-bold uppercase tracking-wider border border-amber-500/40">
+                    Housemate
                   </span>
                 )}
                 {isHighRisk && (
@@ -166,7 +148,7 @@ export default async function ContestantDetailPage({
           <div className="bg-amber-500/10 border-t border-amber-500/20 px-6 sm:px-10 py-3 flex items-center gap-2.5 text-xs text-amber-200">
             <AlertCircle className="w-4 h-4 text-amber-400 flex-shrink-0" />
             <span>
-              <strong>Crucial HIGH RISK ZONE Notice:</strong> {contestant.name} has entered the HIGH RISK ZONE. <em>&quot;HIGH RISK ZONE&quot; does NOT mean elimination.</em> {contestant.name} is an ACTIVE housemate, has NOT been evicted, and is fully nominated for public voting on the Week 1 eviction ballot.
+              <strong>Crucial HIGH RISK ZONE Notice:</strong> {contestant.name} has entered the HIGH RISK ZONE. <em>&quot;HIGH RISK ZONE&quot; does NOT mean elimination.</em> {contestant.name} is an ACTIVE housemate, has NOT been evicted, and is an active resident in the competition.
             </span>
           </div>
         )}
@@ -217,23 +199,23 @@ export default async function ContestantDetailPage({
             <Shield className="w-4 h-4 text-bb-gold" />
           </div>
           <p className="font-display text-xl sm:text-2xl text-white leading-none truncate">
-            {isEliminated ? "ELIMINATED" : isHighRisk ? "HIGH RISK ZONE" : "NOMINATED"}
+            {isEliminated ? "ELIMINATED" : isHighRisk ? "HIGH RISK ZONE" : "HOUSEMATE"}
           </p>
           <span className="text-[10px] text-zinc-500 uppercase">
-            {isEliminated ? "Eliminated Contestant" : isHighRisk ? "Active in Danger Zone" : "Week 1 Housemate"}
+            {isEliminated ? "Eliminated Housemate" : isHighRisk ? "Active in Danger Zone" : "Week 1 Housemate"}
           </span>
         </div>
 
         <div className="editorial-card rounded-lg p-5 space-y-1">
           <div className="flex items-center justify-between text-zinc-400 text-xs font-semibold uppercase tracking-wider">
-            <span>Nominations</span>
-            <Shield className={`w-4 h-4 ${isEliminated ? "text-zinc-500" : "text-amber-400"}`} />
+            <span>Role / Status</span>
+            <Shield className={`w-4 h-4 ${isEliminated ? "text-zinc-500" : "text-emerald-400"}`} />
           </div>
           <p className="font-display text-2xl sm:text-3xl text-white leading-none truncate">
-            {isEliminated ? "EVICTED" : "NOMINATED"}
+            {isEliminated ? "ELIMINATED" : "HOUSEMATE"}
           </p>
           <span className="text-[10px] text-zinc-500 uppercase">
-            {isEliminated ? "Eliminated by Housemates" : "Active Week 1 Ballot"}
+            {isEliminated ? "No Re-entry" : "Active Resident"}
           </span>
         </div>
       </div>
@@ -260,7 +242,7 @@ export default async function ContestantDetailPage({
         <div className="lg:col-span-4 space-y-6">
           <div className="editorial-card rounded-xl p-6 sm:p-8 space-y-4">
             <h2 className="font-display text-2xl uppercase tracking-wide text-white border-b border-white/[0.08] pb-3">
-              Contestant Details
+              Housemate Details
             </h2>
             
             <div className="space-y-3 text-xs">

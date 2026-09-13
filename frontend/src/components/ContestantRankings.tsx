@@ -130,7 +130,7 @@ export const ContestantRankings: React.FC<{ contestants: Contestant[] }> = ({ co
                     {isHighRisk ? "High Risk" : "Active"}
                   </span>
                   <span className="text-[9px] font-semibold text-zinc-500 uppercase">
-                    Nominated
+                    Housemate
                   </span>
                 </div>
                 <div>

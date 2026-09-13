@@ -74,7 +74,7 @@ export const Hero = () => {
                     <AlertCircle className="w-3.5 h-3.5 text-amber-400" />
                   </div>
                   <p className="text-sm font-extrabold text-white mt-0.5 truncate">Aman, Sudheer &amp; Varshini</p>
-                  <span className="text-[10px] font-semibold text-zinc-400 uppercase">Active Nominated Housemates</span>
+                  <span className="text-[10px] font-semibold text-zinc-400 uppercase">Active Housemates</span>
                 </div>
               </div>
 
@@ -82,7 +82,7 @@ export const Hero = () => {
               <div className="flex items-start gap-2 px-3 py-2.5 rounded bg-amber-500/10 border border-amber-500/20 text-[11px] text-zinc-300">
                 <AlertCircle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
                 <span>
-                  <strong className="text-amber-300 uppercase font-bold">HIGH RISK ZONE (3):</strong> Aman, Sudheer Kumar Reddy, and Varshini Sounderajan are the 3 active housemates in the HIGH RISK ZONE (3). All three remain active nominated housemates. Auto Ram Prasad, Mukesh Gowda, Charan, and Chaitra Rai are NOT in the High Risk Zone.
+                  <strong className="text-amber-300 uppercase font-bold">HIGH RISK ZONE (3):</strong> Aman, Sudheer Kumar Reddy, and Varshini Sounderajan are the 3 active housemates in the HIGH RISK ZONE (3). All three remain active housemates. Auto Ram Prasad, Mukesh Gowda, Charan, and Chaitra Rai are NOT in the High Risk Zone.
                 </span>
               </div>
 
@@ -135,7 +135,7 @@ export const Hero = () => {
                     </span>
                   </div>
                   <span className="text-[10px] font-extrabold uppercase tracking-widest text-bb-gold bg-bb-gold/10 px-2 py-0.5 rounded border border-bb-gold/20">
-                    Sunday Closed &bull; 14 Nominated
+                    Sunday Closed &bull; 14 Active Housemates
                   </span>
                 </div>
 
@@ -166,10 +166,10 @@ export const Hero = () => {
                     </div>
                   </Link>
 
-                  {/* Debjani Modak - Blue Team Leader */}
+                  {/* Debjani Modak - Housemate */}
                   <Link
                     href="/contestants/debjani-modak"
-                    className="group relative rounded-lg overflow-hidden border border-blue-500/30 bg-gradient-to-t from-black via-zinc-900 to-transparent p-3 flex flex-col justify-end min-h-[220px] sm:min-h-[260px] transition-transform duration-300 hover:scale-[1.02]"
+                    className="group relative rounded-lg overflow-hidden border border-white/[0.12] bg-gradient-to-t from-black via-zinc-900 to-transparent p-3 flex flex-col justify-end min-h-[220px] sm:min-h-[260px] transition-transform duration-300 hover:scale-[1.02]"
                   >
                     <img
                       src="/images/contestants/debjani-modak.webp"
@@ -180,14 +180,14 @@ export const Hero = () => {
                     
                     <div className="relative z-10 space-y-1">
                       <div className="flex items-center gap-1">
-                        <span className="inline-block px-1.5 py-0.5 rounded bg-blue-500/30 text-blue-300 border border-blue-400/40 text-[9px] font-black uppercase tracking-wider">
-                          BLUE TEAM LEADER
+                        <span className="inline-block px-1.5 py-0.5 rounded bg-white/[0.08] text-white border border-white/20 text-[9px] font-black uppercase tracking-wider">
+                          HOUSEMATE
                         </span>
                       </div>
                       <h3 className="font-display text-xl sm:text-2xl text-white tracking-wide leading-none">
                         Debjani Modak
                       </h3>
-                      <p className="text-[10px] text-zinc-300">Blue Leader &bull; Housemate</p>
+                      <p className="text-[10px] text-zinc-300">Housemate</p>
                     </div>
                   </Link>
                 </div>

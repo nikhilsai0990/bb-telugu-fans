@@ -119,13 +119,13 @@ export default function PollsPage() {
       <div className="space-y-3 border-b border-white/[0.08] pb-6">
         <div className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-zinc-400">
           <span className="w-2 h-2 rounded-full bg-bb-gold animate-pulse" />
-          <span>OFFICIAL FAN BALLOT &bull; WEEK 1 MASS NOMINATIONS</span>
+          <span>OFFICIAL FAN BALLOT &bull; WEEK 1</span>
         </div>
         <h1 className="font-display text-4xl sm:text-6xl uppercase tracking-tight text-white leading-none">
           WHO SHOULD BE SAVED?
         </h1>
         <p className="text-sm text-zinc-300 max-w-2xl leading-relaxed">
-          14 active Bigg Boss Telugu Season 10 housemates are nominated for Week 1 eviction (Charan and Chaitra Rai eliminated). Select your choice below and submit your verified fan vote (1 vote per authenticated account).
+          14 active Bigg Boss Telugu Season 10 housemates (Charan and Chaitra Rai eliminated). Select your choice below and submit your verified fan vote (1 vote per authenticated account).
         </p>
       </div>
 
@@ -182,7 +182,7 @@ export default function PollsPage() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/[0.08] pb-4">
             <div className="flex items-center gap-3">
               <span className="text-xs font-bold uppercase tracking-wider text-white">
-                14 Housemates Nominated
+                14 Active Housemates
               </span>
               <span className="text-zinc-600">&bull;</span>
               <span className="text-xs font-bold uppercase tracking-wider text-bb-gold">

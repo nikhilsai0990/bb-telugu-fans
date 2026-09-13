@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { Trophy, AlertCircle, ArrowUpRight, Crown, Shield } from "lucide-react";
+import { Trophy, AlertCircle, ArrowUpRight, Shield } from "lucide-react";
 import { Contestant } from "../types";
 
 export const TeamVsSection: React.FC<{ contestants: Contestant[] }> = ({ contestants }) => {
@@ -40,9 +40,6 @@ export const TeamVsSection: React.FC<{ contestants: Contestant[] }> = ({ contest
       contestant.id === "c-11" ||
       contestant.id === "c-07";
 
-    const isRedLeader = contestant.slug === "rohit-naidu" || (contestant.role === "LEADER" && contestant.team === "RED");
-    const isBlueLeader = contestant.slug === "debjani-modak" || (contestant.role === "LEADER" && contestant.team === "BLUE");
-
     return (
       <Link
         key={contestant.id}
@@ -52,10 +49,6 @@ export const TeamVsSection: React.FC<{ contestants: Contestant[] }> = ({ contest
             ? "border-red-950/40 opacity-75"
             : isHighRisk
             ? "border-amber-500/40 hover:border-amber-400"
-            : isRedLeader
-            ? "border-red-500/40 hover:border-red-400"
-            : isBlueLeader
-            ? "border-blue-500/40 hover:border-blue-400"
             : "border-white/[0.08] hover:border-white/30"
         } transition-colors flex items-center gap-3`}
       >
@@ -68,23 +61,13 @@ export const TeamVsSection: React.FC<{ contestants: Contestant[] }> = ({ contest
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-1 mb-0.5">
-            {isRedLeader && (
-              <span className="px-1.5 py-0.2 rounded bg-red-600 text-white text-[9px] font-black uppercase tracking-tight flex items-center gap-1">
-                <Crown className="w-2.5 h-2.5" /> RED LEADER
-              </span>
-            )}
-            {isBlueLeader && (
-              <span className="px-1.5 py-0.2 rounded bg-blue-600 text-white text-[9px] font-black uppercase tracking-tight flex items-center gap-1">
-                <Crown className="w-2.5 h-2.5" /> BLUE LEADER
-              </span>
-            )}
             {isEliminated ? (
               <span className="px-1.5 py-0.2 rounded bg-red-950/90 text-red-300 border border-red-800 text-[9px] font-black uppercase tracking-tight">
                 ELIMINATED &bull; NO RE-ENTRY
               </span>
             ) : (
               <span className="px-1.5 py-0.2 rounded bg-white/[0.06] text-zinc-300 text-[9px] font-bold uppercase tracking-tight border border-white/10">
-                Nominated
+                Housemate
               </span>
             )}
             {isHighRisk && (
@@ -125,7 +108,7 @@ export const TeamVsSection: React.FC<{ contestants: Contestant[] }> = ({ contest
               RED TEAM <span className="text-zinc-500 font-sans font-bold text-2xl sm:text-3xl align-middle">VS</span> BLUE TEAM
             </h2>
             <p className="text-sm text-zinc-400 max-w-xl">
-              Bigg Boss Telugu Season 10 features 16 housemates led by Rohit Naidu (Red Team Leader) and Debjani Modak (Blue Team Leader). Auto Ram Prasad, Rohit Naidu, and Temper Vamsi are TASK WINNERS. Charan and Chaitra Rai are ELIMINATED with NO RE-ENTRY. Aman, Sudheer Kumar Reddy, and Varshini Sounderajan occupy the HIGH RISK ZONE (3). Latest Team Task: Krishnudu&apos;s team won against Naresh&apos;s team!
+              Bigg Boss Telugu Season 10 features 16 housemates across Red and Blue teams. Auto Ram Prasad, Rohit Naidu, and Temper Vamsi are TASK WINNERS. Charan and Chaitra Rai are ELIMINATED with NO RE-ENTRY. Aman, Sudheer Kumar Reddy, and Varshini Sounderajan occupy the HIGH RISK ZONE (3). Latest Team Task: Krishnudu&apos;s team won against Naresh&apos;s team!
             </p>
           </div>
           <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-zinc-400">
@@ -149,11 +132,11 @@ export const TeamVsSection: React.FC<{ contestants: Contestant[] }> = ({ contest
                   RED TEAM
                 </h3>
                 <p className="text-xs font-semibold text-zinc-400 mt-1">
-                  Leader: <span className="text-white font-bold">Rohit Naidu</span> &bull; 8 Housemates
+                  8 Housemates
                 </p>
               </div>
               <span className="text-[11px] font-bold uppercase tracking-wider text-red-400 bg-red-500/10 border border-red-500/25 px-2.5 py-1 rounded flex items-center gap-1.5">
-                <Crown className="w-3.5 h-3.5" /> Rohit Naidu Leader
+                RED TEAM
               </span>
             </div>
 
@@ -175,11 +158,11 @@ export const TeamVsSection: React.FC<{ contestants: Contestant[] }> = ({ contest
                   BLUE TEAM
                 </h3>
                 <p className="text-xs font-semibold text-zinc-400 mt-1">
-                  Leader: <span className="text-white font-bold">Debjani Modak</span> &bull; 8 Housemates
+                  8 Housemates
                 </p>
               </div>
               <span className="text-[11px] font-bold uppercase tracking-wider text-blue-400 bg-blue-500/10 border border-blue-500/25 px-2.5 py-1 rounded flex items-center gap-1.5">
-                <Crown className="w-3.5 h-3.5" /> Debjani Modak Leader
+                BLUE TEAM
               </span>
             </div>
 

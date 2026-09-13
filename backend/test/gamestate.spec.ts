@@ -73,30 +73,30 @@ describe("Season 10 Authoritative Game State Tests", () => {
     expect(chaitra.noReentry).toBe(true);
   });
 
-  it("4. Aman is High Risk Zone (Active & Nominated)", () => {
+  it("4. Aman is High Risk Zone (Active housemate)", () => {
     const aman = db.contestants.get("c-12")!;
     expect(aman.zone).toBe("HIGH_RISK");
     expect(aman.isHighRiskZone).toBe(true);
     expect(aman.isActive).toBe(true);
-    expect(aman.isNominated).toBe(true);
+    expect(aman.isNominated).toBe(false);
     expect(aman.isEliminated).toBe(false);
   });
 
-  it("5. Sudheer Kumar Reddy is High Risk Zone (Active & Nominated)", () => {
+  it("5. Sudheer Kumar Reddy is High Risk Zone (Active housemate)", () => {
     const sudheer = db.contestants.get("c-09")!;
     expect(sudheer.zone).toBe("HIGH_RISK");
     expect(sudheer.isHighRiskZone).toBe(true);
     expect(sudheer.isActive).toBe(true);
-    expect(sudheer.isNominated).toBe(true);
+    expect(sudheer.isNominated).toBe(false);
     expect(sudheer.isEliminated).toBe(false);
   });
 
-  it("6. Varshini Sounderajan is High Risk Zone (Active & Nominated)", () => {
+  it("6. Varshini Sounderajan is High Risk Zone (Active housemate)", () => {
     const varshini = db.contestants.get("c-06")!;
     expect(varshini.zone).toBe("HIGH_RISK");
     expect(varshini.isHighRiskZone).toBe(true);
     expect(varshini.isActive).toBe(true);
-    expect(varshini.isNominated).toBe(true);
+    expect(varshini.isNominated).toBe(false);
     expect(varshini.isEliminated).toBe(false);
   });
 
@@ -117,7 +117,7 @@ describe("Season 10 Authoritative Game State Tests", () => {
     expect(ramPrasad.taskTitle).toBe("TASK WINNER");
     expect(ramPrasad.isHousemate).toBe(true);
     expect(ramPrasad.isActive).toBe(true);
-    expect(ramPrasad.isNominated).toBe(true);
+    expect(ramPrasad.isNominated).toBe(false);
   });
 
   it("9. Mukesh Gowda is not High Risk Zone", () => {
@@ -145,13 +145,29 @@ describe("Season 10 Authoritative Game State Tests", () => {
     }
   });
 
-  it("12. Team Leaders: Debjani Modak is Blue Team Leader, Rohit Naidu is Red Team Leader", () => {
+  it("12. Team Leaders removed: Debjani Modak and Rohit Naidu are regular housemates (role: PLAYER)", () => {
+    const all = Array.from(db.contestants.values());
+    const leaders = all.filter((c) => c.role === "LEADER");
+    expect(leaders.length).toBe(0);
+
     const debjani = db.contestants.get("c-01")!;
     const rohit = db.contestants.get("c-11")!;
-    expect(debjani.role).toBe("LEADER");
-    expect(debjani.team).toBe("BLUE");
-    expect(rohit.role).toBe("LEADER");
-    expect(rohit.team).toBe("RED");
+    expect(debjani.role).toBe("PLAYER");
+    expect(rohit.role).toBe("PLAYER");
+  });
+
+  it("12b. Nominated status removed: 0 housemates are nominated", () => {
+    const all = Array.from(db.contestants.values());
+    const nominated = all.filter((c) => c.isNominated);
+    expect(nominated.length).toBe(0);
+  });
+
+  it("12c. Commoner housemate profiles have exact descriptions", () => {
+    expect(db.contestants.get("c-11")?.occupation).toBe("Product Manager • Commoner");
+    expect(db.contestants.get("c-12")?.occupation).toBe("Short Film Actor • Commoner");
+    expect(db.contestants.get("c-14")?.occupation).toBe("Commoner");
+    expect(db.contestants.get("c-15")?.occupation).toBe("Commoner");
+    expect(db.contestants.get("c-16")?.occupation).toBe("Singer • Commoner");
   });
 
   it("13. Sunday voting poll is CLOSED and rejects vote casting", async () => {
