@@ -909,7 +909,7 @@ export class DatabaseService implements OnModuleInit {
     // Title: Power of People — You Choose the Captain
     // Category: Captaincy
     // Contains EXACTLY the 14 active housemates (Charan and Chaitra Rai are ELIMINATED and excluded).
-    // Starts with 0 votes, 0%. Status is CLOSED for Sunday outside Mon-Fri schedule.
+    // Starts with 0 votes, 0%. Status is ACTIVE for Week 2 Captaincy voting.
     const pollCaptainId = "poll-captain-week-02";
     const canonicalPollContestantsOrder = [
       "c-01", // Debjani Modak
@@ -955,12 +955,12 @@ export class DatabaseService implements OnModuleInit {
       title: "Power of People — You Choose the Captain",
       description: "For the first time, the power is in the hands of the people. Vote for the housemate you want to see as Captain.",
       category: "Captaincy",
-      status: "CLOSED",
+      status: "ACTIVE",
       totalVotes: 0,
       options: captainPollOptions,
-      startsAt: new Date(Date.now() - 86400000),
-      endsAt: new Date(),
-      createdAt: new Date(),
+      startsAt: new Date("2026-09-13T00:00:00+05:30"),
+      endsAt: new Date("2026-09-18T23:59:59+05:30"),
+      createdAt: new Date("2026-09-13T00:00:00+05:30"),
     };
     this.polls.set(pollCaptain.id, pollCaptain);
 

@@ -63,9 +63,17 @@ if (!g.__bb_votes) {
   g.__bb_votes = [];
 }
 
-if (!g.__bb_polls) {
+if (!g.__bb_polls || g.__bb_polls.length === 0) {
   // Deep clone fallbackPolls
   g.__bb_polls = JSON.parse(JSON.stringify(fallbackPolls));
+} else {
+  // Ensure poll-captain-week-02 has active status and dates
+  const captainPoll = g.__bb_polls.find((p: any) => p.id === "poll-captain-week-02");
+  if (captainPoll) {
+    captainPoll.status = "ACTIVE";
+    captainPoll.startsAt = "2026-09-13T00:00:00+05:30";
+    captainPoll.endsAt = "2026-09-18T23:59:59+05:30";
+  }
 }
 
 const users: Map<string, ServerUser> = g.__bb_users;
@@ -153,13 +161,13 @@ export async function GET(req: NextRequest, { params }: { params: { slug: string
   if (path === "polls") {
     const url = new URL(req.url);
     const statusFilter = url.searchParams.get("status");
-    const scheduleOpen = isVotingScheduleOpen();
 
     const result = polls.map((p) => {
-      const effectiveStatus = scheduleOpen ? "ACTIVE" : "CLOSED";
+      const scheduleOpen = isVotingScheduleOpen(p);
+      const effectiveStatus = !scheduleOpen ? "CLOSED" : p.status;
       return {
         ...p,
-        status: p.id === "poll-captain-week-02" ? effectiveStatus : p.status,
+        status: effectiveStatus,
       };
     });
 
@@ -178,11 +186,11 @@ export async function GET(req: NextRequest, { params }: { params: { slug: string
     if (!poll) {
       return NextResponse.json({ message: "Poll not found", statusCode: 404 }, { status: 404 });
     }
-    const scheduleOpen = isVotingScheduleOpen();
-    const effectiveStatus = scheduleOpen ? "ACTIVE" : "CLOSED";
+    const scheduleOpen = isVotingScheduleOpen(poll);
+    const effectiveStatus = !scheduleOpen ? "CLOSED" : poll.status;
     return NextResponse.json({
       ...poll,
-      status: poll.id === "poll-captain-week-02" ? effectiveStatus : poll.status,
+      status: effectiveStatus,
     });
   }
 
@@ -372,8 +380,8 @@ export async function POST(req: NextRequest, { params }: { params: { slug: strin
     }
 
     // 4c. Validate Schedule (Section 4: Reject votes outside schedule)
-    const scheduleOpen = isVotingScheduleOpen();
-    if (poll.status === "CLOSED" || !scheduleOpen) {
+    const scheduleOpen = isVotingScheduleOpen(poll);
+    if (poll.status === "CLOSED" || !scheduleOpen || poll.status !== "ACTIVE") {
       return NextResponse.json(
         { message: "Voting is currently closed.", statusCode: 400, error: "Bad Request" },
         { status: 400 }

@@ -349,7 +349,7 @@ export default function PollsPage() {
                   className="px-8 py-3.5 rounded font-bold text-xs uppercase tracking-wider bg-bb-gold hover:bg-bb-gold-light text-black shadow-lg flex items-center justify-center gap-2"
                 >
                   <LogIn className="w-4 h-4" />
-                  <span>Sign In to Cast Vote</span>
+                  <span>SIGN IN OR SIGN UP TO VOTE</span>
                 </Link>
               )
             ) : (

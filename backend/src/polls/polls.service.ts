@@ -12,23 +12,49 @@ import { RedisRateLimiterService } from "../redis/redis-rate-limiter.service";
 import { v4 as uuidv4 } from "uuid";
 import * as crypto from "crypto";
 
-export function isVotingScheduleOpen(now: Date = new Date()): boolean {
+export function isVotingScheduleOpen(
+  poll?: { startsAt?: Date | string; endsAt?: Date | string; status?: string } | null,
+  now: Date = new Date()
+): boolean {
   if (process.env.FORCE_VOTING_OPEN === "true") return true;
   if (process.env.FORCE_VOTING_CLOSED === "true") return false;
 
+  // Poll-level configurable schedule window
+  if (poll) {
+    if (poll.status === "CLOSED" || poll.status === "ARCHIVED" || poll.status === "DRAFT") {
+      return false;
+    }
+
+    if (poll.startsAt && poll.endsAt) {
+      const start = new Date(poll.startsAt).getTime();
+      const end = new Date(poll.endsAt).getTime();
+      const current = now.getTime();
+
+      // Prior to scheduled start
+      if (current < start) {
+        return false;
+      }
+      // Past scheduled end -> automatically closes
+      if (current > end) {
+        return false;
+      }
+      return true;
+    }
+
+    // If poll.status is ACTIVE and no specific dates are set, it's open unless explicitly forced
+    if (poll.status === "ACTIVE") {
+      return true;
+    }
+  }
+
+  // Fallback default IST schedule (Monday 00:00:00 to Friday 23:59:59 IST)
   try {
     const formatter = new Intl.DateTimeFormat("en-US", {
       timeZone: "Asia/Kolkata",
       weekday: "short",
-      hour: "numeric",
-      minute: "numeric",
-      second: "numeric",
-      hour12: false,
     });
     const parts = formatter.formatToParts(now);
     const weekday = parts.find((p) => p.type === "weekday")?.value;
-    // Window: START Monday 00:00:00 IST to STOP Friday 23:59:59 IST
-    // Saturday and Sunday are CLOSED
     if (weekday === "Sat" || weekday === "Sun") {
       return false;
     }
@@ -49,13 +75,11 @@ export class PollsService {
   ) {}
 
   public getAllPolls(statusFilter?: string) {
-    const isScheduleOpen = isVotingScheduleOpen();
     const list: Poll[] = [];
     for (const poll of this.db.polls.values()) {
-      // Dynamic schedule sync for Season 10 polls in non-test mode
-      const effectiveStatus = process.env.NODE_ENV === "test" 
-        ? poll.status 
-        : (!isScheduleOpen ? "CLOSED" : poll.status);
+      // Dynamic schedule sync for Season 10 polls
+      const isScheduleOpen = isVotingScheduleOpen(poll);
+      const effectiveStatus = !isScheduleOpen ? "CLOSED" : poll.status;
 
       if (!statusFilter || effectiveStatus.toLowerCase() === statusFilter.toLowerCase()) {
         const options = Array.from(this.db.pollOptions.values()).filter((opt) => opt.pollId === poll.id);
@@ -78,10 +102,8 @@ export class PollsService {
     if (!poll) {
       throw new NotFoundException("Poll not found");
     }
-    const isScheduleOpen = isVotingScheduleOpen();
-    const effectiveStatus = process.env.NODE_ENV === "test" 
-      ? poll.status 
-      : (!isScheduleOpen ? "CLOSED" : poll.status);
+    const isScheduleOpen = isVotingScheduleOpen(poll);
+    const effectiveStatus = !isScheduleOpen ? "CLOSED" : poll.status;
 
     const options = Array.from(this.db.pollOptions.values()).filter((opt) => opt.pollId === poll.id);
     return {
@@ -125,8 +147,8 @@ export class PollsService {
     }
 
     // 3. Validate Poll Lifecycle & Schedule (Section 4: Reject votes outside schedule)
-    const isScheduleOpen = isVotingScheduleOpen();
-    if (poll.status === "CLOSED" || (!isScheduleOpen && process.env.NODE_ENV !== "test") || poll.status !== "ACTIVE") {
+    const isScheduleOpen = isVotingScheduleOpen(poll);
+    if (poll.status === "CLOSED" || !isScheduleOpen || poll.status !== "ACTIVE") {
       throw new BadRequestException("Voting is currently closed.");
     }
 

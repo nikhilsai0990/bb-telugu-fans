@@ -322,7 +322,7 @@ export const PollWidget: React.FC<{ initialPoll: Poll | null }> = ({ initialPoll
               className="w-full py-3.5 rounded font-bold text-xs uppercase tracking-wider bg-bb-gold hover:bg-bb-gold-light text-black flex items-center justify-center gap-2 shadow-md"
             >
               <LogIn className="w-4 h-4" />
-              <span>Sign In to Cast Your Vote</span>
+              <span>SIGN IN OR SIGN UP TO VOTE</span>
             </Link>
           )
         ) : (

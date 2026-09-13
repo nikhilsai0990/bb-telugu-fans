@@ -136,7 +136,7 @@ test.describe("Complete User Journey & Authoritative Game State Verification", (
     await expect(page.locator("text=TASK WINNER").first()).toBeVisible();
   });
 
-  test("Polls page shows Week 2 Power of People Captain Poll with closed status and live results, and News reflects 7 stories", async ({
+  test("Polls page shows Week 2 Power of People Captain Poll OPEN with enabled vote buttons and 14 active housemates", async ({
     page,
   }) => {
     // 1. Check Polls page
@@ -145,14 +145,20 @@ test.describe("Complete User Journey & Authoritative Game State Verification", (
     await expect(page.locator("text=POWER OF PEOPLE").first()).toBeVisible();
     await expect(page.locator("text=14 Active Housemates").first()).toBeVisible();
 
-    // Verify voting closed indicators: exactly one disabled button
-    await expect(page.locator("button:has-text('Voting is Currently Closed')")).toHaveCount(1);
+    // Verify voting is NOT closed
+    await expect(page.locator("text=Voting is Currently Closed")).toHaveCount(0);
+    await expect(page.locator("text=VOTING IS CURRENTLY CLOSED")).toHaveCount(0);
+
+    // Verify unauthenticated user sees SIGN IN OR SIGN UP TO VOTE
+    await expect(page.locator("text=SIGN IN OR SIGN UP TO VOTE").first()).toBeVisible();
+
+    // Verify live vote results audit section
     await expect(page.locator("[data-testid='live-vote-results']")).toBeVisible();
 
     // Verify Housemate Nominations mechanic component on Polls page
     await expect(page.locator("[data-testid='housemate-nominations-section']")).toBeVisible();
 
-    // Verify 14 active housemates on poll card grid and NO High Risk Zone badges
+    // Verify 14 active housemates on poll card grid and NO High Risk Zone or Team badges
     const pollCards = page.locator("div.group:has(h3)");
     await expect(pollCards).toHaveCount(14);
     const pollsContent = await page.content();
@@ -241,5 +247,39 @@ test.describe("Complete User Journey & Authoritative Game State Verification", (
     await expect(prompt).toBeVisible();
     await expect(prompt.locator("a:has-text('Sign In')")).toBeVisible();
     await expect(prompt.locator("a:has-text('Sign Up')")).toBeVisible();
+  });
+
+  test("Authenticated user can vote for a housemate in Week 2 Captain Poll and duplicate vote is blocked", async ({
+    page,
+  }) => {
+    // 1. Sign in as fan user
+    await page.goto("/login?redirect=/polls");
+    await page.fill("input[placeholder='name@example.com']", "fan@bbtelugufans.com");
+    await page.fill("input[placeholder='••••••••']", "FanPass2026!");
+    await page.click("button[type='submit']");
+    await page.waitForURL((url) => url.pathname === "/polls");
+
+    // 2. User is on /polls and sees open captain poll
+    await expect(page.locator("h1")).toContainText("WHO DO YOU WANT TO SEE AS CAPTAIN?");
+    await expect(page.locator("text=Voting is Currently Closed")).toHaveCount(0);
+
+    // 3. Check vote state: either already cast or cast fresh vote
+    const alreadyVotedBanner = page.locator("text=YOUR VOTE IS ALREADY CAST");
+    const isAlreadyVoted = await alreadyVotedBanner.isVisible();
+
+    if (isAlreadyVoted) {
+      await expect(alreadyVotedBanner).toBeVisible();
+      await expect(page.locator("button:has-text('VOTE ALREADY SUBMITTED')")).toBeVisible();
+    } else {
+      const debjaniOption = page.locator("div.group:has(h3:has-text('Debjani Modak'))").first();
+      await debjaniOption.click();
+
+      const voteBtn = page.locator("button:has-text('Vote for Debjani Modak as Captain')");
+      await expect(voteBtn).toBeVisible();
+      await voteBtn.click();
+
+      await expect(page.locator("text=YOUR VOTE IS ALREADY CAST").or(page.locator("text=Your vote has been securely recorded"))).toBeVisible();
+      await expect(page.locator("button:has-text('VOTE ALREADY SUBMITTED')")).toBeVisible();
+    }
   });
 });

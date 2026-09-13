@@ -567,23 +567,49 @@ export const fallbackContestants: Contestant[] = [
   },
 ];
 
-export function isVotingScheduleOpen(now: Date = new Date()): boolean {
-  if (typeof process !== "undefined" && process.env.NEXT_PUBLIC_FORCE_VOTING_OPEN === "true") return true;
-  if (typeof process !== "undefined" && process.env.NEXT_PUBLIC_FORCE_VOTING_CLOSED === "true") return false;
+export function isVotingScheduleOpen(
+  poll?: { startsAt?: Date | string; endsAt?: Date | string; status?: string } | null,
+  now: Date = new Date()
+): boolean {
+  if (typeof process !== "undefined" && (process.env.NEXT_PUBLIC_FORCE_VOTING_OPEN === "true" || process.env.FORCE_VOTING_OPEN === "true")) return true;
+  if (typeof process !== "undefined" && (process.env.NEXT_PUBLIC_FORCE_VOTING_CLOSED === "true" || process.env.FORCE_VOTING_CLOSED === "true")) return false;
 
+  // Poll-level configurable schedule window
+  if (poll) {
+    if (poll.status === "CLOSED" || poll.status === "ARCHIVED" || poll.status === "DRAFT") {
+      return false;
+    }
+
+    if (poll.startsAt && poll.endsAt) {
+      const start = new Date(poll.startsAt).getTime();
+      const end = new Date(poll.endsAt).getTime();
+      const current = now.getTime();
+
+      // Prior to scheduled start
+      if (current < start) {
+        return false;
+      }
+      // Past scheduled end -> automatically closes
+      if (current > end) {
+        return false;
+      }
+      return true;
+    }
+
+    // If poll.status is ACTIVE and no specific dates are set, it's open unless explicitly forced
+    if (poll.status === "ACTIVE") {
+      return true;
+    }
+  }
+
+  // Fallback default IST schedule (Monday 00:00:00 to Friday 23:59:59 IST)
   try {
     const formatter = new Intl.DateTimeFormat("en-US", {
       timeZone: "Asia/Kolkata",
       weekday: "short",
-      hour: "numeric",
-      minute: "numeric",
-      second: "numeric",
-      hour12: false,
     });
     const parts = formatter.formatToParts(now);
     const weekday = parts.find((p) => p.type === "weekday")?.value;
-    // Window: START Monday 00:00:00 IST to STOP Friday 23:59:59 IST
-    // Saturday and Sunday are CLOSED
     if (weekday === "Sat" || weekday === "Sun") {
       return false;
     }
@@ -597,36 +623,36 @@ export function isVotingScheduleOpen(now: Date = new Date()): boolean {
 }
 
 // Fallback Polls — Week 2 Power of People Captain Poll (Primary) + Week 1 Eviction Poll
-// Status is CLOSED for Sunday!
+// Week 2 Captain Poll is ACTIVE!
 export const fallbackPolls: Poll[] = [
   {
     id: "poll-captain-week-02",
     title: "Power of People — You Choose the Captain",
     description: "For the first time, the power is in the hands of the people. Vote for the housemate you want to see as Captain.",
     category: "Captaincy",
-    status: isVotingScheduleOpen() ? "ACTIVE" : "CLOSED",
+    status: "ACTIVE",
     totalVotes: 0,
     options: [
-      { id: "opt-captain-c-01", contestantId: "c-01", text: "Vote Debjani Modak for Captain", imageUrl: "/images/contestants/debjani-modak.webp", votesCount: 0, percentage: 0, team: "BLUE", zone: "NORMAL", isHighRiskZone: false },
-      { id: "opt-captain-c-02", contestantId: "c-02", text: "Vote Auto Ram Prasad for Captain", imageUrl: "/images/contestants/auto-ram-prasad.webp", votesCount: 0, percentage: 0, team: "BLUE", zone: "NORMAL", isHighRiskZone: false },
-      { id: "opt-captain-c-03", contestantId: "c-03", text: "Vote Jabardasth Naresh for Captain", imageUrl: "/images/contestants/jabardasth-naresh.webp", votesCount: 0, percentage: 0, team: "BLUE", zone: "NORMAL", isHighRiskZone: false },
-      { id: "opt-captain-c-04", contestantId: "c-04", text: "Vote Thrigun for Captain", imageUrl: "/images/contestants/thrigun.webp", votesCount: 0, percentage: 0, team: "BLUE", zone: "NORMAL", isHighRiskZone: false },
-      { id: "opt-captain-c-05", contestantId: "c-05", text: "Vote Mukesh Gowda for Captain", imageUrl: "/images/contestants/mukesh-gowda.webp", votesCount: 0, percentage: 0, team: "BLUE", zone: "NORMAL", isHighRiskZone: false },
-      { id: "opt-captain-c-06", contestantId: "c-06", text: "Vote Varshini Sounderajan for Captain", imageUrl: "/images/contestants/varshini-sounderajan.webp", votesCount: 0, percentage: 0, team: "BLUE", zone: "NORMAL", isHighRiskZone: false },
-      { id: "opt-captain-c-07", contestantId: "c-07", text: "Vote Temper Vamsi for Captain", imageUrl: "/images/contestants/temper-vamsi.webp", votesCount: 0, percentage: 0, team: "RED", zone: "NORMAL", isHighRiskZone: false },
-      { id: "opt-captain-c-08", contestantId: "c-08", text: "Vote Krishnudu for Captain", imageUrl: "/images/contestants/krishnudu.webp", votesCount: 0, percentage: 0, team: "BLUE", zone: "NORMAL", isHighRiskZone: false },
-      { id: "opt-captain-c-09", contestantId: "c-09", text: "Vote Sudheer Kumar Reddy for Captain", imageUrl: "/images/contestants/sudheer-kumar-reddy.webp", votesCount: 0, percentage: 0, team: "BLUE", zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-captain-c-01", contestantId: "c-01", text: "Vote Debjani Modak for Captain", imageUrl: "/images/contestants/debjani-modak.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-captain-c-02", contestantId: "c-02", text: "Vote Auto Ram Prasad for Captain", imageUrl: "/images/contestants/auto-ram-prasad.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-captain-c-03", contestantId: "c-03", text: "Vote Jabardasth Naresh for Captain", imageUrl: "/images/contestants/jabardasth-naresh.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-captain-c-04", contestantId: "c-04", text: "Vote Thrigun for Captain", imageUrl: "/images/contestants/thrigun.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-captain-c-05", contestantId: "c-05", text: "Vote Mukesh Gowda for Captain", imageUrl: "/images/contestants/mukesh-gowda.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-captain-c-06", contestantId: "c-06", text: "Vote Varshini Sounderajan for Captain", imageUrl: "/images/contestants/varshini-sounderajan.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-captain-c-07", contestantId: "c-07", text: "Vote Temper Vamsi for Captain", imageUrl: "/images/contestants/temper-vamsi.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-captain-c-08", contestantId: "c-08", text: "Vote Krishnudu for Captain", imageUrl: "/images/contestants/krishnudu.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-captain-c-09", contestantId: "c-09", text: "Vote Sudheer Kumar Reddy for Captain", imageUrl: "/images/contestants/sudheer-kumar-reddy.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
       // Chaitra Rai (c-10) is ELIMINATED - excluded from voting
-      { id: "opt-captain-c-11", contestantId: "c-11", text: "Vote Rohit Naidu for Captain", imageUrl: "/images/contestants/rohit-naidu.webp", votesCount: 0, percentage: 0, team: "RED", zone: "NORMAL", isHighRiskZone: false },
-      { id: "opt-captain-c-12", contestantId: "c-12", text: "Vote Aman for Captain", imageUrl: "/images/contestants/aman.webp", votesCount: 0, percentage: 0, team: "RED", zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-captain-c-11", contestantId: "c-11", text: "Vote Rohit Naidu for Captain", imageUrl: "/images/contestants/rohit-naidu.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-captain-c-12", contestantId: "c-12", text: "Vote Aman for Captain", imageUrl: "/images/contestants/aman.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
       // Charan (c-13) is ELIMINATED - excluded from voting
-      { id: "opt-captain-c-14", contestantId: "c-14", text: "Vote Shalini for Captain", imageUrl: "/images/contestants/shalini.webp", votesCount: 0, percentage: 0, team: "RED", zone: "NORMAL", isHighRiskZone: false },
-      { id: "opt-captain-c-15", contestantId: "c-15", text: "Vote Srushti Vyakaranam for Captain", imageUrl: "/images/contestants/srushti-vyakaranam.webp", votesCount: 0, percentage: 0, team: "RED", zone: "NORMAL", isHighRiskZone: false },
-      { id: "opt-captain-c-16", contestantId: "c-16", text: "Vote Singer Jhansi for Captain", imageUrl: "/images/contestants/singer-jhansi.webp", votesCount: 0, percentage: 0, team: "RED", zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-captain-c-14", contestantId: "c-14", text: "Vote Shalini for Captain", imageUrl: "/images/contestants/shalini.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-captain-c-15", contestantId: "c-15", text: "Vote Srushti Vyakaranam for Captain", imageUrl: "/images/contestants/srushti-vyakaranam.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-captain-c-16", contestantId: "c-16", text: "Vote Singer Jhansi for Captain", imageUrl: "/images/contestants/singer-jhansi.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
     ],
-    startsAt: new Date(Date.now() - 86400000).toISOString(),
-    endsAt: new Date().toISOString(),
-    createdAt: new Date().toISOString(),
+    startsAt: "2026-09-13T00:00:00+05:30",
+    endsAt: "2026-09-18T23:59:59+05:30",
+    createdAt: "2026-09-13T00:00:00+05:30",
   },
   {
     id: "poll-eviction-01",
@@ -636,20 +662,20 @@ export const fallbackPolls: Poll[] = [
     status: "CLOSED",
     totalVotes: 0,
     options: [
-      { id: "opt-save-c-01", contestantId: "c-01", text: "Save Debjani Modak", imageUrl: "/images/contestants/debjani-modak.webp", votesCount: 0, percentage: 0, team: "BLUE", zone: "NORMAL", isHighRiskZone: false },
-      { id: "opt-save-c-02", contestantId: "c-02", text: "Save Auto Ram Prasad", imageUrl: "/images/contestants/auto-ram-prasad.webp", votesCount: 0, percentage: 0, team: "BLUE", zone: "NORMAL", isHighRiskZone: false },
-      { id: "opt-save-c-03", contestantId: "c-03", text: "Save Jabardasth Naresh", imageUrl: "/images/contestants/jabardasth-naresh.webp", votesCount: 0, percentage: 0, team: "BLUE", zone: "NORMAL", isHighRiskZone: false },
-      { id: "opt-save-c-04", contestantId: "c-04", text: "Save Thrigun", imageUrl: "/images/contestants/thrigun.webp", votesCount: 0, percentage: 0, team: "BLUE", zone: "NORMAL", isHighRiskZone: false },
-      { id: "opt-save-c-05", contestantId: "c-05", text: "Save Mukesh Gowda", imageUrl: "/images/contestants/mukesh-gowda.webp", votesCount: 0, percentage: 0, team: "BLUE", zone: "NORMAL", isHighRiskZone: false },
-      { id: "opt-save-c-06", contestantId: "c-06", text: "Save Varshini Sounderajan", imageUrl: "/images/contestants/varshini-sounderajan.webp", votesCount: 0, percentage: 0, team: "BLUE", zone: "NORMAL", isHighRiskZone: false },
-      { id: "opt-save-c-07", contestantId: "c-07", text: "Save Temper Vamsi", imageUrl: "/images/contestants/temper-vamsi.webp", votesCount: 0, percentage: 0, team: "RED", zone: "NORMAL", isHighRiskZone: false },
-      { id: "opt-save-c-08", contestantId: "c-08", text: "Save Krishnudu", imageUrl: "/images/contestants/krishnudu.webp", votesCount: 0, percentage: 0, team: "BLUE", zone: "NORMAL", isHighRiskZone: false },
-      { id: "opt-save-c-09", contestantId: "c-09", text: "Save Sudheer Kumar Reddy", imageUrl: "/images/contestants/sudheer-kumar-reddy.webp", votesCount: 0, percentage: 0, team: "BLUE", zone: "NORMAL", isHighRiskZone: false },
-      { id: "opt-save-c-11", contestantId: "c-11", text: "Save Rohit Naidu", imageUrl: "/images/contestants/rohit-naidu.webp", votesCount: 0, percentage: 0, team: "RED", zone: "NORMAL", isHighRiskZone: false },
-      { id: "opt-save-c-12", contestantId: "c-12", text: "Save Aman", imageUrl: "/images/contestants/aman.webp", votesCount: 0, percentage: 0, team: "RED", zone: "NORMAL", isHighRiskZone: false },
-      { id: "opt-save-c-14", contestantId: "c-14", text: "Save Shalini", imageUrl: "/images/contestants/shalini.webp", votesCount: 0, percentage: 0, team: "RED", zone: "NORMAL", isHighRiskZone: false },
-      { id: "opt-save-c-15", contestantId: "c-15", text: "Save Srushti Vyakaranam", imageUrl: "/images/contestants/srushti-vyakaranam.webp", votesCount: 0, percentage: 0, team: "RED", zone: "NORMAL", isHighRiskZone: false },
-      { id: "opt-save-c-16", contestantId: "c-16", text: "Save Singer Jhansi", imageUrl: "/images/contestants/singer-jhansi.webp", votesCount: 0, percentage: 0, team: "RED", zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-save-c-01", contestantId: "c-01", text: "Save Debjani Modak", imageUrl: "/images/contestants/debjani-modak.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-save-c-02", contestantId: "c-02", text: "Save Auto Ram Prasad", imageUrl: "/images/contestants/auto-ram-prasad.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-save-c-03", contestantId: "c-03", text: "Save Jabardasth Naresh", imageUrl: "/images/contestants/jabardasth-naresh.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-save-c-04", contestantId: "c-04", text: "Save Thrigun", imageUrl: "/images/contestants/thrigun.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-save-c-05", contestantId: "c-05", text: "Save Mukesh Gowda", imageUrl: "/images/contestants/mukesh-gowda.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-save-c-06", contestantId: "c-06", text: "Save Varshini Sounderajan", imageUrl: "/images/contestants/varshini-sounderajan.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-save-c-07", contestantId: "c-07", text: "Save Temper Vamsi", imageUrl: "/images/contestants/temper-vamsi.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-save-c-08", contestantId: "c-08", text: "Save Krishnudu", imageUrl: "/images/contestants/krishnudu.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-save-c-09", contestantId: "c-09", text: "Save Sudheer Kumar Reddy", imageUrl: "/images/contestants/sudheer-kumar-reddy.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-save-c-11", contestantId: "c-11", text: "Save Rohit Naidu", imageUrl: "/images/contestants/rohit-naidu.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-save-c-12", contestantId: "c-12", text: "Save Aman", imageUrl: "/images/contestants/aman.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-save-c-14", contestantId: "c-14", text: "Save Shalini", imageUrl: "/images/contestants/shalini.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-save-c-15", contestantId: "c-15", text: "Save Srushti Vyakaranam", imageUrl: "/images/contestants/srushti-vyakaranam.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-save-c-16", contestantId: "c-16", text: "Save Singer Jhansi", imageUrl: "/images/contestants/singer-jhansi.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
     ],
     startsAt: new Date(Date.now() - 86400000 * 2).toISOString(),
     endsAt: new Date(Date.now() - 86400000).toISOString(),
@@ -859,8 +885,12 @@ export const api = {
       const res = await fetch(`${API_BASE}/polls${q}`);
       if (res.ok) return await res.json();
     } catch (e) {}
-    if (status) return fallbackPolls.filter((p) => p.status.toLowerCase() === status.toLowerCase());
-    return fallbackPolls;
+    const evaluated = fallbackPolls.map((p) => ({
+      ...p,
+      status: (isVotingScheduleOpen(p) ? p.status : "CLOSED") as "ACTIVE" | "CLOSED",
+    }));
+    if (status) return evaluated.filter((p) => p.status.toLowerCase() === status.toLowerCase());
+    return evaluated;
   },
 
   async getPoll(id: string): Promise<Poll | null> {
@@ -868,7 +898,8 @@ export const api = {
       const res = await fetch(`${API_BASE}/polls/${id}`);
       if (res.ok) return await res.json();
     } catch (e) {}
-    return fallbackPolls.find((p) => p.id === id) || fallbackPolls[0];
+    const p = fallbackPolls.find((item) => item.id === id) || fallbackPolls[0];
+    return p ? { ...p, status: (isVotingScheduleOpen(p) ? p.status : "CLOSED") as "ACTIVE" | "CLOSED" } : null;
   },
 
   async getVoteStatus(pollId: string, customToken?: string): Promise<{ hasVoted: boolean; optionId?: string; contestantName?: string }> {

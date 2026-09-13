@@ -1,13 +1,15 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Lock, Mail, ArrowRight } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams.get("redirect");
   const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -34,6 +36,10 @@ export default function LoginPage() {
               return;
             }
           } catch (_) {}
+        }
+        if (redirectUrl && redirectUrl.startsWith("/")) {
+          window.location.href = redirectUrl;
+          return;
         }
         router.push("/profile");
       }
@@ -142,5 +148,13 @@ export default function LoginPage() {
 
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-[75vh] flex items-center justify-center text-white text-xs">Loading...</div>}>
+      <LoginForm />
+    </Suspense>
   );
 }

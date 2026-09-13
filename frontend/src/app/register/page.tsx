@@ -1,13 +1,15 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { User, Mail, Lock, ArrowRight } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
-export default function RegisterPage() {
+function RegisterForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams.get("redirect");
   const { register } = useAuth();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -31,6 +33,10 @@ export default function RegisterPage() {
     try {
       const ok = await register(username, email, password);
       if (ok) {
+        if (redirectUrl && redirectUrl.startsWith("/")) {
+          window.location.href = redirectUrl;
+          return;
+        }
         router.push("/profile");
       }
     } catch (e: any) {
@@ -135,5 +141,13 @@ export default function RegisterPage() {
 
       </div>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={<div className="min-h-[75vh] flex items-center justify-center text-white text-xs">Loading...</div>}>
+      <RegisterForm />
+    </Suspense>
   );
 }

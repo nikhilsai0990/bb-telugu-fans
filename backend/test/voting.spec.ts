@@ -19,6 +19,7 @@ describe("Voting System - Comprehensive Automated Tests", () => {
     const p = db.polls.get("poll-eviction-01");
     if (p) {
       p.status = "ACTIVE";
+      p.endsAt = new Date(Date.now() + 86400000 * 7);
     }
   });
 
@@ -350,5 +351,69 @@ describe("Voting System - Comprehensive Automated Tests", () => {
     expect(poll.totalVotes).toBe(initialTotalVotes);
     expect(option.votesCount).toBe(initialOptionVotes);
     expect(db.votes.size).toBe(initialVotesSize);
+  });
+
+  // TC-VOTE-013: Week 2 Captain Poll (poll-captain-week-02) is ACTIVE and open for audience voting
+  it("TC-VOTE-013: Week 2 Captain Poll (poll-captain-week-02) is ACTIVE and accepts vote", async () => {
+    const poll = db.polls.get("poll-captain-week-02")!;
+    expect(poll).toBeDefined();
+    expect(poll.status).toBe("ACTIVE");
+    expect(poll.totalVotes).toBe(0);
+
+    const result = await pollsService.castVote({
+      pollId: "poll-captain-week-02",
+      optionId: "opt-captain-c-01",
+      userId: "captain-voter-001",
+      clientIp: "192.168.1.188",
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.totalVotes).toBe(1);
+  });
+
+  // TC-VOTE-014: Expired poll past endsAt automatically rejects vote with BadRequestException
+  it("TC-VOTE-014: Expired poll past endsAt automatically rejects vote", async () => {
+    const expiredPoll = pollsService.createPoll({
+      title: "Expired Test Poll",
+      options: [{ text: "Option A" }, { text: "Option B" }],
+    });
+    // Set endsAt in the past
+    expiredPoll.status = "ACTIVE";
+    expiredPoll.startsAt = new Date(Date.now() - 86400000 * 5);
+    expiredPoll.endsAt = new Date(Date.now() - 1000); // 1 second ago
+
+    await expect(
+      pollsService.castVote({
+        pollId: expiredPoll.id,
+        optionId: expiredPoll.options[0].id,
+        userId: "expired-voter-001",
+        clientIp: "192.168.1.189",
+      })
+    ).rejects.toThrow(BadRequestException);
+  });
+
+  // TC-VOTE-015: Duplicate vote in poll-captain-week-02 rejected with ALREADY_VOTED
+  it("TC-VOTE-015: Duplicate vote in poll-captain-week-02 rejected with ALREADY_VOTED", async () => {
+    const pollId = "poll-captain-week-02";
+    const optionId = "opt-captain-c-02";
+    const userId = "captain-duplicate-tester";
+    const clientIp = "192.168.1.190";
+
+    const first = await pollsService.castVote({
+      pollId,
+      optionId,
+      userId,
+      clientIp,
+    });
+    expect(first.success).toBe(true);
+
+    await expect(
+      pollsService.castVote({
+        pollId,
+        optionId: "opt-captain-c-03",
+        userId,
+        clientIp,
+      })
+    ).rejects.toThrow(ConflictException);
   });
 });
