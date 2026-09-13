@@ -32,10 +32,17 @@ test.describe("Complete User Journey & Authoritative Game State Verification", (
     await expect(page.locator("[data-testid='eliminated-section']")).toBeVisible();
     await expect(page.locator("text=ELIMINATED CONTESTANTS").first()).toBeVisible();
 
-    // Verify Team Leaders removed & High Risk Zone removed
+    // Verify Individual Housemates Arena Section
+    await expect(page.locator("[data-testid='housemates-arena-section']")).toBeVisible();
+
+    // Verify Teams completely removed & High Risk Zone removed
     const pageContent = await page.content();
     expect(pageContent).not.toContain("Red Team Leader");
     expect(pageContent).not.toContain("Blue Team Leader");
+    expect(pageContent).not.toContain("RED TEAM");
+    expect(pageContent).not.toContain("BLUE TEAM");
+    expect(pageContent).not.toContain("Red Team");
+    expect(pageContent).not.toContain("Blue Team");
     expect(pageContent).not.toContain("HIGH RISK ZONE");
     expect(pageContent).toContain("Krishnudu");
   });
@@ -141,6 +148,10 @@ test.describe("Complete User Journey & Authoritative Game State Verification", (
     await expect(pollCards).toHaveCount(14);
     const pollsContent = await page.content();
     expect(pollsContent).not.toContain("HIGH RISK ZONE");
+    expect(pollsContent).not.toContain("RED TEAM");
+    expect(pollsContent).not.toContain("BLUE TEAM");
+    expect(pollsContent).not.toContain("Red Team");
+    expect(pollsContent).not.toContain("Blue Team");
 
     // Charan and Chaitra Rai excluded from ballot
     await expect(pollCards.filter({ hasText: "Charan" })).toHaveCount(0);

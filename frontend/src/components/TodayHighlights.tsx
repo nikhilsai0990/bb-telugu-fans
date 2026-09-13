@@ -108,9 +108,9 @@ export const TodayHighlights: React.FC<{ news: NewsItem[] }> = ({ news }) => {
                         Sudheer Won Challenge
                       </span>
                     ) : isTeamTask ? (
-                      <span className="text-[10px] font-bold text-blue-400 uppercase tracking-tight flex items-center gap-1">
-                        <CheckCircle className="w-3.5 h-3.5 text-blue-400" />
-                        Krishnudu Team Won Against Naresh Team
+                      <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-tight flex items-center gap-1">
+                        <CheckCircle className="w-3.5 h-3.5 text-zinc-400" />
+                        Historical Task &bull; Krishnudu vs Naresh
                       </span>
                     ) : isEliminated ? (
                       <span className="text-[10px] font-bold text-red-400 uppercase tracking-tight flex items-center gap-1">

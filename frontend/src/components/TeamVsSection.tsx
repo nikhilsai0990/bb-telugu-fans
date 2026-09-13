@@ -6,8 +6,15 @@ import { Trophy, AlertCircle, ArrowUpRight, Shield } from "lucide-react";
 import { Contestant } from "../types";
 
 export const TeamVsSection: React.FC<{ contestants: Contestant[] }> = ({ contestants }) => {
-  const redTeam = contestants.filter((c) => c.team === "RED");
-  const blueTeam = contestants.filter((c) => c.team === "BLUE");
+  const activeHousemates = contestants.filter(
+    (c) =>
+      !c.isEliminated &&
+      c.status !== "ELIMINATED" &&
+      c.slug !== "charan" &&
+      c.slug !== "chaitra-rai" &&
+      c.id !== "c-13" &&
+      c.id !== "c-10"
+  );
 
   const renderCard = (contestant: Contestant) => {
     const isEliminated =
@@ -74,91 +81,61 @@ export const TeamVsSection: React.FC<{ contestants: Contestant[] }> = ({ contest
   };
 
   return (
-    <section className="py-14 border-b border-white/[0.08] relative">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+    <section className="py-12 border-b border-white/[0.08] relative" data-testid="housemates-arena-section">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         
         {/* Section Editorial Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div className="space-y-1.5">
             <div className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-zinc-400">
               <span className="w-2 h-2 rounded-full bg-bb-gold" />
-              <span>Team Hierarchy &bull; Season 10</span>
+              <span>Season 10 Arena &bull; Individual Format</span>
             </div>
             <h2 className="font-display text-4xl sm:text-5xl uppercase tracking-tight text-white">
-              RED TEAM <span className="text-zinc-500 font-sans font-bold text-2xl sm:text-3xl align-middle">VS</span> BLUE TEAM
+              SEASON 10 <span className="text-bb-gold">HOUSEMATES</span>
             </h2>
-            <p className="text-sm text-zinc-400 max-w-xl">
-              Bigg Boss Telugu Season 10 features 16 housemates across Red and Blue teams. Auto Ram Prasad, Rohit Naidu, and Temper Vamsi are TASK WINNERS. Charan and Chaitra Rai are ELIMINATED with NO RE-ENTRY. 14 active housemates remain in the competition. Latest Team Task: Krishnudu&apos;s team won against Naresh&apos;s team!
+            <p className="text-sm text-zinc-400 max-w-xl leading-relaxed">
+              Bigg Boss Telugu Season 10 is an individual competition featuring 14 active housemates. Auto Ram Prasad, Rohit Naidu, and Temper Vamsi are TASK WINNERS. Charan and Chaitra Rai are ELIMINATED based on housemates&apos; votes (NO RE-ENTRY).
             </p>
           </div>
           <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-zinc-400">
-            <span className="px-2.5 py-1 rounded bg-white/[0.04] border border-white/[0.08] text-white">
+            <span className="px-3 py-1.5 rounded bg-white/[0.04] border border-white/[0.08] text-white">
               14 Active Housemates
             </span>
-            <span className="px-2.5 py-1 rounded bg-red-950/40 border border-red-800/40 text-red-300">
+            <span className="px-3 py-1.5 rounded bg-red-950/40 border border-red-800/40 text-red-300">
               2 Eliminated (No Re-entry)
             </span>
           </div>
         </div>
 
-        {/* Editorial Split-Screen Layout: Red Team vs Blue Team */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          
-          {/* Red Team */}
-          <div className="editorial-panel rounded-xl p-6 space-y-6 border border-red-500/20">
-            <div className="flex items-start justify-between border-b border-white/[0.08] pb-4">
-              <div>
-                <h3 className="font-display text-3xl uppercase tracking-wide text-red-400 leading-none">
-                  RED TEAM
-                </h3>
-                <p className="text-xs font-semibold text-zinc-400 mt-1">
-                  8 Housemates
-                </p>
-              </div>
-              <span className="text-[11px] font-bold uppercase tracking-wider text-red-400 bg-red-500/10 border border-red-500/25 px-2.5 py-1 rounded flex items-center gap-1.5">
-                RED TEAM
-              </span>
+        {/* 14 Active Housemates Grid */}
+        <div className="editorial-panel rounded-xl p-6 space-y-4 border border-white/[0.08]">
+          <div className="flex items-center justify-between border-b border-white/[0.08] pb-3 text-xs">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="font-bold uppercase tracking-wider text-white">ACTIVE HOUSEMATES (14)</span>
             </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {redTeam.map(renderCard)}
-            </div>
-
-            <div className="pt-2 border-t border-white/[0.06] flex items-center justify-between text-[11px] text-zinc-400">
-              <span>Task Winners: Rohit Naidu, Temper Vamsi</span>
-              <span className="text-red-400 font-semibold">Charan &amp; Chaitra Rai Eliminated</span>
-            </div>
+            <Link href="/contestants" className="text-bb-gold hover:underline font-bold text-xs uppercase tracking-wider">
+              View Full Directory &rarr;
+            </Link>
           </div>
 
-          {/* Blue Team */}
-          <div className="editorial-panel rounded-xl p-6 space-y-6 border border-blue-500/20">
-            <div className="flex items-start justify-between border-b border-white/[0.08] pb-4">
-              <div>
-                <h3 className="font-display text-3xl uppercase tracking-wide text-blue-400 leading-none">
-                  BLUE TEAM
-                </h3>
-                <p className="text-xs font-semibold text-zinc-400 mt-1">
-                  8 Housemates
-                </p>
-              </div>
-              <span className="text-[11px] font-bold uppercase tracking-wider text-blue-400 bg-blue-500/10 border border-blue-500/25 px-2.5 py-1 rounded flex items-center gap-1.5">
-                BLUE TEAM
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {blueTeam.map(renderCard)}
-            </div>
-
-            <div className="pt-2 border-t border-white/[0.06] flex items-center justify-between text-[11px] text-zinc-400">
-              <span>Task Winner: Auto Ram Prasad</span>
-              <span className="text-blue-400 font-semibold">Latest Task Winner: Krishnudu&apos;s Team</span>
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5">
+            {activeHousemates.map(renderCard)}
           </div>
 
+          <div className="pt-3 border-t border-white/[0.06] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-[11px] text-zinc-400">
+            <span className="flex items-center gap-1.5">
+              <Trophy className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Individual Task Winners: Auto Ram Prasad, Rohit Naidu, Temper Vamsi</span>
+            </span>
+            <span className="text-zinc-500">Pure individual format &bull; Zero teams</span>
+          </div>
         </div>
 
       </div>
     </section>
   );
 };
+
+export const HousematesArenaSection = TeamVsSection;

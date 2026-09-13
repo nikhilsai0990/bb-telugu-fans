@@ -39,7 +39,7 @@ export const Hero = () => {
 
             {/* Editorial Context */}
             <p className="text-sm sm:text-base text-zinc-300 font-normal leading-relaxed max-w-xl">
-              The premier fan community for Bigg Boss Telugu Season 10. Auto Ram Prasad, Rohit Naidu, and Temper Vamsi are TASK WINNERS. Charan and Chaitra Rai have both been officially ELIMINATED based on housemates&apos; votes with NO RE-ENTRY. 14 active housemates remain in the competition. In the latest team task, Krishnudu&apos;s team defeated Naresh&apos;s team!
+              The premier fan community for Bigg Boss Telugu Season 10. Auto Ram Prasad, Rohit Naidu, and Temper Vamsi are TASK WINNERS. Charan and Chaitra Rai have both been officially ELIMINATED based on housemates&apos; votes with NO RE-ENTRY. 14 active housemates remain in the individual competition.
             </p>
 
             {/* Official Match State Board */}
@@ -86,11 +86,11 @@ export const Hero = () => {
                 </span>
               </div>
 
-              {/* Team Task Result Banner */}
+              {/* Individual Task Winners Banner */}
               <div className="flex items-start gap-2 px-3 py-2 rounded bg-white/[0.03] border border-white/[0.08] text-[11px] text-zinc-300">
                 <Trophy className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
                 <span>
-                  <strong className="text-white uppercase font-bold">Latest Team Task:</strong> Team A (Naresh) vs Team B (Krishnudu) &mdash; <span className="text-emerald-400 font-bold">Winner: Krishnudu&apos;s Team!</span>
+                  <strong className="text-white uppercase font-bold">Individual Task Winners:</strong> Auto Ram Prasad, Rohit Naidu, and Temper Vamsi have all secured individual task victories.
                 </span>
               </div>
             </div>

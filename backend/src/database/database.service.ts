@@ -1060,7 +1060,7 @@ export class DatabaseService implements OnModuleInit {
       username: adminUser.username,
       userAvatar: adminUser.avatarUrl,
       category: "Nominations",
-      title: "14 Active Housemates Nominated: Cast your vote when polls are open!",
+      title: "14 Active Housemates in the Arena: Cast your vote when polls are open!",
       description: "With Charan and Chaitra Rai eliminated (no re-entry), 14 housemates remain in the competition. Voting is currently closed for Sunday.",
       likesCount: 0,
       commentsCount: 0,
