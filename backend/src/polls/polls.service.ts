@@ -98,7 +98,10 @@ export class PollsService {
   }
 
   public getPollById(id: string) {
-    const poll = this.db.polls.get(id);
+    let poll = this.db.polls.get(id);
+    if (!poll && (id === "poll-captain-week-02" || id === "poll-elimination-week-02")) {
+      poll = this.db.polls.get("poll-elimination-week-02") || this.db.polls.get("poll-captain-week-02");
+    }
     if (!poll) {
       throw new NotFoundException("Poll not found");
     }
@@ -133,15 +136,19 @@ export class PollsService {
     voterToken?: string;
     clientIp: string;
   }) {
-    const { pollId, optionId, userId, voterToken, clientIp } = params;
+    let { pollId, optionId, userId, voterToken, clientIp } = params;
 
     // 1. Authenticate user identity (Part 9: Anonymous voting is NOT allowed)
     if (!userId) {
       throw new UnauthorizedException("Authentication required to vote. Please sign in or sign up.");
     }
 
-    // 2. Validate Poll Existence
-    const poll = this.db.polls.get(pollId);
+    // 2. Validate Poll Existence (with fallback alias support)
+    let poll = this.db.polls.get(pollId);
+    if (!poll && (pollId === "poll-captain-week-02" || pollId === "poll-elimination-week-02")) {
+      poll = this.db.polls.get("poll-elimination-week-02") || this.db.polls.get("poll-captain-week-02");
+      if (poll) pollId = poll.id;
+    }
     if (!poll) {
       throw new NotFoundException("Poll does not exist");
     }
@@ -154,15 +161,34 @@ export class PollsService {
 
     // 4. Validate Option Belongs to this Poll
     const option = this.db.pollOptions.get(optionId);
-    if (!option || option.pollId !== pollId) {
+    if (!option || (option.pollId !== pollId && option.pollId !== poll.id)) {
       throw new BadRequestException("Selected option does not belong to this poll");
     }
 
-    // 5. Validate Contestant is active and not eliminated (Part 27)
+    // 5. Validate Contestant is eligible for this poll (Section 1 & 11)
     if (option.contestantId) {
       const contestant = this.db.contestants.get(option.contestantId);
       if (!contestant || contestant.status === "ELIMINATED" || contestant.isEliminated || !contestant.isActive) {
         throw new BadRequestException("Voting is not permitted for eliminated contestants.");
+      }
+
+      // Excluded from Week 2 Elimination Poll: Aman, Jabardasth Naresh, Temper Vamsi, Charan, Chaitra Rai
+      const isWeek2ElimPoll =
+        poll.id === "poll-elimination-week-02" ||
+        poll.id === "poll-captain-week-02" ||
+        poll.category === "Elimination" ||
+        poll.title.toUpperCase().includes("ELIMINATED");
+
+      if (isWeek2ElimPoll) {
+        const INELIGIBLE_CONTESTANT_IDS = ["c-12", "c-03", "c-07", "c-10", "c-13"];
+        const INELIGIBLE_CONTESTANT_NAMES = ["aman", "jabardasth naresh", "temper vamsi", "charan", "chaitra rai"];
+
+        if (
+          INELIGIBLE_CONTESTANT_IDS.includes(option.contestantId) ||
+          INELIGIBLE_CONTESTANT_NAMES.includes(contestant.name.toLowerCase())
+        ) {
+          throw new BadRequestException(`Contestant ${contestant.name} is not eligible for this elimination poll.`);
+        }
       }
     }
 
@@ -224,7 +250,12 @@ export class PollsService {
       if (contestant) contestantName = contestant.name;
     }
     if (!contestantName) {
-      contestantName = option.text.replace(/Save\s*/i, "").replace(/\s*\([^)]*\)/i, "").trim();
+      contestantName = option.text
+        .replace(/Save\s*/i, "")
+        .replace(/Vote\s*/i, "")
+        .replace(/\s*for Captain/i, "")
+        .replace(/\s*\([^)]*\)/i, "")
+        .trim();
     }
 
     return {
@@ -248,15 +279,20 @@ export class PollsService {
     pollId: string;
     userId?: string;
   }) {
-    const { pollId, userId } = params;
+    let { pollId, userId } = params;
     if (!userId) {
       return { hasVoted: false };
+    }
+
+    if (!this.db.polls.has(pollId) && (pollId === "poll-captain-week-02" || pollId === "poll-elimination-week-02")) {
+      const alt = this.db.polls.get("poll-elimination-week-02") || this.db.polls.get("poll-captain-week-02");
+      if (alt) pollId = alt.id;
     }
 
     const todayStr = new Date().toISOString().slice(0, 10);
 
     for (const v of this.db.votes.values()) {
-      if (v.pollId === pollId && v.userId === userId) {
+      if ((v.pollId === pollId || (pollId === "poll-elimination-week-02" && v.pollId === "poll-captain-week-02")) && v.userId === userId) {
         const voteDay = v.createdAt.toISOString().slice(0, 10);
         if (voteDay === todayStr) {
           const option = this.db.pollOptions.get(v.optionId);
@@ -267,7 +303,12 @@ export class PollsService {
               if (contestant) contestantName = contestant.name;
             }
             if (!contestantName) {
-              contestantName = option.text.replace(/Save\s*/i, "").replace(/\s*\([^)]*\)/i, "").trim();
+              contestantName = option.text
+                .replace(/Save\s*/i, "")
+                .replace(/Vote\s*/i, "")
+                .replace(/\s*for Captain/i, "")
+                .replace(/\s*\([^)]*\)/i, "")
+                .trim();
             }
           }
 

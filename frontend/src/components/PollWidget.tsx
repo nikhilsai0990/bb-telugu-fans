@@ -121,9 +121,7 @@ export const PollWidget: React.FC<{ initialPoll: Poll | null }> = ({ initialPoll
             {poll.title}
           </h3>
           <p className="text-xs text-zinc-300 max-w-lg leading-relaxed pt-1">
-            {poll.status === "CLOSED"
-              ? "For the first time, the power is in the hands of the people. Voting is currently closed."
-              : "For the first time, the power is in the hands of the people. Vote for the housemate you want to see as Captain (1 vote per user per day)."}
+            Vote for the housemate you think will be eliminated this week.
           </p>
         </div>
 
@@ -132,12 +130,12 @@ export const PollWidget: React.FC<{ initialPoll: Poll | null }> = ({ initialPoll
             Ballot Status
           </span>
           {poll.status === "CLOSED" ? (
-            <span className="text-xs font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 inline-block mt-0.5">
-              Voting Closed
+            <span className="text-xs font-bold uppercase tracking-wider text-zinc-400 bg-white/[0.04] px-2 py-0.5 rounded border border-white/10 inline-block mt-0.5">
+              Schedule Ended
             </span>
           ) : poll.totalVotes === 0 ? (
             <span className="text-xs font-bold uppercase tracking-wider text-bb-gold bg-bb-gold/10 px-2 py-0.5 rounded border border-bb-gold/20 inline-block mt-0.5">
-              No Votes Yet &bull; Cast First Vote
+              0 Votes Recorded (0%)
             </span>
           ) : (
             <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 inline-block mt-0.5">
@@ -294,7 +292,7 @@ export const PollWidget: React.FC<{ initialPoll: Poll | null }> = ({ initialPoll
             className="w-full py-3.5 rounded font-bold text-xs uppercase tracking-wider bg-white/[0.06] text-zinc-500 cursor-not-allowed border border-white/[0.08] flex items-center justify-center gap-2"
           >
             <Lock className="w-4 h-4 text-zinc-500" />
-            <span>Voting is Currently Closed</span>
+            <span>VOTING IS CURRENTLY CLOSED</span>
           </button>
         ) : !hasVoted ? (
           user ? (
@@ -312,7 +310,7 @@ export const PollWidget: React.FC<{ initialPoll: Poll | null }> = ({ initialPoll
                 {voting
                   ? "Recording Vote..."
                   : selectedItem
-                  ? `Vote for ${selectedItem.text.replace(/Save\s*/i, "").replace(/Vote\s*/i, "").replace(/\s*for Captain/i, "").trim()} as Captain`
+                  ? `Vote for ${selectedItem.text.replace(/Save\s*/i, "").replace(/Vote\s*/i, "").replace(/\s*for Captain/i, "").replace(/\s*\([^)]*\)/i, "").trim()}`
                   : "Select a Housemate to Vote"}
               </span>
             </button>

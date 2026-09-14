@@ -182,16 +182,20 @@ describe("Season 10 Authoritative Game State Tests", () => {
     ).rejects.toThrow(BadRequestException);
   });
 
-  it("14. Primary Week 2 Captain Poll (poll-captain-week-02) has exactly 14 options (Charan & Chaitra Rai excluded)", () => {
-    const poll = db.polls.get("poll-captain-week-02")!;
+  it("14. Primary Week 2 Elimination Poll (poll-elimination-week-02) has exactly 11 options (Aman, Naresh, Vamsi, Charan, Chaitra Rai excluded)", () => {
+    const poll = db.polls.get("poll-elimination-week-02")!;
     expect(poll).toBeDefined();
-    expect(poll.title).toBe("Power of People — You Choose the Captain");
-    expect(poll.category).toBe("Captaincy");
+    expect(poll.title).toBe("WHO WILL BE ELIMINATED THIS WEEK?");
+    expect(poll.category).toBe("Elimination");
     expect(poll.totalVotes).toBe(0);
-    expect(poll.options.length).toBe(14);
+    expect(poll.options.length).toBe(11);
+    const contestantIds = poll.options.map((o) => o.contestantId);
+    expect(contestantIds).not.toContain("c-13"); // Charan excluded
+    expect(contestantIds).not.toContain("c-10"); // Chaitra Rai excluded
+    expect(contestantIds).not.toContain("c-12"); // Aman excluded
+    expect(contestantIds).not.toContain("c-03"); // Jabardasth Naresh excluded
+    expect(contestantIds).not.toContain("c-07"); // Temper Vamsi excluded
     for (const opt of poll.options) {
-      expect(opt.contestantId).not.toBe("c-13"); // Charan excluded
-      expect(opt.contestantId).not.toBe("c-10"); // Chaitra Rai excluded
       expect(opt.votesCount).toBe(0);
     }
   });
@@ -200,8 +204,8 @@ describe("Season 10 Authoritative Game State Tests", () => {
     const news = Array.from(db.news.values());
     expect(news.length).toBe(7);
     const titles = news.map((n) => n.title);
-    expect(titles.some((t) => t.includes("Power of People begins in Week 2"))).toBe(true);
-    expect(titles.some((t) => t.includes("Housemates enter the nomination battle"))).toBe(true);
+    expect(titles.some((t) => t.includes("Shalini vs Varshini: Big Fight"))).toBe(true);
+    expect(titles.some((t) => t.includes("Sudheer & Thrigun During Nominations"))).toBe(true);
     expect(titles.some((t) => t.includes("No Elimination on Sunday"))).toBe(true);
     expect(titles.some((t) => t.includes("Srushti Vyakaranam lost the Power Key"))).toBe(true);
     expect(titles.some((t) => t.includes("Sudheer Kumar Reddy won"))).toBe(true);
@@ -210,10 +214,10 @@ describe("Season 10 Authoritative Game State Tests", () => {
   });
 
   it("16. User cannot vote more than once per day when poll is active", async () => {
-    const poll = db.polls.get("poll-captain-week-02")!;
+    const poll = db.polls.get("poll-elimination-week-02")!;
     poll.status = "ACTIVE";
-    const pollId = "poll-captain-week-02";
-    const optionId = "opt-captain-c-01";
+    const pollId = "poll-elimination-week-02";
+    const optionId = "opt-elim-c-01";
     const userId = "test-daily-user-1";
     const clientIp = "192.168.1.200";
 
@@ -228,10 +232,69 @@ describe("Season 10 Authoritative Game State Tests", () => {
     await expect(
       pollsService.castVote({
         pollId,
-        optionId: "opt-captain-c-02",
+        optionId: "opt-elim-c-02",
         userId,
         clientIp,
       })
     ).rejects.toThrow(ConflictException);
+  });
+
+  it("17. Direct API votes for ineligible contestants (Charan, Chaitra Rai, Aman, Jabardasth Naresh, Temper Vamsi) return 400 Bad Request", async () => {
+    const pollId = "poll-elimination-week-02";
+    const ineligibleContestants = [
+      { id: "c-13", name: "Charan" },
+      { id: "c-10", name: "Chaitra Rai" },
+      { id: "c-12", name: "Aman" },
+      { id: "c-03", name: "Jabardasth Naresh" },
+      { id: "c-07", name: "Temper Vamsi" },
+    ];
+
+    for (const contestant of ineligibleContestants) {
+      // Direct option injection attempt targeting ineligible contestant
+      const spoofedOpt = {
+        id: `opt-spoof-${contestant.id}`,
+        pollId,
+        contestantId: contestant.id,
+        text: `Vote ${contestant.name}`,
+        votesCount: 0,
+      };
+      db.pollOptions.set(spoofedOpt.id, spoofedOpt as any);
+
+      await expect(
+        pollsService.castVote({
+          pollId,
+          optionId: spoofedOpt.id,
+          userId: `test-ineligible-${contestant.id}`,
+          clientIp: "192.168.1.201",
+        })
+      ).rejects.toThrow(BadRequestException);
+    }
+  });
+
+  it("18. Direct API vote for any of the 11 eligible housemates succeeds, increments DB vote count and recalculates percentages", async () => {
+    const pollId = "poll-elimination-week-02";
+    const poll = db.polls.get(pollId)!;
+    poll.status = "ACTIVE";
+    expect(poll.options.length).toBe(11);
+
+    for (let i = 0; i < poll.options.length; i++) {
+      const opt = poll.options[i];
+      const res = await pollsService.castVote({
+        pollId,
+        optionId: opt.id,
+        userId: `voter-eligible-${i}`,
+        clientIp: `192.168.2.${i + 1}`,
+      });
+      expect(res.success).toBe(true);
+      expect(res.totalVotes).toBe(i + 1);
+    }
+
+    const updatedPoll = db.polls.get(pollId)!;
+    expect(updatedPoll.totalVotes).toBe(11);
+    for (const opt of updatedPoll.options) {
+      expect(opt.votesCount).toBe(1);
+      const pct = ((opt.votesCount / updatedPoll.totalVotes) * 100).toFixed(1);
+      expect(pct).toBe("9.1");
+    }
   });
 });

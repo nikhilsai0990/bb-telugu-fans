@@ -29,19 +29,19 @@ export const Hero = () => {
 
             {/* Monumental Headline */}
             <div className="space-y-1">
-              <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl tracking-tight uppercase text-white leading-[0.92]">
+              <h1 className="font-display text-4xl sm:text-6xl lg:text-7xl tracking-tight uppercase text-white leading-[0.92]">
                 <span>POWER OF</span>{" "}
                 <span className="text-bb-gold">PEOPLE.</span>
                 <br />
-                <span className="text-white">YOU CHOOSE</span>
+                <span className="text-white">WHO WILL BE</span>
                 <br />
-                <span className="text-zinc-300">THE CAPTAIN.</span>
+                <span className="text-zinc-300">ELIMINATED THIS WEEK??</span>
               </h1>
             </div>
 
             {/* Editorial Context */}
             <p className="text-sm sm:text-base text-zinc-300 font-normal leading-relaxed max-w-xl">
-              For the first time, the power is in the hands of the people. Under Week 2 &ldquo;Power of People&rdquo;, audience fans vote directly for who will lead as Captain. In the house, nominations are decided by housemates who must battle through arena tasks for survival. Charan and Chaitra Rai are ELIMINATED (NO RE-ENTRY). 14 active housemates remain.
+              Under Week 2 &ldquo;Power of People&rdquo;, the decision belongs to the audience. Fans are voting to decide who they think will be eliminated this week. In the house, nominations are decided by housemates who must battle through arena tasks for survival. Charan and Chaitra Rai are ELIMINATED (NO RE-ENTRY). 14 active housemates remain.
             </p>
 
             {/* Official Match State Board */}
@@ -58,7 +58,7 @@ export const Hero = () => {
               <div className="flex items-start gap-2 px-3 py-2 rounded bg-bb-gold/10 border border-bb-gold/30 text-[11px] text-zinc-200">
                 <Vote className="w-4 h-4 text-bb-gold flex-shrink-0 mt-0.5" />
                 <span>
-                  <strong className="text-bb-gold uppercase font-bold">POWER OF PEOPLE:</strong> You Choose the Captain. Cast your vote for the housemate you want to see as Captain.
+                  <strong className="text-bb-gold uppercase font-bold">POWER OF PEOPLE:</strong> Vote for the housemate you think will be eliminated this week.
                 </span>
               </div>
 
@@ -104,7 +104,7 @@ export const Hero = () => {
                 className="px-6 py-3 rounded bg-bb-gold hover:bg-bb-gold-light text-black font-bold text-xs uppercase tracking-wider transition-colors flex items-center gap-2 shadow-sm"
               >
                 <Vote className="w-4 h-4" />
-                <span>Vote For Captain</span>
+                <span>Vote Elimination Poll</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <Link

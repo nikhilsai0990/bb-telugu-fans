@@ -136,14 +136,13 @@ test.describe("Complete User Journey & Authoritative Game State Verification", (
     await expect(page.locator("text=TASK WINNER").first()).toBeVisible();
   });
 
-  test("Polls page shows Week 2 Power of People Captain Poll OPEN with enabled vote buttons and 14 active housemates", async ({
+  test("Polls page shows Week 2 Elimination Poll OPEN with enabled vote buttons and 11 eligible housemates", async ({
     page,
   }) => {
     // 1. Check Polls page
     await page.goto("/polls");
-    await expect(page.locator("h1")).toContainText("WHO DO YOU WANT TO SEE AS CAPTAIN?");
-    await expect(page.locator("text=POWER OF PEOPLE").first()).toBeVisible();
-    await expect(page.locator("text=14 Active Housemates").first()).toBeVisible();
+    await expect(page.locator("h1")).toContainText("WHO WILL BE ELIMINATED THIS WEEK?");
+    await expect(page.locator("text=11 Active Housemates").first()).toBeVisible();
 
     // Verify voting is NOT closed
     await expect(page.locator("text=Voting is Currently Closed")).toHaveCount(0);
@@ -158,9 +157,9 @@ test.describe("Complete User Journey & Authoritative Game State Verification", (
     // Verify Housemate Nominations mechanic component on Polls page
     await expect(page.locator("[data-testid='housemate-nominations-section']")).toBeVisible();
 
-    // Verify 14 active housemates on poll card grid and NO High Risk Zone or Team badges
+    // Verify 11 eligible housemates on poll card grid and NO High Risk Zone or Team badges
     const pollCards = page.locator("div.group:has(h3)");
-    await expect(pollCards).toHaveCount(14);
+    await expect(pollCards).toHaveCount(11);
     const pollsContent = await page.content();
     expect(pollsContent).not.toContain("HIGH RISK ZONE");
     expect(pollsContent).not.toContain("RED TEAM");
@@ -168,15 +167,18 @@ test.describe("Complete User Journey & Authoritative Game State Verification", (
     expect(pollsContent).not.toContain("Red Team");
     expect(pollsContent).not.toContain("Blue Team");
 
-    // Charan and Chaitra Rai excluded from ballot
+    // Charan, Chaitra Rai, Aman, Jabardasth Naresh, Temper Vamsi excluded from ballot
     await expect(pollCards.filter({ hasText: "Charan" })).toHaveCount(0);
     await expect(pollCards.filter({ hasText: "Chaitra Rai" })).toHaveCount(0);
+    await expect(pollCards.filter({ hasText: "Aman" })).toHaveCount(0);
+    await expect(pollCards.filter({ hasText: "Jabardasth Naresh" })).toHaveCount(0);
+    await expect(pollCards.filter({ hasText: "Temper Vamsi" })).toHaveCount(0);
 
     // 2. Check News dispatches - 7 official stories (2 Week 2 + 5 historical)
     await page.goto("/news");
     await expect(page.locator("h1")).toContainText("Editorial News");
-    await expect(page.locator("text=Power of People begins in Week 2").first()).toBeVisible();
-    await expect(page.locator("text=Housemates enter the nomination battle").first()).toBeVisible();
+    await expect(page.locator("text=Shalini vs Varshini: Big Fight").first()).toBeVisible();
+    await expect(page.locator("text=Sudheer & Thrigun During Nominations").first()).toBeVisible();
     await expect(page.locator("text=No Elimination on Sunday").first()).toBeVisible();
     await expect(page.locator("text=Srushti Vyakaranam lost the Power Key").first()).toBeVisible();
     await expect(page.locator("text=Sudheer Kumar Reddy won").first()).toBeVisible();

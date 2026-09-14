@@ -141,13 +141,13 @@ export function PollDetailClient({ initialPoll }: { initialPoll: Poll }) {
           <div className="space-y-1">
             <div className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-zinc-400">
               <span className="w-2 h-2 rounded-full bg-bb-gold animate-pulse" />
-              <span>OFFICIAL FAN BALLOT &bull; WEEK 1</span>
+              <span>OFFICIAL FAN BALLOT &bull; WEEK 2</span>
             </div>
             <h1 className="font-display text-4xl sm:text-5xl uppercase tracking-tight text-white leading-none">
               {poll.title}
             </h1>
             <p className="text-xs sm:text-sm text-zinc-300 max-w-xl leading-relaxed pt-1">
-              14 active housemates in the Season 10 house (Charan and Chaitra Rai eliminated). Cast your verified fan vote to save your favorite housemate (1 vote per user per day).
+              Vote for the housemate you think will be eliminated this week (1 authenticated vote per user per day).
             </p>
           </div>
 
@@ -308,7 +308,7 @@ export function PollDetailClient({ initialPoll }: { initialPoll: Poll }) {
               className="px-8 py-3.5 rounded font-bold text-xs uppercase tracking-wider bg-white/[0.06] text-zinc-500 cursor-not-allowed border border-white/[0.08] flex items-center justify-center gap-2"
             >
               <Lock className="w-4 h-4 text-zinc-500" />
-              <span>Voting is Currently Closed</span>
+              <span>VOTING IS CURRENTLY CLOSED</span>
             </button>
           ) : !hasVoted ? (
             user ? (
@@ -326,7 +326,7 @@ export function PollDetailClient({ initialPoll }: { initialPoll: Poll }) {
                   {voting
                     ? "Submitting Vote..."
                     : selectedItem
-                    ? `Cast Vote to Save ${selectedItem.text.replace(/Save\s*/i, "").replace(/\s*\([^)]*\)/i, "").trim()}`
+                    ? `Cast Vote for ${selectedItem.text.replace(/Save\s*/i, "").replace(/Vote\s*/i, "").replace(/\s*\([^)]*\)/i, "").trim()}`
                     : "Select a Housemate to Cast Vote"}
                 </span>
               </button>

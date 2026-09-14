@@ -35,7 +35,7 @@ export const HousemateNominationsSection: React.FC = () => {
                 href="/polls"
                 className="px-5 py-2.5 rounded bg-bb-gold hover:bg-bb-gold-light text-black font-bold text-xs uppercase tracking-wider transition-colors inline-flex items-center gap-2 shadow"
               >
-                <span>Captain Poll</span>
+                <span>Elimination Poll</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>

@@ -622,33 +622,33 @@ export function isVotingScheduleOpen(
   }
 }
 
-// Fallback Polls — Week 2 Power of People Captain Poll (Primary) + Week 1 Eviction Poll
-// Week 2 Captain Poll is ACTIVE!
+// Fallback Polls — Week 2 Power of People Elimination Poll (Primary) + Week 1 Eviction Poll
+// Week 2 Elimination Poll is ACTIVE!
 export const fallbackPolls: Poll[] = [
   {
-    id: "poll-captain-week-02",
-    title: "Power of People — You Choose the Captain",
-    description: "For the first time, the power is in the hands of the people. Vote for the housemate you want to see as Captain.",
-    category: "Captaincy",
+    id: "poll-elimination-week-02",
+    title: "WHO WILL BE ELIMINATED THIS WEEK?",
+    description: "Vote for the housemate you think will be eliminated this week.",
+    category: "Elimination",
     status: "ACTIVE",
     totalVotes: 0,
     options: [
-      { id: "opt-captain-c-01", contestantId: "c-01", text: "Vote Debjani Modak for Captain", imageUrl: "/images/contestants/debjani-modak.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
-      { id: "opt-captain-c-02", contestantId: "c-02", text: "Vote Auto Ram Prasad for Captain", imageUrl: "/images/contestants/auto-ram-prasad.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
-      { id: "opt-captain-c-03", contestantId: "c-03", text: "Vote Jabardasth Naresh for Captain", imageUrl: "/images/contestants/jabardasth-naresh.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
-      { id: "opt-captain-c-04", contestantId: "c-04", text: "Vote Thrigun for Captain", imageUrl: "/images/contestants/thrigun.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
-      { id: "opt-captain-c-05", contestantId: "c-05", text: "Vote Mukesh Gowda for Captain", imageUrl: "/images/contestants/mukesh-gowda.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
-      { id: "opt-captain-c-06", contestantId: "c-06", text: "Vote Varshini Sounderajan for Captain", imageUrl: "/images/contestants/varshini-sounderajan.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
-      { id: "opt-captain-c-07", contestantId: "c-07", text: "Vote Temper Vamsi for Captain", imageUrl: "/images/contestants/temper-vamsi.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
-      { id: "opt-captain-c-08", contestantId: "c-08", text: "Vote Krishnudu for Captain", imageUrl: "/images/contestants/krishnudu.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
-      { id: "opt-captain-c-09", contestantId: "c-09", text: "Vote Sudheer Kumar Reddy for Captain", imageUrl: "/images/contestants/sudheer-kumar-reddy.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-elim-c-01", contestantId: "c-01", text: "Vote Debjani Modak", imageUrl: "/images/contestants/debjani-modak.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-elim-c-02", contestantId: "c-02", text: "Vote Auto Ram Prasad", imageUrl: "/images/contestants/auto-ram-prasad.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
+      // c-03 Jabardasth Naresh - EXCLUDED from Week 2 Elimination Poll
+      { id: "opt-elim-c-04", contestantId: "c-04", text: "Vote Thrigun", imageUrl: "/images/contestants/thrigun.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-elim-c-05", contestantId: "c-05", text: "Vote Mukesh Gowda", imageUrl: "/images/contestants/mukesh-gowda.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-elim-c-06", contestantId: "c-06", text: "Vote Varshini Sounderajan", imageUrl: "/images/contestants/varshini-sounderajan.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
+      // c-07 Temper Vamsi - EXCLUDED from Week 2 Elimination Poll
+      { id: "opt-elim-c-08", contestantId: "c-08", text: "Vote Krishnudu", imageUrl: "/images/contestants/krishnudu.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-elim-c-09", contestantId: "c-09", text: "Vote Sudheer Kumar Reddy", imageUrl: "/images/contestants/sudheer-kumar-reddy.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
       // Chaitra Rai (c-10) is ELIMINATED - excluded from voting
-      { id: "opt-captain-c-11", contestantId: "c-11", text: "Vote Rohit Naidu for Captain", imageUrl: "/images/contestants/rohit-naidu.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
-      { id: "opt-captain-c-12", contestantId: "c-12", text: "Vote Aman for Captain", imageUrl: "/images/contestants/aman.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-elim-c-11", contestantId: "c-11", text: "Vote Rohit Naidu", imageUrl: "/images/contestants/rohit-naidu.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
+      // c-12 Aman - EXCLUDED from Week 2 Elimination Poll
       // Charan (c-13) is ELIMINATED - excluded from voting
-      { id: "opt-captain-c-14", contestantId: "c-14", text: "Vote Shalini for Captain", imageUrl: "/images/contestants/shalini.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
-      { id: "opt-captain-c-15", contestantId: "c-15", text: "Vote Srushti Vyakaranam for Captain", imageUrl: "/images/contestants/srushti-vyakaranam.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
-      { id: "opt-captain-c-16", contestantId: "c-16", text: "Vote Singer Jhansi for Captain", imageUrl: "/images/contestants/singer-jhansi.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-elim-c-14", contestantId: "c-14", text: "Vote Shalini", imageUrl: "/images/contestants/shalini.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-elim-c-15", contestantId: "c-15", text: "Vote Srushti Vyakaranam", imageUrl: "/images/contestants/srushti-vyakaranam.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
+      { id: "opt-elim-c-16", contestantId: "c-16", text: "Vote Singer Jhansi", imageUrl: "/images/contestants/singer-jhansi.webp", votesCount: 0, percentage: 0, zone: "NORMAL", isHighRiskZone: false },
     ],
     startsAt: "2026-09-13T00:00:00+05:30",
     endsAt: "2026-09-18T23:59:59+05:30",
@@ -687,12 +687,12 @@ export const fallbackPolls: Poll[] = [
 export const fallbackNews: NewsItem[] = [
   {
     id: "news-w02-01",
-    title: "Power of People begins in Week 2 — audience gets the power to choose the Captain.",
-    slug: "power-of-people-begins-in-week-2-audience-gets-power-to-choose-captain",
-    summary: "Bigg Boss Telugu Season 10 introduces the groundbreaking 'Power of People' initiative, giving fans direct authority to elect the house Captain.",
-    content: "For the first time in Bigg Boss Telugu history, the ultimate authority shifts to the audience. Under the 'Power of People' initiative in Week 2, viewers hold the key to captaincy, voting directly for the housemate they want to see lead the house. The official audience captain poll is now live.",
-    category: "Captaincy",
-    imageUrl: "/images/contestants/debjani-modak.webp",
+    title: "Shalini vs Varshini: Big Fight",
+    slug: "shalini-vs-varshini-big-fight",
+    summary: "Shalini and Varshini had a major confrontation in the house.",
+    content: "Shalini and Varshini had a major confrontation in the house.",
+    category: "House Dynamics",
+    imageUrl: "/images/contestants/shalini.webp",
     viewsCount: 0,
     isTrending: true,
     isPublished: true,
@@ -701,12 +701,12 @@ export const fallbackNews: NewsItem[] = [
   },
   {
     id: "news-w02-02",
-    title: "Housemates enter the nomination battle — nominations are decided inside the house, while nominated contestants must fight through the game.",
-    slug: "housemates-enter-nomination-battle-nominations-decided-inside-house",
-    summary: "Week 2 nomination dynamics unfold inside the house as housemates cast internal votes, leaving nominated contenders to battle for survival in the arena.",
-    content: "The intensity reaches a boiling point in Bigg Boss Telugu Season 10 as Week 2 nominations get underway. Unlike public voting nominations, housemates decide the nominations face-to-face inside the house. Those put on the block must prove their mettle through physical, mental, and endurance challenges to stay alive in the game.",
+    title: "Sudheer & Thrigun During Nominations",
+    slug: "sudheer-and-thrigun-during-nominations",
+    summary: "Sudheer and Thrigun were involved during the nomination process.",
+    content: "Sudheer and Thrigun were involved during the nomination process.",
     category: "Nominations",
-    imageUrl: "/images/contestants/auto-ram-prasad.webp",
+    imageUrl: "/images/contestants/sudheer-kumar-reddy.webp",
     viewsCount: 0,
     isTrending: true,
     isPublished: true,

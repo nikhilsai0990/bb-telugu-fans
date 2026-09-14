@@ -35,9 +35,16 @@ export const TodayHighlights: React.FC<{ news: NewsItem[] }> = ({ news }) => {
         {/* 5-Story Editorial Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
           {news.slice(0, 5).map((item, idx) => {
+            const isShaliniVarshini =
+              item.slug.includes("shalini") ||
+              item.slug.includes("varshini") ||
+              item.title.toLowerCase().includes("shalini vs varshini");
+            const isSudheerThrigun =
+              item.slug.includes("sudheer-and-thrigun") ||
+              item.title.toLowerCase().includes("sudheer & thrigun");
             const isEliminated = item.slug.includes("eliminated") || item.slug.includes("re-entry") || item.slug.includes("charan");
             const isPowerKey = item.slug.includes("power-key") || item.slug.includes("srushti");
-            const isSudheer = item.slug.includes("sudheer");
+            const isSudheer = item.slug.includes("sudheer") && !isSudheerThrigun;
             const isTeamTask = item.slug.includes("krishnudu") || item.slug.includes("naresh");
             const isNoElimination = item.slug.includes("no-elimination");
 
@@ -61,13 +68,73 @@ export const TodayHighlights: React.FC<{ news: NewsItem[] }> = ({ news }) => {
               >
                 {/* Contestant Portrait Side */}
                 <div className={`sm:w-2/5 relative ${idx === 0 ? "h-64 sm:h-auto" : "h-52 sm:h-auto"} min-h-[200px] bg-black flex-shrink-0 overflow-hidden`}>
-                  <img
-                    src={item.imageUrl || fallbackImage}
-                    alt={item.title}
-                    className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500 filter brightness-95"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t sm:bg-gradient-to-r from-transparent to-[#13141B]/90 sm:to-[#13141B]" />
-                  <span className="absolute top-3 left-3 text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded bg-black/80 text-white border border-white/20">
+                  {isShaliniVarshini ? (
+                    <div className="grid grid-cols-2 h-full w-full relative">
+                      {/* Left: Shalini */}
+                      <div className="relative h-full overflow-hidden">
+                        <img
+                          src="/images/contestants/shalini.webp"
+                          alt="Shalini"
+                          className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500 filter brightness-95"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                        <span className="absolute bottom-2 left-2 text-[10px] font-extrabold uppercase tracking-wider text-white bg-black/70 px-1.5 py-0.5 rounded border border-white/20">
+                          Shalini
+                        </span>
+                      </div>
+                      {/* Right: Varshini Sounderajan */}
+                      <div className="relative h-full overflow-hidden border-l border-white/10">
+                        <img
+                          src="/images/contestants/varshini-sounderajan.webp"
+                          alt="Varshini Sounderajan"
+                          className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500 filter brightness-95"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                        <span className="absolute bottom-2 right-2 text-[10px] font-extrabold uppercase tracking-wider text-white bg-black/70 px-1.5 py-0.5 rounded border border-white/20">
+                          Varshini
+                        </span>
+                      </div>
+                      {/* VS Center Badge */}
+                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+                        <span className="px-2 py-0.5 rounded-full bg-red-600 text-white font-black text-[9px] tracking-wider border border-white/40 shadow-lg">
+                          VS
+                        </span>
+                      </div>
+                    </div>
+                  ) : isSudheerThrigun ? (
+                    <div className="grid grid-cols-2 h-full w-full relative">
+                      <div className="relative h-full overflow-hidden">
+                        <img
+                          src="/images/contestants/sudheer-kumar-reddy.webp"
+                          alt="Sudheer Kumar Reddy"
+                          className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500 filter brightness-95"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                        <span className="absolute bottom-2 left-2 text-[10px] font-extrabold uppercase tracking-wider text-white bg-black/70 px-1.5 py-0.5 rounded border border-white/20">
+                          Sudheer
+                        </span>
+                      </div>
+                      <div className="relative h-full overflow-hidden border-l border-white/10">
+                        <img
+                          src="/images/contestants/thrigun.webp"
+                          alt="Thrigun"
+                          className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500 filter brightness-95"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                        <span className="absolute bottom-2 right-2 text-[10px] font-extrabold uppercase tracking-wider text-white bg-black/70 px-1.5 py-0.5 rounded border border-white/20">
+                          Thrigun
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <img
+                      src={item.imageUrl || fallbackImage}
+                      alt={item.title}
+                      className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500 filter brightness-95"
+                    />
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t sm:bg-gradient-to-r from-transparent to-[#13141B]/90 sm:to-[#13141B] pointer-events-none" />
+                  <span className="absolute top-3 left-3 text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded bg-black/80 text-white border border-white/20 z-10">
                     {item.category || "Bulletin"}
                   </span>
                 </div>
@@ -92,7 +159,17 @@ export const TodayHighlights: React.FC<{ news: NewsItem[] }> = ({ news }) => {
 
                   {/* Clarification or Read Link */}
                   <div className="pt-2 border-t border-white/[0.06] flex items-center justify-between text-xs">
-                    {isNoElimination ? (
+                    {isShaliniVarshini ? (
+                      <span className="text-[10px] font-bold text-red-400 uppercase tracking-tight flex items-center gap-1">
+                        <AlertCircle className="w-3.5 h-3.5 text-red-400" />
+                        Big Fight &bull; House Confrontation
+                      </span>
+                    ) : isSudheerThrigun ? (
+                      <span className="text-[10px] font-bold text-bb-gold uppercase tracking-tight flex items-center gap-1">
+                        <CheckCircle className="w-3.5 h-3.5 text-bb-gold" />
+                        Nominations Process
+                      </span>
+                    ) : isNoElimination ? (
                       <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-tight flex items-center gap-1">
                         <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
                         No Eviction on Sunday &bull; All 14 Safe

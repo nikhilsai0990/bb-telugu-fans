@@ -67,12 +67,15 @@ if (!g.__bb_polls || g.__bb_polls.length === 0) {
   // Deep clone fallbackPolls
   g.__bb_polls = JSON.parse(JSON.stringify(fallbackPolls));
 } else {
-  // Ensure poll-captain-week-02 has active status and dates
-  const captainPoll = g.__bb_polls.find((p: any) => p.id === "poll-captain-week-02");
-  if (captainPoll) {
-    captainPoll.status = "ACTIVE";
-    captainPoll.startsAt = "2026-09-13T00:00:00+05:30";
-    captainPoll.endsAt = "2026-09-18T23:59:59+05:30";
+  // Ensure poll-elimination-week-02 has active status and dates
+  const elimPoll = g.__bb_polls.find((p: any) => p.id === "poll-elimination-week-02" || p.id === "poll-captain-week-02");
+  if (elimPoll) {
+    elimPoll.id = "poll-elimination-week-02";
+    elimPoll.title = "WHO WILL BE ELIMINATED THIS WEEK?";
+    elimPoll.description = "Vote for the housemate you think will be eliminated this week.";
+    elimPoll.status = "ACTIVE";
+    elimPoll.startsAt = "2026-09-13T00:00:00+05:30";
+    elimPoll.endsAt = "2026-09-18T23:59:59+05:30";
   }
 }
 
@@ -181,8 +184,11 @@ export async function GET(req: NextRequest, { params }: { params: { slug: string
 
   // 4. Single Poll (/polls/:id)
   if (slug.length === 2 && slug[0] === "polls") {
-    const pollId = slug[1];
-    const poll = polls.find((p) => p.id === pollId) || fallbackPolls.find((p) => p.id === pollId);
+    let pollId = slug[1];
+    let poll = polls.find((p) => p.id === pollId) || fallbackPolls.find((p) => p.id === pollId);
+    if (!poll && (pollId === "poll-captain-week-02" || pollId === "poll-elimination-week-02")) {
+      poll = polls.find((p) => p.id === "poll-elimination-week-02" || p.id === "poll-captain-week-02") || fallbackPolls[0];
+    }
     if (!poll) {
       return NextResponse.json({ message: "Poll not found", statusCode: 404 }, { status: 404 });
     }
@@ -196,17 +202,24 @@ export async function GET(req: NextRequest, { params }: { params: { slug: string
 
   // 5. Vote Status (/polls/:id/vote-status)
   if (slug.length === 3 && slug[0] === "polls" && slug[2] === "vote-status") {
-    const pollId = slug[1];
+    let pollId = slug[1];
     const user = extractUserFromReq(req);
     if (!user) {
       return NextResponse.json({ hasVoted: false });
     }
     const todayStr = new Date().toISOString().slice(0, 10);
-    const existing = votes.find((v) => v.pollId === pollId && v.userId === user.id && v.date === todayStr);
+    const existing = votes.find(
+      (v) => (v.pollId === pollId || (pollId === "poll-elimination-week-02" && v.pollId === "poll-captain-week-02") || (pollId === "poll-captain-week-02" && v.pollId === "poll-elimination-week-02")) && v.userId === user.id && v.date === todayStr
+    );
     if (existing) {
-      const poll = polls.find((p) => p.id === pollId);
+      const poll = polls.find((p) => p.id === pollId || p.id === "poll-elimination-week-02") || fallbackPolls[0];
       const opt = poll?.options?.find((o: any) => o.id === existing.optionId);
-      let contestantName = opt?.text?.replace(/Save\s*/i, "")?.replace(/Vote\s*/i, "")?.replace(/\s*for Captain/i, "")?.trim();
+      let contestantName = opt?.text
+        ?.replace(/Save\s*/i, "")
+        ?.replace(/Vote\s*/i, "")
+        ?.replace(/\s*for Captain/i, "")
+        ?.replace(/\s*\([^)]*\)/i, "")
+        ?.trim();
       return NextResponse.json({
         hasVoted: true,
         optionId: existing.optionId,
@@ -360,7 +373,7 @@ export async function POST(req: NextRequest, { params }: { params: { slug: strin
 
   // 4. Cast Vote (/polls/:id/votes)
   if (slug.length === 3 && slug[0] === "polls" && slug[2] === "votes") {
-    const pollId = slug[1];
+    let pollId = slug[1];
     const body = await req.json().catch(() => ({}));
     const optionId = body.optionId;
 
@@ -375,6 +388,10 @@ export async function POST(req: NextRequest, { params }: { params: { slug: strin
 
     // 4b. Find Poll
     let poll = polls.find((p) => p.id === pollId);
+    if (!poll && (pollId === "poll-captain-week-02" || pollId === "poll-elimination-week-02")) {
+      poll = polls.find((p) => p.id === "poll-elimination-week-02" || p.id === "poll-captain-week-02") || fallbackPolls[0];
+      if (poll) pollId = poll.id;
+    }
     if (!poll) {
       return NextResponse.json({ message: "Poll does not exist", statusCode: 404 }, { status: 404 });
     }
@@ -394,14 +411,17 @@ export async function POST(req: NextRequest, { params }: { params: { slug: strin
       return NextResponse.json({ message: "Selected option does not belong to this poll", statusCode: 400 }, { status: 400 });
     }
 
-    // 4e. Validate not eliminated
-    if (option.contestantId === "c-10" || option.contestantId === "c-13") {
-      return NextResponse.json({ message: "Voting is not permitted for eliminated contestants.", statusCode: 400 }, { status: 400 });
+    // 4e. Validate not eliminated or ineligible for Week 2 poll
+    const INELIGIBLE_IDS = ["c-12", "c-03", "c-07", "c-10", "c-13"];
+    if (option.contestantId && INELIGIBLE_IDS.includes(option.contestantId)) {
+      return NextResponse.json({ message: "Contestant is not eligible for this elimination poll.", statusCode: 400 }, { status: 400 });
     }
 
     // 4f. Check duplicate vote today (1 vote per user per day/poll)
     const todayStr = new Date().toISOString().slice(0, 10);
-    const existing = votes.find((v) => v.pollId === pollId && v.userId === user.id && v.date === todayStr);
+    const existing = votes.find(
+      (v) => (v.pollId === pollId || (pollId === "poll-elimination-week-02" && v.pollId === "poll-captain-week-02") || (pollId === "poll-captain-week-02" && v.pollId === "poll-elimination-week-02")) && v.userId === user.id && v.date === todayStr
+    );
     if (existing) {
       return NextResponse.json(
         {
@@ -428,6 +448,7 @@ export async function POST(req: NextRequest, { params }: { params: { slug: strin
       .replace(/Save\s*/i, "")
       .replace(/Vote\s*/i, "")
       .replace(/\s*for Captain/i, "")
+      .replace(/\s*\([^)]*\)/i, "")
       .trim();
 
     return NextResponse.json({

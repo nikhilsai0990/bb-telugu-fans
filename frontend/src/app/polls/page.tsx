@@ -22,7 +22,7 @@ export default function PollsPage() {
   useEffect(() => {
     // 1. Immediate sync check from localStorage
     const saved = typeof window !== "undefined"
-      ? (localStorage.getItem("bb_voted_poll-captain-week-02") || localStorage.getItem("bb_voted_poll-eviction-01"))
+      ? (localStorage.getItem("bb_voted_poll-elimination-week-02") || localStorage.getItem("bb_voted_poll-captain-week-02") || localStorage.getItem("bb_voted_poll-eviction-01"))
       : null;
     if (saved) {
       try {
@@ -52,7 +52,7 @@ export default function PollsPage() {
               const opt = currentPoll.options.find((o) => o.id === status.optionId);
               if (opt) {
                 setVotedContestantName(
-                  opt.text.replace(/Save\s*/i, "").replace(/Vote\s*/i, "").replace(/\s*for Captain/i, "").trim()
+                  opt.text.replace(/Save\s*/i, "").replace(/Vote\s*/i, "").replace(/\s*for Captain/i, "").replace(/\s*\([^)]*\)/i, "").trim()
                 );
               }
             }
@@ -61,6 +61,7 @@ export default function PollsPage() {
             setSelectedOption(null);
             setVotedContestantName(null);
             if (typeof window !== "undefined") {
+              localStorage.removeItem("bb_voted_poll-elimination-week-02");
               localStorage.removeItem("bb_voted_poll-captain-week-02");
               localStorage.removeItem("bb_voted_poll-eviction-01");
               localStorage.removeItem(`bb_voted_${currentPoll.id}`);
@@ -76,23 +77,27 @@ export default function PollsPage() {
 
   const selectedItem = poll?.options.find((o) => o.id === selectedOption);
 
-  const handleVote = async () => {
-    if (!poll || !selectedOption || hasVoted) return;
+  const handleVote = async (targetOptionId?: string) => {
+    const optId = targetOptionId || selectedOption;
+    if (!poll || !optId || hasVoted) return;
     if (!user) {
       setErrorMsg("Authentication required to cast a vote. Please sign in or register.");
       return;
     }
+    setSelectedOption(optId);
     setVoting(true);
     setErrorMsg(null);
     setSuccessMsg(null);
 
+    const item = poll.options.find((o) => o.id === optId);
+
     try {
-      const res = await api.vote(poll.id, selectedOption, token || undefined);
+      const res = await api.vote(poll.id, optId, token || undefined);
       setHasVoted(true);
       const chosenName =
         res.contestantName ||
-        (selectedItem
-          ? selectedItem.text.replace(/Save\s*/i, "").replace(/\s*\([^)]*\)/i, "").trim()
+        (item
+          ? item.text.replace(/Save\s*/i, "").replace(/Vote\s*/i, "").replace(/\s*for Captain/i, "").replace(/\s*\([^)]*\)/i, "").trim()
           : "your selected housemate");
       setVotedContestantName(chosenName);
       setSuccessMsg(res.message || "Your verified vote has been recorded securely.");
@@ -126,10 +131,10 @@ export default function PollsPage() {
           <span>WEEK 2 &bull; POWER OF PEOPLE</span>
         </div>
         <h1 className="font-display text-4xl sm:text-6xl uppercase tracking-tight text-white leading-none">
-          WHO DO YOU WANT TO SEE AS CAPTAIN?
+          WHO WILL BE ELIMINATED THIS WEEK?
         </h1>
         <p className="text-sm text-zinc-300 max-w-2xl leading-relaxed">
-          For the first time, the power is in the hands of the people. Vote for the housemate you want to see as Captain. 14 active housemates (Charan and Chaitra Rai eliminated). Select your choice below and submit your verified fan vote (1 vote per authenticated account).
+          Vote for the housemate you think will be eliminated this week.
         </p>
       </div>
 
@@ -186,7 +191,7 @@ export default function PollsPage() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/[0.08] pb-4">
             <div className="flex items-center gap-3">
               <span className="text-xs font-bold uppercase tracking-wider text-white">
-                14 Active Housemates
+                11 Eligible Candidates
               </span>
               <span className="text-zinc-600">&bull;</span>
               <span className="text-xs font-bold uppercase tracking-wider text-bb-gold">
@@ -195,9 +200,13 @@ export default function PollsPage() {
             </div>
 
             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider">
-              {poll.totalVotes === 0 ? (
+              {poll.status === "CLOSED" ? (
+                <span className="text-zinc-400 bg-white/[0.04] px-3 py-1 rounded border border-white/10">
+                  SCHEDULE ENDED
+                </span>
+              ) : poll.totalVotes === 0 ? (
                 <span className="text-bb-gold bg-bb-gold/10 px-3 py-1 rounded border border-bb-gold/25">
-                  NO VOTES YET &bull; CAST YOUR VOTE
+                  0 VOTES (0%) &bull; CAST FIRST VOTE
                 </span>
               ) : (
                 <span className="text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded border border-emerald-500/25">
@@ -216,7 +225,7 @@ export default function PollsPage() {
                   ✓ YOUR VOTE IS ALREADY CAST
                 </div>
                 <p className="text-sm text-zinc-200 font-medium">
-                  You voted for <span className="text-white font-bold">{votedContestantName || (selectedItem ? selectedItem.text.replace(/Save\s*/i, "").replace(/\s*\([^)]*\)/i, "").trim() : "your selected housemate")}</span>.
+                  You voted for <span className="text-white font-bold">{votedContestantName || (selectedItem ? selectedItem.text.replace(/Save\s*/i, "").replace(/Vote\s*/i, "").replace(/\s*for Captain/i, "").replace(/\s*\([^)]*\)/i, "").trim() : "your selected housemate")}</span>.
                 </p>
               </div>
             </div>
@@ -236,7 +245,7 @@ export default function PollsPage() {
             </div>
           )}
 
-          {/* 14-Candidate Grid */}
+          {/* Eligible Candidate Cards Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
             {poll.options.map((option) => {
               const isSelected = selectedOption === option.id;
@@ -250,13 +259,20 @@ export default function PollsPage() {
                 .replace(/\s*\([^)]*\)/i, "")
                 .trim();
 
+              const votes = option.votesCount || 0;
+              const percentage = poll.totalVotes > 0 ? ((votes / poll.totalVotes) * 100).toFixed(1) : "0.0";
+              const isVotedChoice = hasVoted && (
+                (votedContestantName && cleanName.toLowerCase() === votedContestantName.toLowerCase()) ||
+                selectedOption === option.id
+              );
+
               return (
                 <div
                   key={option.id}
                   onClick={() => !hasVoted && poll.status !== "CLOSED" && setSelectedOption(option.id)}
-                  className={`group relative p-3.5 rounded-lg border transition-all flex flex-col justify-between min-h-[115px] ${
+                  className={`group relative p-3.5 rounded-lg border transition-all flex flex-col justify-between min-h-[140px] ${
                     hasVoted || poll.status === "CLOSED"
-                      ? "cursor-default bg-white/[0.02] border-white/[0.06]"
+                      ? "bg-white/[0.02] border-white/[0.06]"
                       : isSelected
                       ? "bg-bb-gold/10 border-bb-gold ring-1 ring-bb-gold cursor-pointer"
                       : "bg-[#13141B] border-white/[0.07] hover:border-white/20 hover:bg-[#181923] cursor-pointer"
@@ -264,7 +280,7 @@ export default function PollsPage() {
                 >
                   <div className="flex items-start gap-3">
                     {/* Real Avatar */}
-                    <div className="relative w-12 h-12 rounded overflow-hidden flex-shrink-0 border border-white/10 bg-black">
+                    <div className="relative w-14 h-14 rounded overflow-hidden flex-shrink-0 border border-white/10 bg-black">
                       {option.imageUrl ? (
                         <img
                           src={option.imageUrl}
@@ -283,24 +299,59 @@ export default function PollsPage() {
                       <h3 className="font-display text-xl uppercase tracking-wide text-white group-hover:text-bb-gold transition-colors leading-tight truncate">
                         {cleanName}
                       </h3>
+                      <span className="text-[10px] text-zinc-400 block mt-0.5">
+                        Active Housemate
+                      </span>
+                      {(hasVoted || poll.status === "CLOSED") && (
+                        <div className="mt-1 text-xs">
+                          <span className="font-display font-bold text-bb-gold">{votes} Votes</span>
+                          <span className="text-zinc-500 text-[10px] ml-1.5">({percentage}%)</span>
+                        </div>
+                      )}
                     </div>
                   </div>
 
-                  {/* Radio Selector */}
-                  <div className="pt-2 border-t border-white/[0.05] flex items-center justify-between mt-2">
-                    <span className="text-[10px] text-zinc-400 font-semibold uppercase tracking-wider">
-                      {hasVoted || poll.status === "CLOSED" ? `${option.votesCount || 0} Votes` : "Select Housemate"}
-                    </span>
-                    {!hasVoted && poll.status !== "CLOSED" && (
-                      <div
-                        className={`w-4 h-4 rounded-full border flex items-center justify-center transition-colors ${
+                  {/* Card Action & Vote Button */}
+                  <div className="pt-2.5 border-t border-white/[0.06] flex items-center justify-between mt-2">
+                    {poll.status === "CLOSED" ? (
+                      <span className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider">
+                        Voting Closed
+                      </span>
+                    ) : hasVoted ? (
+                      isVotedChoice ? (
+                        <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
+                          YOUR VOTE
+                        </span>
+                      ) : (
+                        <span className="text-[10px] text-zinc-500 font-semibold uppercase">
+                          Recorded
+                        </span>
+                      )
+                    ) : user ? (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleVote(option.id);
+                        }}
+                        disabled={voting}
+                        className={`w-full py-1.5 px-3 rounded font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 ${
                           isSelected
-                            ? "border-bb-gold bg-bb-gold text-black"
-                            : "border-white/20 group-hover:border-white/40"
+                            ? "bg-bb-gold text-black shadow"
+                            : "bg-white/[0.06] hover:bg-bb-gold hover:text-black text-white border border-white/10"
                         }`}
                       >
-                        {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-black" />}
-                      </div>
+                        <Vote className="w-3.5 h-3.5" />
+                        <span>Vote</span>
+                      </button>
+                    ) : (
+                      <Link
+                        href="/login?redirect=/polls"
+                        onClick={(e) => e.stopPropagation()}
+                        className="w-full py-1.5 px-3 rounded font-bold text-xs uppercase tracking-wider bg-white/[0.06] hover:bg-bb-gold hover:text-black text-zinc-300 border border-white/10 flex items-center justify-center gap-1.5 transition-all"
+                      >
+                        <Vote className="w-3.5 h-3.5" />
+                        <span>Vote</span>
+                      </Link>
                     )}
                   </div>
                 </div>
@@ -321,12 +372,12 @@ export default function PollsPage() {
                 className="px-8 py-3.5 rounded font-bold text-xs uppercase tracking-wider bg-white/[0.06] text-zinc-500 cursor-not-allowed border border-white/[0.08] flex items-center justify-center gap-2"
               >
                 <Lock className="w-4 h-4 text-zinc-500" />
-                <span>Voting is Currently Closed</span>
+                <span>VOTING IS CURRENTLY CLOSED</span>
               </button>
             ) : !hasVoted ? (
               user ? (
                 <button
-                  onClick={handleVote}
+                  onClick={() => handleVote()}
                   disabled={!selectedOption || voting}
                   className={`px-8 py-3.5 rounded font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 ${
                     !selectedOption || voting
@@ -339,7 +390,7 @@ export default function PollsPage() {
                     {voting
                       ? "Submitting Vote..."
                       : selectedItem
-                      ? `Vote for ${selectedItem.text.replace(/Save\s*/i, "").replace(/Vote\s*/i, "").replace(/\s*for Captain/i, "").trim()} as Captain`
+                      ? `Vote for ${selectedItem.text.replace(/Save\s*/i, "").replace(/Vote\s*/i, "").replace(/\s*for Captain/i, "").replace(/\s*\([^)]*\)/i, "").trim()}`
                       : "Select a Housemate to Vote"}
                   </span>
                 </button>

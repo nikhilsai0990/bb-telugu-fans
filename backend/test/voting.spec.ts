@@ -353,17 +353,17 @@ describe("Voting System - Comprehensive Automated Tests", () => {
     expect(db.votes.size).toBe(initialVotesSize);
   });
 
-  // TC-VOTE-013: Week 2 Captain Poll (poll-captain-week-02) is ACTIVE and open for audience voting
-  it("TC-VOTE-013: Week 2 Captain Poll (poll-captain-week-02) is ACTIVE and accepts vote", async () => {
-    const poll = db.polls.get("poll-captain-week-02")!;
+  // TC-VOTE-013: Week 2 Elimination Poll (poll-elimination-week-02) is ACTIVE and open for audience voting
+  it("TC-VOTE-013: Week 2 Elimination Poll (poll-elimination-week-02) is ACTIVE and accepts vote", async () => {
+    const poll = db.polls.get("poll-elimination-week-02")!;
     expect(poll).toBeDefined();
     expect(poll.status).toBe("ACTIVE");
     expect(poll.totalVotes).toBe(0);
 
     const result = await pollsService.castVote({
-      pollId: "poll-captain-week-02",
-      optionId: "opt-captain-c-01",
-      userId: "captain-voter-001",
+      pollId: "poll-elimination-week-02",
+      optionId: "opt-elim-c-01",
+      userId: "elim-voter-001",
       clientIp: "192.168.1.188",
     });
 
@@ -392,11 +392,11 @@ describe("Voting System - Comprehensive Automated Tests", () => {
     ).rejects.toThrow(BadRequestException);
   });
 
-  // TC-VOTE-015: Duplicate vote in poll-captain-week-02 rejected with ALREADY_VOTED
-  it("TC-VOTE-015: Duplicate vote in poll-captain-week-02 rejected with ALREADY_VOTED", async () => {
-    const pollId = "poll-captain-week-02";
-    const optionId = "opt-captain-c-02";
-    const userId = "captain-duplicate-tester";
+  // TC-VOTE-015: Duplicate vote in poll-elimination-week-02 rejected with ALREADY_VOTED
+  it("TC-VOTE-015: Duplicate vote in poll-elimination-week-02 rejected with ALREADY_VOTED", async () => {
+    const pollId = "poll-elimination-week-02";
+    const optionId = "opt-elim-c-01";
+    const userId = "elim-duplicate-tester";
     const clientIp = "192.168.1.190";
 
     const first = await pollsService.castVote({
@@ -410,7 +410,7 @@ describe("Voting System - Comprehensive Automated Tests", () => {
     await expect(
       pollsService.castVote({
         pollId,
-        optionId: "opt-captain-c-03",
+        optionId: "opt-elim-c-02",
         userId,
         clientIp,
       })
