@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   Trophy,
+  Crown,
   ArrowLeft,
   Vote,
   MessageSquare,
@@ -38,6 +39,15 @@ export default async function ContestantDetailPage({
     contestant.id === "c-02" ||
     contestant.id === "c-11" ||
     contestant.id === "c-07";
+
+  const isCaptaincyContender =
+    Boolean(contestant.isCaptaincyContender) ||
+    [
+      "c-04", "c-16", "c-12", "c-14", "c-05", "c-01", "c-02", "c-11",
+    ].includes(contestant.id) ||
+    [
+      "thrigun", "singer-jhansi", "aman", "shalini", "mukesh-gowda", "debjani-modak", "auto-ram-prasad", "rohit-naidu",
+    ].includes(contestant.slug);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 space-y-10">
@@ -83,6 +93,11 @@ export default async function ContestantDetailPage({
                 {isTaskWinner && (
                   <span className="px-2.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
                     <Trophy className="w-3.5 h-3.5 text-emerald-400" /> TASK WINNER
+                  </span>
+                )}
+                {isCaptaincyContender && !isEliminated && (
+                  <span className="px-2.5 py-0.5 rounded bg-bb-gold/20 text-bb-gold border border-bb-gold/50 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+                    <Crown className="w-3.5 h-3.5 text-bb-gold" /> CAPTAINCY CONTENDER
                   </span>
                 )}
               </div>

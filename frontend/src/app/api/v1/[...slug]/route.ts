@@ -29,6 +29,15 @@ interface ServerVote {
   date: string; // YYYY-MM-DD
 }
 
+interface ServerPasswordReset {
+  id: string;
+  userId: string;
+  tokenHash: string;
+  expiresAt: string; // ISO string
+  used: boolean;
+  createdAt: string;
+}
+
 const g = global as any;
 if (!g.__bb_users) {
   g.__bb_users = new Map<string, ServerUser>();
@@ -79,9 +88,18 @@ if (!g.__bb_polls || g.__bb_polls.length === 0) {
   }
 }
 
+if (!g.__bb_resets) {
+  g.__bb_resets = new Map<string, ServerPasswordReset>();
+}
+if (!g.__bb_reset_ratelimits) {
+  g.__bb_reset_ratelimits = new Map<string, { count: number; firstRequest: number }>();
+}
+
 const users: Map<string, ServerUser> = g.__bb_users;
 const votes: ServerVote[] = g.__bb_votes;
 const polls: any[] = g.__bb_polls;
+const passwordResets: Map<string, ServerPasswordReset> = g.__bb_resets;
+const resetRateLimits: Map<string, { count: number; firstRequest: number }> = g.__bb_reset_ratelimits;
 
 function hashPassword(plain: string): string {
   return crypto.createHmac("sha256", PWD_SALT).update(plain).digest("hex");
@@ -268,6 +286,21 @@ export async function GET(req: NextRequest, { params }: { params: { slug: string
     return NextResponse.json(fallbackNews);
   }
 
+  // 10. Verify Reset Token (/auth/verify-reset-token)
+  if (path === "auth/verify-reset-token") {
+    const url = new URL(req.url);
+    const token = (url.searchParams.get("token") || "").trim();
+    if (!token) {
+      return NextResponse.json({ valid: false, message: "Token is required." }, { status: 400 });
+    }
+    const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
+    const record = passwordResets.get(tokenHash);
+    if (!record || record.used || new Date(record.expiresAt).getTime() < Date.now()) {
+      return NextResponse.json({ valid: false, message: "Invalid or expired reset token." }, { status: 400 });
+    }
+    return NextResponse.json({ valid: true });
+  }
+
   return NextResponse.json({ message: "Not found", statusCode: 404 }, { status: 404 });
 }
 
@@ -369,6 +402,121 @@ export async function POST(req: NextRequest, { params }: { params: { slug: strin
   // 3. User Logout (/auth/logout)
   if (path === "auth/logout") {
     return NextResponse.json({ success: true, message: "Logged out successfully." });
+  }
+
+  // 3a. Forgot Password (/auth/forgot-password)
+  if (path === "auth/forgot-password") {
+    const body = await req.json().catch(() => ({}));
+    const email = (body.email || "").trim().toLowerCase();
+
+    // Client identifier for rate limiting (IP or email)
+    const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "ip-local";
+    const rateLimitKey = `${clientIp}:${email}`;
+    const now = Date.now();
+    const windowMs = 15 * 60 * 1000; // 15 mins
+    const maxAttempts = 5;
+
+    const rateRecord = resetRateLimits.get(rateLimitKey);
+    if (rateRecord && now - rateRecord.firstRequest < windowMs) {
+      if (rateRecord.count >= maxAttempts) {
+        return NextResponse.json(
+          { message: "Too many password reset requests. Please try again later.", statusCode: 429, error: "Too Many Requests" },
+          { status: 429 }
+        );
+      }
+      rateRecord.count += 1;
+    } else {
+      resetRateLimits.set(rateLimitKey, { count: 1, firstRequest: now });
+    }
+
+    // Lookup user without revealing existence
+    let foundUser: ServerUser | undefined;
+    if (email) {
+      for (const u of Array.from(users.values())) {
+        if (u.email.toLowerCase() === email) {
+          foundUser = u;
+          break;
+        }
+      }
+    }
+
+    if (foundUser) {
+      // Generate secure 32-byte single-use random token
+      const rawToken = crypto.randomBytes(32).toString("hex");
+      // Store ONLY the SHA-256 hash of the token
+      const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
+      const expiresAt = new Date(Date.now() + 30 * 60 * 1000).toISOString();
+
+      passwordResets.set(tokenHash, {
+        id: "rst-" + crypto.randomBytes(8).toString("hex"),
+        userId: foundUser.id,
+        tokenHash,
+        expiresAt,
+        used: false,
+        createdAt: new Date().toISOString(),
+      });
+    }
+
+    // Always return generic success message to prevent account enumeration
+    return NextResponse.json({
+      message: "If an account exists for this email, you will receive a password reset link.",
+    });
+  }
+
+  // 3b. Reset Password (/auth/reset-password)
+  if (path === "auth/reset-password") {
+    const body = await req.json().catch(() => ({}));
+    const token = (body.token || "").trim();
+    const newPassword = body.newPassword || "";
+
+    if (!token || !newPassword) {
+      return NextResponse.json(
+        { message: "Reset token and new password are required.", statusCode: 400, error: "Bad Request" },
+        { status: 400 }
+      );
+    }
+
+    if (newPassword.length < 6) {
+      return NextResponse.json(
+        { message: "Password must be at least 6 characters.", statusCode: 400, error: "Bad Request" },
+        { status: 400 }
+      );
+    }
+
+    // SHA-256 hash of provided token
+    const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
+    const resetRecord = passwordResets.get(tokenHash);
+
+    if (!resetRecord || resetRecord.used) {
+      return NextResponse.json(
+        { message: "Invalid or expired password reset token.", statusCode: 400, error: "Bad Request" },
+        { status: 400 }
+      );
+    }
+
+    if (new Date(resetRecord.expiresAt).getTime() < Date.now()) {
+      return NextResponse.json(
+        { message: "Password reset token has expired. Please request a new one.", statusCode: 400, error: "Bad Request" },
+        { status: 400 }
+      );
+    }
+
+    const user = users.get(resetRecord.userId);
+    if (!user) {
+      return NextResponse.json(
+        { message: "Invalid or expired password reset token.", statusCode: 400, error: "Bad Request" },
+        { status: 400 }
+      );
+    }
+
+    // Update password using standard hash
+    user.passwordHash = hashPassword(newPassword);
+    // Invalidate token (single-use)
+    resetRecord.used = true;
+
+    return NextResponse.json({
+      message: "Password has been successfully reset. You can now sign in with your new password.",
+    });
   }
 
   // 4. Cast Vote (/polls/:id/votes)

@@ -42,6 +42,7 @@ export interface Contestant {
   isTaskWinner?: boolean;
   taskTitle?: string;
   taskStatus?: TaskStatus;
+  isCaptaincyContender?: boolean;
   isEliminated?: boolean;
   eliminatedAt?: Date;
   eliminationReason?: string;
@@ -175,6 +176,16 @@ export interface AuditLog {
   createdAt: Date;
 }
 
+export interface PasswordReset {
+  id: string;
+  userId: string;
+  tokenHash: string;
+  expiresAt: Date;
+  used: boolean;
+  createdAt: Date;
+  clientIpHash?: string;
+}
+
 @Injectable()
 export class DatabaseService implements OnModuleInit {
   public users: Map<string, User> = new Map();
@@ -189,6 +200,7 @@ export class DatabaseService implements OnModuleInit {
   public news: Map<string, NewsItem> = new Map();
   public memes: Map<string, Meme> = new Map();
   public reports: Map<string, Report> = new Map();
+  public passwordResets: Map<string, PasswordReset> = new Map();
   public auditLogs: AuditLog[] = [];
 
   // Unique constraint indexes for instant, race-condition safe lookups
@@ -896,11 +908,23 @@ export class DatabaseService implements OnModuleInit {
       },
     ];
 
+    const captaincyContenderIds = new Set([
+      "c-04", // Thrigun
+      "c-16", // Singer Jhansi
+      "c-12", // Aman
+      "c-14", // Shalini
+      "c-05", // Mukesh Gowda
+      "c-01", // Debjani Modak
+      "c-02", // Auto Ram Prasad
+      "c-11", // Rohit Naidu
+    ]);
+
     for (const c of contestantsList) {
       c.zone = "NORMAL";
       c.isHighRiskZone = false;
       c.isHighZone = false;
       c.isHousemate = true;
+      c.isCaptaincyContender = captaincyContenderIds.has(c.id);
       this.contestants.set(c.id, c);
     }
 
@@ -1011,6 +1035,20 @@ export class DatabaseService implements OnModuleInit {
 
     // 4. Official Season 10 News Dispatches (Week 2 Updates + Historical Stories)
     const newsItems: NewsItem[] = [
+      {
+        id: "news-w02-captaincy",
+        title: "Captaincy Contenders Selected Through Audience Votes",
+        slug: "captaincy-contenders-selected-through-audience-votes",
+        summary: "For the first time, the audience selected the Week 2 captaincy contenders through public votes.",
+        content: "For the first time, the audience selected the Week 2 captaincy contenders through public votes. Eight housemates have secured their spots in the captaincy battle: Thrigun, Singer Jhansi, Aman, Shalini, Mukesh Gowda, Debjani Modak, Auto Ram Prasad, and Rohit Naidu. These contenders will now compete in upcoming captaincy tasks to determine who takes charge of the Bigg Boss Telugu house for Week 2.",
+        category: "Captaincy",
+        imageUrl: "/images/contestants/thrigun.webp",
+        viewsCount: 0,
+        isTrending: true,
+        isPublished: true,
+        publishedAt: new Date(Date.now() - 1000 * 60 * 15),
+        createdAt: new Date(Date.now() - 1000 * 60 * 15),
+      },
       {
         id: "news-w02-01",
         title: "Shalini vs Varshini: Big Fight",

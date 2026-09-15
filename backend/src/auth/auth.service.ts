@@ -4,6 +4,7 @@ import {
   ConflictException,
   ForbiddenException,
   NotFoundException,
+  BadRequestException,
   HttpException,
   HttpStatus,
 } from "@nestjs/common";
@@ -23,6 +24,8 @@ export class AuthService {
   private readonly jwtSecret = process.env.JWT_SECRET || "bb_super_secret_jwt_key_2026";
   // Rate limiting / brute-force protection: identifier -> { count, lockedUntil }
   private failedLoginAttempts: Map<string, { count: number; lockedUntil: number }> = new Map();
+  // Password reset rate limiting: identifier -> { count, firstRequest }
+  private resetRateLimits: Map<string, { count: number; firstRequest: number }> = new Map();
 
   constructor(private readonly db: DatabaseService) {}
 
@@ -232,5 +235,125 @@ export class AuthService {
         badges: ["Early Pioneer", "House Insider", "Top Debater"],
       },
     };
+  }
+
+  public async forgotPassword(
+    dto: { email: string },
+    clientIdentifier?: string,
+  ): Promise<{ message: string; _testToken?: string }> {
+    const identifier = (clientIdentifier || dto.email || "").trim().toLowerCase();
+    const now = Date.now();
+    const windowMs = 15 * 60 * 1000; // 15 mins
+    const maxAttempts = 5;
+
+    const rateRecord = this.resetRateLimits.get(identifier);
+    if (rateRecord && now - rateRecord.firstRequest < windowMs) {
+      if (rateRecord.count >= maxAttempts) {
+        throw new HttpException(
+          {
+            statusCode: HttpStatus.TOO_MANY_REQUESTS,
+            error: "Too Many Requests",
+            message: "Too many password reset requests. Please try again later.",
+          },
+          HttpStatus.TOO_MANY_REQUESTS,
+        );
+      }
+      rateRecord.count += 1;
+    } else {
+      this.resetRateLimits.set(identifier, { count: 1, firstRequest: now });
+    }
+
+    const email = dto.email.trim().toLowerCase();
+    let foundUser: User | undefined;
+    for (const u of this.db.users.values()) {
+      if (u.email.toLowerCase() === email) {
+        foundUser = u;
+        break;
+      }
+    }
+
+    let testToken: string | undefined;
+
+    if (foundUser) {
+      // 1. Generate a secure, random single-use reset token (32 bytes = 64 hex chars)
+      const rawToken = crypto.randomBytes(32).toString("hex");
+      // 2. Store ONLY the SHA-256 hash of the token
+      const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
+      // 3. 30-minute expiry
+      const expiresAt = new Date(Date.now() + 30 * 60 * 1000);
+
+      this.db.passwordResets.set(tokenHash, {
+        id: uuidv4(),
+        userId: foundUser.id,
+        tokenHash,
+        expiresAt,
+        used: false,
+        createdAt: new Date(),
+      });
+
+      testToken = rawToken;
+    }
+
+    // Always return generic success message to prevent email enumeration
+    return {
+      message: "If an account exists for this email, you will receive a password reset link.",
+      _testToken: testToken,
+    };
+  }
+
+  public async resetPassword(dto: {
+    token: string;
+    newPassword: string;
+  }): Promise<{ message: string }> {
+    const token = (dto.token || "").trim();
+    const newPassword = dto.newPassword || "";
+
+    if (!token || !newPassword) {
+      throw new BadRequestException("Reset token and new password are required.");
+    }
+
+    if (newPassword.length < 6) {
+      throw new BadRequestException("Password must be at least 6 characters.");
+    }
+
+    // SHA-256 hash of the candidate token
+    const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
+    const resetRecord = this.db.passwordResets.get(tokenHash);
+
+    if (!resetRecord || resetRecord.used) {
+      throw new BadRequestException("Invalid or expired password reset token.");
+    }
+
+    if (resetRecord.expiresAt.getTime() < Date.now()) {
+      throw new BadRequestException("Password reset token has expired. Please request a new one.");
+    }
+
+    const user = this.db.users.get(resetRecord.userId);
+    if (!user) {
+      throw new BadRequestException("Invalid or expired password reset token.");
+    }
+
+    // Hash new password using existing mechanism
+    user.passwordHash = this.hashPassword(newPassword);
+    // Invalidate token (single-use)
+    resetRecord.used = true;
+
+    // Clear any brute-force lockout on user account
+    this.failedLoginAttempts.delete(user.email.toLowerCase());
+    this.failedLoginAttempts.delete(user.username.toLowerCase());
+
+    return {
+      message: "Password has been successfully reset. You can now sign in with your new password.",
+    };
+  }
+
+  public verifyResetToken(token: string): { valid: boolean } {
+    if (!token) return { valid: false };
+    const tokenHash = crypto.createHash("sha256").update(token.trim()).digest("hex");
+    const record = this.db.passwordResets.get(tokenHash);
+    if (!record || record.used || record.expiresAt.getTime() < Date.now()) {
+      return { valid: false };
+    }
+    return { valid: true };
   }
 }

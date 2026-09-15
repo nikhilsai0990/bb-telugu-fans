@@ -1,7 +1,7 @@
-import { Controller, Post, Get, Body, Res, Req, UseGuards, HttpStatus } from "@nestjs/common";
+import { Controller, Post, Get, Body, Res, Req, Query, UseGuards, HttpStatus } from "@nestjs/common";
 import { Response, Request } from "express";
 import { AuthService } from "./auth.service";
-import { RegisterDto, LoginDto, GoogleLoginDto } from "./dto/auth.dto";
+import { RegisterDto, LoginDto, GoogleLoginDto, ForgotPasswordDto, ResetPasswordDto } from "./dto/auth.dto";
 import { AuthGuard, CurrentUser } from "./auth.guard";
 import { TokenPayload } from "./auth.service";
 
@@ -55,5 +55,23 @@ export class AuthController {
   async logout(@Res({ passthrough: true }) res: Response) {
     res.clearCookie("access_token");
     return { success: true, message: "Logged out successfully" };
+  }
+
+  @Post("forgot-password")
+  async forgotPassword(@Body() dto: ForgotPasswordDto, @Req() req: Request) {
+    const clientIp = (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() || req.ip;
+    const result = await this.authService.forgotPassword(dto, clientIp);
+    // Never reveal raw token in production API response
+    return { message: result.message };
+  }
+
+  @Post("reset-password")
+  async resetPassword(@Body() dto: ResetPasswordDto) {
+    return this.authService.resetPassword(dto);
+  }
+
+  @Get("verify-reset-token")
+  async verifyResetToken(@Query("token") token: string) {
+    return this.authService.verifyResetToken(token);
   }
 }

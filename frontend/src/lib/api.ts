@@ -38,6 +38,7 @@ export const fallbackContestants: Contestant[] = [
     isHousemate: true,
     isTaskWinner: true,
     taskTitle: "TASK WINNER",
+    isCaptaincyContender: true,
     avatarUrl: "/images/contestants/rohit-naidu.webp",
     bio: "Product Manager • Commoner and Task Winner, navigating the house with strategic composure and athletic dedication.",
     occupation: "Product Manager • Commoner",
@@ -68,6 +69,7 @@ export const fallbackContestants: Contestant[] = [
     team: "RED",
     role: "PLAYER",
     isHousemate: true,
+    isCaptaincyContender: true,
     zone: "NORMAL",
     isHighRiskZone: false,
     isHighZone: false,
@@ -104,6 +106,7 @@ export const fallbackContestants: Contestant[] = [
     isHighRiskZone: false,
     isHighZone: false,
     isHousemate: true,
+    isCaptaincyContender: true,
     avatarUrl: "/images/contestants/shalini.webp",
     bio: "Commoner voicing unfiltered perspectives as an active housemate.",
     occupation: "Commoner",
@@ -137,6 +140,7 @@ export const fallbackContestants: Contestant[] = [
     isHighRiskZone: false,
     isHighZone: false,
     isHousemate: true,
+    isCaptaincyContender: true,
     avatarUrl: "/images/contestants/singer-jhansi.webp",
     bio: "Singer • Commoner infusing the house with cultural resonance, melody, and authenticity.",
     occupation: "Singer • Commoner",
@@ -312,6 +316,7 @@ export const fallbackContestants: Contestant[] = [
     isHousemate: true,
     isTaskWinner: true,
     taskTitle: "TASK WINNER",
+    isCaptaincyContender: true,
     avatarUrl: "/images/contestants/auto-ram-prasad.webp",
     bio: "Celebrated Jabardasth punchline king and Task Winner, competing as an active housemate.",
     occupation: "Stand-up Comedian & Writer",
@@ -345,6 +350,7 @@ export const fallbackContestants: Contestant[] = [
     isHighRiskZone: false,
     isHighZone: false,
     isHousemate: true,
+    isCaptaincyContender: true,
     avatarUrl: "/images/contestants/thrigun.webp",
     bio: "Dynamic Tollywood actor bringing physical stamina and dedication to the house.",
     occupation: "Film Actor",
@@ -378,6 +384,7 @@ export const fallbackContestants: Contestant[] = [
     isHighRiskZone: false,
     isHighZone: false,
     isHousemate: true,
+    isCaptaincyContender: true,
     avatarUrl: "/images/contestants/mukesh-gowda.webp",
     bio: "Beloved television actor bringing dignified strength and poise to the game.",
     occupation: "Television Actor",
@@ -510,6 +517,7 @@ export const fallbackContestants: Contestant[] = [
     isHighRiskZone: false,
     isHighZone: false,
     isHousemate: true,
+    isCaptaincyContender: true,
     avatarUrl: "/images/contestants/debjani-modak.webp",
     bio: "Graceful television serial actress competing in the house with determination.",
     occupation: "Television Actress",
@@ -685,6 +693,20 @@ export const fallbackPolls: Poll[] = [
 
 // Fallback News — Week 2 Updates + 5 Historical Stories
 export const fallbackNews: NewsItem[] = [
+  {
+    id: "news-w02-captaincy",
+    title: "Captaincy Contenders Selected Through Audience Votes",
+    slug: "captaincy-contenders-selected-through-audience-votes",
+    summary: "For the first time, the audience selected the Week 2 captaincy contenders through public votes.",
+    content: "For the first time, the audience selected the Week 2 captaincy contenders through public votes. Eight housemates have secured their spots in the captaincy battle: Thrigun, Singer Jhansi, Aman, Shalini, Mukesh Gowda, Debjani Modak, Auto Ram Prasad, and Rohit Naidu. These contenders will now compete in upcoming captaincy tasks to determine who takes charge of the Bigg Boss Telugu house for Week 2.",
+    category: "Captaincy",
+    imageUrl: "/images/contestants/thrigun.webp",
+    viewsCount: 0,
+    isTrending: true,
+    isPublished: true,
+    publishedAt: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
+    createdAt: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
+  },
   {
     id: "news-w02-01",
     title: "Shalini vs Varshini: Big Fight",
@@ -1121,5 +1143,32 @@ export const api = {
         peakConcurrentUsers: 2410,
       },
     };
+  },
+
+  // Password Recovery
+  async forgotPassword(email: string): Promise<{ message: string }> {
+    const res = await fetch(`${API_BASE}/auth/forgot-password`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(data.message || "Unable to process password reset request.");
+    }
+    return data;
+  },
+
+  async resetPassword(token: string, newPassword: string): Promise<{ message: string }> {
+    const res = await fetch(`${API_BASE}/auth/reset-password`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token, newPassword }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(data.message || "Failed to reset password.");
+    }
+    return data;
   },
 };

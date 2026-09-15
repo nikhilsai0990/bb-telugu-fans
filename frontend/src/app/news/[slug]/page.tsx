@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, MessageSquare, AlertCircle, CheckCircle, Vote } from "lucide-react";
+import { ArrowLeft, MessageSquare, AlertCircle, CheckCircle, Vote, Crown } from "lucide-react";
 import { api } from "../../../lib/api";
 
 export default async function NewsDetailPage({
@@ -13,6 +13,9 @@ export default async function NewsDetailPage({
   if (!article) notFound();
 
   const isHighZone = article.slug.includes("high-zone") || article.slug.includes("high-risk");
+  const isCaptaincy =
+    article.slug.includes("captaincy-contenders") ||
+    article.title.toLowerCase().includes("captaincy contenders");
 
   return (
     <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 space-y-8">
@@ -50,13 +53,62 @@ export default async function NewsDetailPage({
       </div>
 
       {/* Featured Media */}
-      <div className="rounded-xl overflow-hidden border border-white/[0.1] aspect-[16/10] sm:aspect-[3/2] w-full bg-black">
-        <img
-          src={article.imageUrl || (isHighZone ? "/images/contestants/aman.webp" : "/images/contestants/debjani-modak.webp")}
-          alt={article.title}
-          className="w-full h-full object-cover object-[center_20%]"
-        />
-      </div>
+      {!isCaptaincy && (
+        <div className="rounded-xl overflow-hidden border border-white/[0.1] aspect-[16/10] sm:aspect-[3/2] w-full bg-black">
+          <img
+            src={article.imageUrl || (isHighZone ? "/images/contestants/aman.webp" : "/images/contestants/debjani-modak.webp")}
+            alt={article.title}
+            className="w-full h-full object-cover object-[center_20%]"
+          />
+        </div>
+      )}
+
+      {/* Captaincy 8-Contenders Showcase */}
+      {isCaptaincy && (
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 text-bb-gold border-b border-white/10 pb-2">
+            <Crown className="w-5 h-5 text-bb-gold" />
+            <h2 className="font-display text-xl sm:text-2xl uppercase tracking-wide text-white">
+              8 Audience-Selected Captaincy Contenders
+            </h2>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5 sm:gap-4">
+            {[
+              { name: "Thrigun", image: "/images/contestants/thrigun.webp", slug: "thrigun" },
+              { name: "Singer Jhansi", image: "/images/contestants/singer-jhansi.webp", slug: "singer-jhansi" },
+              { name: "Aman", image: "/images/contestants/aman.webp", slug: "aman" },
+              { name: "Shalini", image: "/images/contestants/shalini.webp", slug: "shalini" },
+              { name: "Mukesh Gowda", image: "/images/contestants/mukesh-gowda.webp", slug: "mukesh-gowda" },
+              { name: "Debjani Modak", image: "/images/contestants/debjani-modak.webp", slug: "debjani-modak" },
+              { name: "Auto Ram Prasad", image: "/images/contestants/auto-ram-prasad.webp", slug: "auto-ram-prasad" },
+              { name: "Rohit Naidu", image: "/images/contestants/rohit-naidu.webp", slug: "rohit-naidu" },
+            ].map((c) => (
+              <Link
+                key={c.slug}
+                href={`/contestants/${c.slug}`}
+                className="group relative rounded-lg overflow-hidden border border-white/10 hover:border-bb-gold/60 transition-all bg-black flex flex-col"
+              >
+                <div className="relative aspect-[4/5] w-full overflow-hidden bg-black">
+                  <img
+                    src={c.image}
+                    alt={c.name}
+                    className="w-full h-full object-cover object-top filter brightness-95 group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent" />
+                  <span className="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-bb-gold text-black text-[9px] font-black uppercase tracking-wider shadow">
+                    CONTENDER
+                  </span>
+                </div>
+                <div className="p-2.5 bg-[#14151D] text-center border-t border-white/10">
+                  <h4 className="font-display text-sm uppercase tracking-wide text-white group-hover:text-bb-gold transition-colors truncate">
+                    {c.name}
+                  </h4>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Content Body */}
       <div className="editorial-panel rounded-xl p-6 sm:p-10 border border-white/[0.08] space-y-6 text-zinc-300 text-base sm:text-lg leading-relaxed whitespace-pre-line">

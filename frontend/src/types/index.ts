@@ -25,6 +25,7 @@ export interface Contestant {
   isTaskWinner?: boolean;
   taskTitle?: string;
   taskStatus?: TaskStatus;
+  isCaptaincyContender?: boolean;
   isEliminated?: boolean;
   eliminatedAt?: string;
   eliminationReason?: string;

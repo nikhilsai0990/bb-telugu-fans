@@ -200,10 +200,11 @@ describe("Season 10 Authoritative Game State Tests", () => {
     }
   });
 
-  it("15. Latest News contains all 7 official stories (2 Week 2 + 5 historical)", () => {
+  it("15. Latest News contains all 8 official stories (3 Week 2 + 5 historical)", () => {
     const news = Array.from(db.news.values());
-    expect(news.length).toBe(7);
+    expect(news.length).toBe(8);
     const titles = news.map((n) => n.title);
+    expect(titles.some((t) => t.includes("Captaincy Contenders Selected Through Audience Votes"))).toBe(true);
     expect(titles.some((t) => t.includes("Shalini vs Varshini: Big Fight"))).toBe(true);
     expect(titles.some((t) => t.includes("Sudheer & Thrigun During Nominations"))).toBe(true);
     expect(titles.some((t) => t.includes("No Elimination on Sunday"))).toBe(true);
@@ -211,6 +212,19 @@ describe("Season 10 Authoritative Game State Tests", () => {
     expect(titles.some((t) => t.includes("Sudheer Kumar Reddy won"))).toBe(true);
     expect(titles.some((t) => t.includes("Krishnudu's team won the task"))).toBe(true);
     expect(titles.some((t) => t.includes("No re-entry for Chaitra Rai and Charan"))).toBe(true);
+  });
+
+  it("15b. Exactly 8 contestants are marked as Captaincy Contenders", () => {
+    const all = Array.from(db.contestants.values());
+    const contenders = all.filter((c) => c.isCaptaincyContender);
+    expect(contenders.length).toBe(8);
+    const expectedIds = ["c-04", "c-16", "c-12", "c-14", "c-05", "c-01", "c-02", "c-11"].sort();
+    const actualIds = contenders.map((c) => c.id).sort();
+    expect(actualIds).toEqual(expectedIds);
+
+    // Verify eliminated contestants are NOT captaincy contenders
+    expect(db.contestants.get("c-13")?.isCaptaincyContender).toBeFalsy();
+    expect(db.contestants.get("c-10")?.isCaptaincyContender).toBeFalsy();
   });
 
   it("16. User cannot vote more than once per day when poll is active", async () => {

@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { Newspaper, ArrowRight, AlertCircle, CheckCircle } from "lucide-react";
+import { Newspaper, ArrowRight, AlertCircle, CheckCircle, Crown } from "lucide-react";
 import { NewsItem } from "../types";
 
 export const TodayHighlights: React.FC<{ news: NewsItem[] }> = ({ news }) => {
@@ -35,6 +35,9 @@ export const TodayHighlights: React.FC<{ news: NewsItem[] }> = ({ news }) => {
         {/* 5-Story Editorial Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
           {news.slice(0, 5).map((item, idx) => {
+            const isCaptaincyContenders =
+              item.slug.includes("captaincy-contenders") ||
+              item.title.toLowerCase().includes("captaincy contenders");
             const isShaliniVarshini =
               item.slug.includes("shalini") ||
               item.slug.includes("varshini") ||
@@ -68,7 +71,37 @@ export const TodayHighlights: React.FC<{ news: NewsItem[] }> = ({ news }) => {
               >
                 {/* Contestant Portrait Side */}
                 <div className={`sm:w-2/5 relative ${idx === 0 ? "h-64 sm:h-auto" : "h-52 sm:h-auto"} min-h-[200px] bg-black flex-shrink-0 overflow-hidden`}>
-                  {isShaliniVarshini ? (
+                  {isCaptaincyContenders ? (
+                    <div className="grid grid-cols-4 grid-rows-2 h-full w-full relative bg-zinc-950 p-1.5 gap-1.5">
+                      {[
+                        { name: "Thrigun", image: "/images/contestants/thrigun.webp" },
+                        { name: "Jhansi", image: "/images/contestants/singer-jhansi.webp" },
+                        { name: "Aman", image: "/images/contestants/aman.webp" },
+                        { name: "Shalini", image: "/images/contestants/shalini.webp" },
+                        { name: "Mukesh", image: "/images/contestants/mukesh-gowda.webp" },
+                        { name: "Debjani", image: "/images/contestants/debjani-modak.webp" },
+                        { name: "Ram Prasad", image: "/images/contestants/auto-ram-prasad.webp" },
+                        { name: "Rohit", image: "/images/contestants/rohit-naidu.webp" },
+                      ].map((c) => (
+                        <div key={c.name} className="relative rounded overflow-hidden border border-white/10 bg-black flex flex-col justify-end group/contender">
+                          <img
+                            src={c.image}
+                            alt={c.name}
+                            className="absolute inset-0 w-full h-full object-cover object-top filter brightness-95 group-hover/contender:scale-105 transition-transform"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
+                          <span className="relative z-10 text-[9px] font-black uppercase tracking-tight text-white px-0.5 pb-0.5 truncate text-center leading-none">
+                            {c.name}
+                          </span>
+                        </div>
+                      ))}
+                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-none">
+                        <span className="px-2 py-0.5 rounded-full bg-bb-gold text-black font-black text-[9px] tracking-wider border border-white/50 shadow-xl flex items-center gap-1">
+                          <Crown className="w-2.5 h-2.5" /> 8 CONTENDERS
+                        </span>
+                      </div>
+                    </div>
+                  ) : isShaliniVarshini ? (
                     <div className="grid grid-cols-2 h-full w-full relative">
                       {/* Left: Shalini */}
                       <div className="relative h-full overflow-hidden">
@@ -159,7 +192,12 @@ export const TodayHighlights: React.FC<{ news: NewsItem[] }> = ({ news }) => {
 
                   {/* Clarification or Read Link */}
                   <div className="pt-2 border-t border-white/[0.06] flex items-center justify-between text-xs">
-                    {isShaliniVarshini ? (
+                    {isCaptaincyContenders ? (
+                      <span className="text-[10px] font-bold text-bb-gold uppercase tracking-tight flex items-center gap-1">
+                        <Crown className="w-3.5 h-3.5 text-bb-gold" />
+                        8 Contenders Selected &bull; Audience Public Votes
+                      </span>
+                    ) : isShaliniVarshini ? (
                       <span className="text-[10px] font-bold text-red-400 uppercase tracking-tight flex items-center gap-1">
                         <AlertCircle className="w-3.5 h-3.5 text-red-400" />
                         Big Fight &bull; House Confrontation

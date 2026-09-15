@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { Trophy, AlertCircle, ArrowUpRight, Shield } from "lucide-react";
+import { Trophy, Crown, AlertCircle, ArrowUpRight, Shield } from "lucide-react";
 import { Contestant } from "../types";
 
 export const TeamVsSection: React.FC<{ contestants: Contestant[] }> = ({ contestants }) => {
@@ -33,6 +33,15 @@ export const TeamVsSection: React.FC<{ contestants: Contestant[] }> = ({ contest
       contestant.id === "c-02" ||
       contestant.id === "c-11" ||
       contestant.id === "c-07";
+
+    const isCaptaincyContender =
+      Boolean(contestant.isCaptaincyContender) ||
+      [
+        "c-04", "c-16", "c-12", "c-14", "c-05", "c-01", "c-02", "c-11",
+      ].includes(contestant.id) ||
+      [
+        "thrigun", "singer-jhansi", "aman", "shalini", "mukesh-gowda", "debjani-modak", "auto-ram-prasad", "rohit-naidu",
+      ].includes(contestant.slug);
 
     return (
       <Link
@@ -65,6 +74,11 @@ export const TeamVsSection: React.FC<{ contestants: Contestant[] }> = ({ contest
             {isTaskWinner && (
               <span className="px-1.5 py-0.2 rounded bg-emerald-600 text-white text-[9px] font-black uppercase tracking-tight flex items-center gap-1">
                 <Trophy className="w-2.5 h-2.5" /> TASK WINNER
+              </span>
+            )}
+            {isCaptaincyContender && !isEliminated && (
+              <span className="px-1.5 py-0.2 rounded bg-bb-gold/20 text-bb-gold border border-bb-gold/40 text-[9px] font-bold uppercase tracking-tight flex items-center gap-1">
+                <Crown className="w-2.5 h-2.5" /> CAPTAINCY CONTENDER
               </span>
             )}
           </div>

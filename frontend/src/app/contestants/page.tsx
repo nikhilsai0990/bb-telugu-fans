@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Search, AlertCircle, ArrowUpRight, Trophy } from "lucide-react";
+import { Search, AlertCircle, ArrowUpRight, Trophy, Crown } from "lucide-react";
 import { Contestant } from "../../types";
 import { api, fallbackContestants } from "../../lib/api";
 
@@ -132,6 +132,15 @@ export default function ContestantsPage() {
               contestant.id === "c-11" ||
               contestant.id === "c-07";
 
+            const isCaptaincyContender =
+              Boolean(contestant.isCaptaincyContender) ||
+              [
+                "c-04", "c-16", "c-12", "c-14", "c-05", "c-01", "c-02", "c-11",
+              ].includes(contestant.id) ||
+              [
+                "thrigun", "singer-jhansi", "aman", "shalini", "mukesh-gowda", "debjani-modak", "auto-ram-prasad", "rohit-naidu",
+              ].includes(contestant.slug);
+
             return (
               <Link
                 key={contestant.id}
@@ -168,6 +177,12 @@ export default function ContestantsPage() {
                       {isTaskWinner && (
                         <span className="px-2 py-0.5 rounded bg-emerald-600 text-white text-[9px] font-black uppercase tracking-wider flex items-center gap-1 shadow">
                           <Trophy className="w-2.5 h-2.5" /> TASK WINNER
+                        </span>
+                      )}
+
+                      {isCaptaincyContender && !isEliminated && (
+                        <span className="px-2 py-0.5 rounded bg-bb-gold/20 text-bb-gold border border-bb-gold/50 text-[9px] font-black uppercase tracking-wider flex items-center gap-1 shadow backdrop-blur-sm">
+                          <Crown className="w-2.5 h-2.5" /> CAPTAINCY CONTENDER
                         </span>
                       )}
                     </div>
